@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 from routers import posts
 from routers import users
 from routers import ai
+from models.base import Base, engine
+from models import user, post
 import os
 
 load_dotenv(dotenv_path='/workspaces/EraApp/backend/.env')
@@ -24,3 +26,5 @@ def health():
 app.include_router(posts.router, prefix="/posts", tags=["posts"])
 app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(ai.router, prefix="/ai", tags=["ai"])
+
+Base.metadata.create_all(bind=engine)

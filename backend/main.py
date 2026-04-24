@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from backend.routers import posts
+from routers import posts
+from routers import users
+from routers import ai
 import os
 
 load_dotenv(dotenv_path='/workspaces/EraApp/backend/.env')
@@ -20,3 +22,5 @@ def health():
     return {"status": "ok", "app": "Era"}
 
 app.include_router(posts.router, prefix="/posts", tags=["posts"])
+app.include_router(users.router, prefix="/users", tags=["users"])
+app.include_router(ai.router, prefix="/ai", tags=["ai"])

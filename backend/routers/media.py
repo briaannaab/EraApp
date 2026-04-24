@@ -17,9 +17,6 @@ router = APIRouter()
 @router.post("/upload/image")
 async def upload_image(file: UploadFile = File(...)):
     """Upload an image to Cloudinary."""
-    if not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="File must be an image")
-    
     contents = await file.read()
     result = cloudinary.uploader.upload(
         contents,
@@ -36,9 +33,6 @@ async def upload_image(file: UploadFile = File(...)):
 @router.post("/upload/video")
 async def upload_video(file: UploadFile = File(...)):
     """Upload a video to Cloudinary."""
-    if not file.content_type.startswith("video/"):
-        raise HTTPException(status_code=400, detail="File must be a video")
-    
     contents = await file.read()
     result = cloudinary.uploader.upload(
         contents,

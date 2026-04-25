@@ -42,21 +42,27 @@ class ApiService {
   }
 
   static Future<String?> uploadImage(Uint8List bytes, String filename) async {
-    final request = http.MultipartRequest(
-      'POST',
-      Uri.parse('$baseUrl/media/upload/image'),
-    );
-    request.files.add(http.MultipartFile.fromBytes(
-      'file',
-      bytes,
-      filename: filename,
-    ));
-    final response = await request.send();
-    if (response.statusCode == 200) {
+    try {
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/media/upload/image'),
+      );
+      request.files.add(http.MultipartFile.fromBytes(
+        'file',
+        bytes,
+        filename: filename,
+      ));
+      final response = await request.send();
       final body = await response.stream.bytesToString();
-      final data = jsonDecode(body);
-      return data['url'];
+      print('Upload status: ${response.statusCode}');
+      print('Upload body: $body');
+      if (response.statusCode == 200) {
+        final data = jsonDecode(body);
+        return data['url'];
+      }
+      return null;
+    } catch (e) {
+      print('Upload error: $e');
+      return null;
     }
-    return null;
   }
-}

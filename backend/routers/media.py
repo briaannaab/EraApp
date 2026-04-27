@@ -33,7 +33,8 @@ async def upload_image(file: UploadFile = File(...)):
     result = cloudinary.uploader.upload(
         contents,
         folder="era/images",
-        resource_type="auto"
+        resource_type="auto",
+        format="jpg" #Always convert to JPEG
     )
     return {
         "url": result["secure_url"],

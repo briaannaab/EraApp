@@ -87,6 +87,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showCreatePost(BuildContext context) {
     final controller = TextEditingController();
     Uint8List? selectedImageBytes;
+    Uint8List? selectedVideoBytes;
+    String? selectedVideoName;
 
     showModalBottomSheet(
       context: context,
@@ -123,31 +125,81 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(8),
                   child: Image.memory(selectedImageBytes!, height: 150, fit: BoxFit.cover),
                 ),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () async {
-                  final result = await FilePicker.platform.pickFiles(type: FileType.image);
-                  if (result != null && result.files.first.bytes != null) {
-                    setModalState(() {
-                      selectedImageBytes = result.files.first.bytes;
-                    });
-                  }
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              if (selectedVideoBytes != null)
+                Container(
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xFF333333)),
-                    borderRadius: BorderRadius.circular(4),
+                    color: const Color(0xFF2A2A2A),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
+                  child: Row(
                     children: [
-                      Icon(Icons.image_outlined, color: Colors.white54, size: 18),
-                      SizedBox(width: 6),
-                      Text('Photo', style: TextStyle(color: Colors.white54, fontSize: 13)),
+                      const Icon(Icons.videocam, color: Color(0xFFC9A84C)),
+                      const SizedBox(width: 8),
+                      Text(selectedVideoName ?? 'Video selected',
+                          style: const TextStyle(color: Colors.white54, fontSize: 13)),
                     ],
                   ),
                 ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      final result = await FilePicker.platform.pickFiles(type: FileType.image);
+                      if (result != null && result.files.first.bytes != null) {
+                        setModalState(() {
+                          selectedImageBytes = result.files.first.bytes;
+                          selectedVideoBytes = null;
+                          selectedVideoName = null;
+                        });
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFF333333)),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.image_outlined, color: Colors.white54, size: 18),
+                          SizedBox(width: 6),
+                          Text('Photo', style: TextStyle(color: Colors.white54, fontSize: 13)),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  GestureDetector(
+                    onTap: () async {
+                      final result = await FilePicker.platform.pickFiles(type: FileType.video);
+                      if (result != null && result.files.first.bytes != null) {
+                        setModalState(() {
+                          selectedVideoBytes = result.files.first.bytes;
+                          selectedVideoName = result.files.first.name;
+                          selectedImageBytes = null;
+                        });
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFF333333)),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.videocam_outlined, color: Colors.white54, size: 18),
+                          SizedBox(width: 6),
+                          Text('Video', style: TextStyle(color: Colors.white54, fontSize: 13)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
               SizedBox(
@@ -165,6 +217,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       mediaUrl = await ApiService.uploadImage(
                         selectedImageBytes!,
                         'post_image.jpg',
+                      );
+                    } else if (selectedVideoBytes != null) {
+                      mediaUrl = await ApiService.uploadVideo(
+                        selectedVideoBytes!,
+                        selectedVideoName ?? 'post_video.mp4',
                       );
                     }
                     await ApiService.createPost(
@@ -196,6 +253,11 @@ class _PostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isVideo = post['media_url'] != null &&
+        (post['media_url'].toString().contains('.mp4') ||
+         post['media_url'].toString().contains('.mov') ||
+         post['media_url'].toString().contains('video'));
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
@@ -232,15 +294,37 @@ class _PostCard extends StatelessWidget {
           if (post['media_url'] != null)
             Padding(
               padding: const EdgeInsets.only(top: 12),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  post['media_url'], 
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: 300
-                ),
-              ),
+              child: isVideo
+                  ? GestureDetector(
+                      onTap: () => _launchVideo(context, post['media_url']),
+                      child: Container(
+                        width: double.infinity,
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1A1A1A),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.play_circle_filled,
+                                color: Color(0xFFC9A84C), size: 56),
+                            SizedBox(height: 8),
+                            Text('Tap to play video',
+                                style: TextStyle(color: Colors.white54, fontSize: 13)),
+                          ],
+                        ),
+                      ),
+                    )
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        post['media_url'],
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: 300,
+                      ),
+                    ),
             ),
           const SizedBox(height: 12),
           Row(
@@ -272,6 +356,33 @@ class _PostCard extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  void _launchVideo(BuildContext context, String url) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Open video in browser?',
+                style: TextStyle(color: Colors.white)),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFC9A84C),
+                foregroundColor: Colors.black,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Open'),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -54,15 +54,13 @@ class ApiService {
       ));
       final response = await request.send();
       final body = await response.stream.bytesToString();
-      print('Upload status: ${response.statusCode}');
-      print('Upload body: $body');
       if (response.statusCode == 200) {
         final data = jsonDecode(body);
         return data['url'];
       }
       return null;
     } catch (e) {
-      print('Upload error: $e');
       return null;
     }
   }
+}

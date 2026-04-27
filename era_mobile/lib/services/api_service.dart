@@ -64,3 +64,25 @@ class ApiService {
     }
   }
 }
+static Future<String?> uploadVideo(Uint8List bytes, String filename) async {
+    try {
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/media/upload/video'),
+      );
+      request.files.add(http.MultipartFile.fromBytes(
+        'file',
+        bytes,
+        filename: filename,
+      ));
+      final response = await request.send();
+      final body = await response.stream.bytesToString();
+      if (response.statusCode == 200) {
+        final data = jsonDecode(body);
+        return data['url'];
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }

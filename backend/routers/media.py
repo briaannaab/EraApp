@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, HTTPException
 from dotenv import load_dotenv
 import cloudinary
 import cloudinary.uploader
@@ -40,4 +40,23 @@ async def upload_image(file: UploadFile = File(...)):
         "public_id": result["public_id"],
         "width": result.get("width"),
         "height": result.get("height")
+    }
+
+@router.post("/upload/video")
+async def upload_video(file: UploadFile = File(...)):
+    """Upload a video to Cloudinary."""
+    if not file.content_type.startswith("video/"):
+        raise HTTPException(status_code=400, detail="File must be a video")
+    
+    contents = await file.read()
+    result = cloudinary.uploader.upload(
+        contents,
+        folder="era/videos",
+        resource_type="video"
+    )
+    return {
+        "url": result["secure_url"],
+        "public_id": result["public_id"],
+        "duration": result.get("duration"),
+        "format": result["format"]
     }

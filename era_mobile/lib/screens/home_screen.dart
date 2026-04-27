@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 import '../services/api_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -295,27 +296,7 @@ class _PostCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 12),
               child: isVideo
-                  ? GestureDetector(
-                      onTap: () => _launchVideo(context, post['media_url']),
-                      child: Container(
-                        width: double.infinity,
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1A1A1A),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.play_circle_filled,
-                                color: Color(0xFFC9A84C), size: 56),
-                            SizedBox(height: 8),
-                            Text('Tap to play video',
-                                style: TextStyle(color: Colors.white54, fontSize: 13)),
-                          ],
-                        ),
-                      ),
-                    )
+                  ? _VideoPlayer(url: post['media_url'])
                   : ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: Image.network(
@@ -359,30 +340,63 @@ class _PostCard extends StatelessWidget {
       ),
     );
   }
+}
 
-  void _launchVideo(BuildContext context, String url) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Open video in browser?',
-                style: TextStyle(color: Colors.white)),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFC9A84C),
-                foregroundColor: Colors.black,
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Open'),
+class _VideoPlayer extends StatefulWidget {
+  final String url;
+  const _VideoPlayer({required this.url});
+
+  @override
+  State<_VideoPlayer> createState() => _VideoPlayerState();
+}
+
+class _VideoPlayerState extends State<_VideoPlayer> {
+  late VideoPlayerController _controller;
+  bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url))
+      ..initialize().then((_) {
+        setState(() => _initialized = true);
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_initialized) {
+      return const SizedBox(
+        height: 200,
+        child: Center(child: CircularProgressIndicator(color: Color(0xFFC9A84C))),
+      );
+    }
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _controller.value.isPlaying ? _controller.pause() : _controller.play();
+        });
+      },
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: AspectRatio(
+              aspectRatio: _controller.value.aspectRatio,
+              child: VideoPlayer(_controller),
             ),
-          ],
-        ),
+          ),
+          if (!_controller.value.isPlaying)
+            const Icon(Icons.play_circle_filled,
+                color: Color(0xFFC9A84C), size: 56),
+        ],
       ),
     );
   }

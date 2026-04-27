@@ -63,7 +63,7 @@ class ApiService {
       return null;
     }
   }
-}
+
 static Future<String?> uploadVideo(Uint8List bytes, String filename) async {
     try {
       final request = http.MultipartRequest(
@@ -86,3 +86,4 @@ static Future<String?> uploadVideo(Uint8List bytes, String filename) async {
       return null;
     }
   }
+}

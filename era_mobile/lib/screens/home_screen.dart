@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart';
 import '../services/api_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -351,53 +352,46 @@ class _VideoPlayer extends StatefulWidget {
 }
 
 class _VideoPlayerState extends State<_VideoPlayer> {
-  late VideoPlayerController _controller;
-  bool _initialized = false;
+  late VideoPlayerController _videoController;
+  ChewieController? _chewieController;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url))
+    _videoController = VideoPlayerController.networkUrl(Uri.parse(widget.url))
       ..initialize().then((_) {
-        setState(() => _initialized = true);
+        setState(() {
+          _chewieController = ChewieController(
+            videoPlayerController: _videoController,
+            autoPlay: false,
+            looping: false,
+            aspectRatio: _videoController.value.aspectRatio,
+            placeholder: const Center(
+              child: CircularProgressIndicator(color: Color(0xFFC9A84C)),
+            ),
+          );
+        });
       });
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _videoController.dispose();
+    _chewieController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_initialized) {
+    if (_chewieController == null) {
       return const SizedBox(
         height: 200,
         child: Center(child: CircularProgressIndicator(color: Color(0xFFC9A84C))),
       );
     }
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _controller.value.isPlaying ? _controller.pause() : _controller.play();
-        });
-      },
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: AspectRatio(
-              aspectRatio: _controller.value.aspectRatio,
-              child: VideoPlayer(_controller),
-            ),
-          ),
-          if (!_controller.value.isPlaying)
-            const Icon(Icons.play_circle_filled,
-                color: Color(0xFFC9A84C), size: 56),
-        ],
-      ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Chewie(controller: _chewieController!),
     );
   }
 }

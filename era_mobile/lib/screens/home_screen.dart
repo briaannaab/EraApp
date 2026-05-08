@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 import '../services/api_service.dart';
+import 'live_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -33,6 +34,62 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() => loading = false);
     }
   }
+  Widget _buildLiveBanner(BuildContext context) {
+  return GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LiveScreen(
+            channelName: "era_live_stream",
+            isBroadcaster: false, // They are joining to WATCH
+          ),
+        ),
+      );
+    },
+    child: Container(
+      margin: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFC9A84C), width: 1),
+      ),
+      child: Row(
+        children: [
+          const Stack(
+            alignment: Alignment.center,
+            children: [
+              Icon(Icons.circle, color: Colors.red, size: 12),
+              // Optional: You could add a pulsing animation here later
+            ],
+          ),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("LIVE NOW", 
+                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12)),
+                Text("Join the community era", 
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFFC9A84C),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Text("Watch", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -71,9 +128,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   onRefresh: loadPosts,
                   color: const Color(0xFFC9A84C),
                   child: ListView.builder(
-                    itemCount: posts.length,
+                    itemCount: posts.length + 1,
                     itemBuilder: (context, index) {
-                      final post = posts[index];
+                      if (index == 0){
+                        return _buildLiveBanner(context);
+                      }
+                      final post = posts[index - 1];
                       return _PostCard(post: post, onLike: loadPosts);
                     },
                   ),
@@ -86,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showCreatePost(BuildContext context) {
+   void _showCreatePost(BuildContext context) {
     final controller = TextEditingController();
     Uint8List? selectedImageBytes;
     Uint8List? selectedVideoBytes;
@@ -146,6 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 12),
               Row(
                 children: [
+                  // --- PHOTO BUTTON ---
                   GestureDetector(
                     onTap: () async {
                       final result = await FilePicker.platform.pickFiles(type: FileType.image);
@@ -174,6 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(width: 12),
+                  // --- VIDEO BUTTON ---
                   GestureDetector(
                     onTap: () async {
                       final result = await FilePicker.platform.pickFiles(type: FileType.video);
@@ -201,9 +263,41 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(width: 12),
+                  // --- LIVE BUTTON ---
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LiveScreen(
+                            channelName: "era_live_stream",
+                            isBroadcaster: true,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFFC9A84C)),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.sensors, color: Color(0xFFC9A84C), size: 18),
+                          SizedBox(width: 6),
+                          Text('Live', style: TextStyle(color: Color(0xFFC9A84C), fontSize: 13, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
+              // --- POST BUTTON ---
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -216,15 +310,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (controller.text.isEmpty) return;
                     String? mediaUrl;
                     if (selectedImageBytes != null) {
-                      mediaUrl = await ApiService.uploadImage(
-                        selectedImageBytes!,
-                        'post_image.jpg',
-                      );
+                      mediaUrl = await ApiService.uploadImage(selectedImageBytes!, 'post.jpg');
                     } else if (selectedVideoBytes != null) {
-                      mediaUrl = await ApiService.uploadVideo(
-                        selectedVideoBytes!,
-                        selectedVideoName ?? 'post_video.mp4',
-                      );
+                      mediaUrl = await ApiService.uploadVideo(selectedVideoBytes!, selectedVideoName ?? 'video.mp4');
                     }
                     await ApiService.createPost(
                       userId: 1,
@@ -245,7 +333,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-}
 
 class _PostCard extends StatelessWidget {
   final Map<String, dynamic> post;

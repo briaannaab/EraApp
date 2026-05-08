@@ -24,7 +24,7 @@ class EraApp extends StatelessWidget {
           surface: const Color(0xFF1A1A1A),
         ),
       ),
-      home: const HomeScreen(),
+      home: const AuthScreen(),
     );
   }
 }

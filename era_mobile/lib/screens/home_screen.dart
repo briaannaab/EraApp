@@ -333,6 +333,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
 
 class _PostCard extends StatelessWidget {
   final Map<String, dynamic> post;

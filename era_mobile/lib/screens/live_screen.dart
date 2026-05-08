@@ -4,7 +4,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 class LiveScreen extends StatefulWidget {
   final String channelName;
-  final bool isBroadcaster; // True for streamer, False for audience
+  final bool isBroadcaster;
 
   const LiveScreen({super.key, required this.channelName, required this.isBroadcaster});
 
@@ -24,17 +24,14 @@ class _LiveScreenState extends State<LiveScreen> {
   }
 
   Future<void> initAgora() async {
-    // 1. Request permissions
     await [Permission.microphone, Permission.camera].request();
 
-    // 2. Create the engine
     _engine = createAgoraRtcEngine();
     await _engine.initialize(const RtcEngineContext(
-      appId: "YOUR_APP_ID_HERE", // Get from Agora Console
+      appId: "33b01205033847599870ee46a71c41f3",
       channelProfile: ChannelProfileType.channelProfileLiveBroadcasting,
     ));
 
-    // 3. Set up event handlers
     _engine.registerEventHandler(
       RtcEngineEventHandler(
         onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
@@ -49,19 +46,19 @@ class _LiveScreenState extends State<LiveScreen> {
       ),
     );
 
-    // 4. Set Client Role
     await _engine.setClientRole(
-      role: widget.isBroadcaster ? ClientRoleType.clientRoleBroadcaster : ClientRoleType.clientRoleAudience,
+      role: widget.isBroadcaster
+          ? ClientRoleType.clientRoleBroadcaster
+          : ClientRoleType.clientRoleAudience,
     );
 
     await _engine.enableVideo();
     await _engine.startPreview();
 
-    // 5. Join Channel
     await _engine.joinChannel(
-      token: "YOUR_TEMP_TOKEN", // Use "" for testing if token is disabled
+      token: "",
       channelId: widget.channelName,
-      uid: 0, // 0 allows Agora to assign a random UID
+      uid: 0,
       options: const ChannelMediaOptions(),
     );
   }
@@ -72,24 +69,40 @@ class _LiveScreenState extends State<LiveScreen> {
     _engine.release();
     super.dispose();
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Live: ${widget.channelName}')),
+      backgroundColor: const Color(0xFF080808),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF080808),
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: Text(
+          '🔴 LIVE: ${widget.channelName}',
+          style: const TextStyle(
+            color: Color(0xFFC9A84C),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: Stack(
         children: [
-          Center(child: _remoteVideo()), // Remote user view
+          Center(child: _remoteVideo()),
           Align(
             alignment: Alignment.topLeft,
             child: SizedBox(
-              width: 100, height: 150,
-              child: Center(child: _localUserJoined ? AgoraVideoView(
-                controller: VideoViewController(
-                  rtcEngine: _engine,
-                  canvas: const VideoCanvas(uid: 0),
-                ),
-              ) : const CircularProgressIndicator()),
+              width: 100,
+              height: 150,
+              child: Center(
+                child: _localUserJoined
+                    ? AgoraVideoView(
+                        controller: VideoViewController(
+                          rtcEngine: _engine,
+                          canvas: const VideoCanvas(uid: 0),
+                        ),
+                      )
+                    : const CircularProgressIndicator(color: Color(0xFFC9A84C)),
+              ),
             ),
           ),
         ],
@@ -107,7 +120,11 @@ class _LiveScreenState extends State<LiveScreen> {
         ),
       );
     } else {
-      return const Text('Waiting for a broadcaster...', textAlign: TextAlign.center);
+      return const Text(
+        'Waiting for a broadcaster...',
+        textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.white54),
+      );
     }
   }
 }

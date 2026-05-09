@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from models.base import get_db
 from models.user import User
 from typing import Optional
+from models.post import Post
 
 router = APIRouter()
 
@@ -44,3 +45,23 @@ def follow_user(user_id: int, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(user)
     return user
+
+@router.get("/{username}/profile")
+def get_profile(username: str, db: Session = Depends(get_db)):
+    user =db.query(User). filter(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    posts = db.query(Post).filter(Post.username == username).order_by(Post.created_at.desc()).all()
+
+    return{
+    "id": user.id,
+    "username": user.username,
+    "bio": user.bio,
+    "is_creator": user.is_creator,
+    "followers": user.followers,
+    "following": user.following,
+    "tips_received": user.tips_received,
+    "post_count": len(posts),
+    "posts": posts
+}

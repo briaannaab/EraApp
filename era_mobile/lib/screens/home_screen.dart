@@ -356,7 +356,14 @@ class _PostCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+GestureDetector(
+  onTap: () => Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => ProfileScreen(username: post['username']),
+    ),
+  ),
+          child: Row(
             children: [
               CircleAvatar(
                 backgroundColor: const Color(0xFF2A1A4A),
@@ -378,6 +385,7 @@ class _PostCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
           const SizedBox(height: 12),
           Text(post['content'],
               style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.5)),

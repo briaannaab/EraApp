@@ -37,6 +37,7 @@ dependencies:
   chewie: ^1.8.0
   agora_rtc_engine: ^6.3.2
   permission_handler: ^11.3.1
+  shared_preferences: ^2.2.0
 
 dev_dependencies:
   flutter_test:

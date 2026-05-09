@@ -128,16 +128,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   onRefresh: loadPosts,
                   color: const Color(0xFFC9A84C),
                   child: ListView.builder(
-                    itemCount: posts.length + 1,
+                    itemCount: posts.length,
                     itemBuilder: (context, index) {
-                      if (index == 0){
-                        return _buildLiveBanner(context);
-                      }
-                      final post = posts[index - 1];
+                      //if (index == 0){
+                        //return _buildLiveBanner(context);
+                      
+                      final post = posts[index];
                       return _PostCard(post: post, onLike: loadPosts);
-                    },
+                    }
                   ),
-                ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFFC9A84C),
         onPressed: () => _showCreatePost(context),

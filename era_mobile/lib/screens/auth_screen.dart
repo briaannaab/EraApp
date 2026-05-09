@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../services/api_service.dart';
 import 'home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -36,6 +37,9 @@ class _AuthScreenState extends State<AuthScreen> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', data['access_token']);
+        await prefs.setString('username', data['user']['username']);
         // TODO: save token to storage
         if (mounted) {
           Navigator.pushReplacement(

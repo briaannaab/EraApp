@@ -64,7 +64,7 @@ class ApiService {
     }
   }
 
-static Future<String?> uploadVideo(Uint8List bytes, String filename) async {
+  static Future<String?> uploadVideo(Uint8List bytes, String filename) async {
     try {
       final request = http.MultipartRequest(
         'POST',
@@ -85,5 +85,32 @@ static Future<String?> uploadVideo(Uint8List bytes, String filename) async {
     } catch (e) {
       return null;
     }
+  }
+
+  static Future<List<dynamic>> getComments(int postId) async {
+    final response = await http.get(Uri.parse('$baseUrl/comments/$postId'));
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    return [];
+  }
+
+  static Future<Map<String, dynamic>> createComment({
+    required int postId,
+    required int userId,
+    required String username,
+    required String content,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/comments/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'post_id': postId,
+        'user_id': userId,
+        'username': username,
+        'content': content,
+      }),
+    );
+    return jsonDecode(response.body);
   }
 }

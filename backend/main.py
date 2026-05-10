@@ -10,6 +10,9 @@ from routers import payments
 from routers import media
 import os
 from routers import auth
+from models import user, post, comment
+from routers import comments
+
 
 
 load_dotenv(dotenv_path='/workspaces/EraApp/backend/.env')
@@ -34,5 +37,6 @@ app.include_router(ai.router, prefix="/ai", tags=["ai"])
 app.include_router(payments.router, prefix="/payments", tags=["payments"])
 app.include_router(media.router, prefix="/media", tags=["media"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
+app.include_router(comments.router, prefix="/comments", tags=["comments"])
 
 Base.metadata.create_all(bind=engine)

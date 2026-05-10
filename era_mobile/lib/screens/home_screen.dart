@@ -27,13 +27,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> loadPosts() async {
     try {
       final data = await ApiService.getPosts();
-      print('Posts Loaded: ${data.length}')
       setState(() {
         posts = data;
         loading = false;
       });
     } catch (e) {
-      print('Error loading posts: $e')
       setState(() => loading = false);
     }
   }
@@ -288,6 +286,8 @@ class _PostCard extends StatelessWidget {
          post['media_url'].toString().contains('.mov') ||
          post['media_url'].toString().contains('video'));
 
+    final username = (post['username'] ?? 'unknown') as String;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
@@ -300,7 +300,7 @@ class _PostCard extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ProfileScreen(username: post['username']),
+                builder: (context) => ProfileScreen(username: username),
               ),
             ),
             child: Row(
@@ -308,7 +308,7 @@ class _PostCard extends StatelessWidget {
                 CircleAvatar(
                   backgroundColor: const Color(0xFF2A1A4A),
                   child: Text(
-                    post['username'][0].toUpperCase(),
+                    username[0].toUpperCase(),
                     style: const TextStyle(color: Color(0xFFC9A84C)),
                   ),
                 ),
@@ -316,7 +316,7 @@ class _PostCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('@${post['username']}',
+                    Text('@$username',
                         style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold)),
                     Text(post['created_at'].toString().substring(0, 10),
@@ -327,22 +327,36 @@ class _PostCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Text(post['content'],
+          Text(post['content'] ?? '',
               style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.5)),
           if (post['media_url'] != null)
             Padding(
               padding: const EdgeInsets.only(top: 12),
               child: isVideo
-                  ? _VideoPlayer(url: post['media_url'])
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        post['media_url'],
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: 300,
-                      ),
-                    ),
+    ? Builder(
+        builder: (context) {
+          try {
+            return _VideoPlayer(url: post['media_url']);
+          } catch (e) {
+            return Container(
+              height: 200,
+              color: const Color(0xFF1A1A1A),
+              child: const Center(
+                child: Icon(Icons.videocam_off, color: Colors.white54),
+              ),
+            );
+          }
+        },
+      )
+    : ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.network(
+          post['media_url'],
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: 300,
+        ),
+      ),
             ),
           const SizedBox(height: 12),
           Row(
@@ -356,7 +370,7 @@ class _PostCard extends StatelessWidget {
                   children: [
                     const Icon(Icons.favorite_border, color: Colors.white38, size: 18),
                     const SizedBox(width: 4),
-                    Text('${post['likes']}',
+                    Text('${post['likes'] ?? 0}',
                         style: const TextStyle(color: Colors.white38, fontSize: 13)),
                   ],
                 ),
@@ -367,7 +381,7 @@ class _PostCard extends StatelessWidget {
                   const Icon(Icons.monetization_on_outlined,
                       color: Color(0xFFC9A84C), size: 18),
                   const SizedBox(width: 4),
-                  Text('\$${post['tips'].toStringAsFixed(2)}',
+                  Text('\$${(post['tips'] ?? 0.0).toStringAsFixed(2)}',
                       style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 13)),
                 ],
               ),
@@ -427,7 +441,10 @@ class _VideoPlayerState extends State<_VideoPlayer> {
     }
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
-      child: Chewie(controller: _chewieController!),
+      child: AspectRatio(
+        aspectRatio: _chewieController!.videoPlayerController.value.aspectRatio,
+        child: Chewie(controller: _chewieController!),
+      ),
     );
   }
 }

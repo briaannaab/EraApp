@@ -37,9 +37,6 @@ class _AuthScreenState extends State<AuthScreen> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', data['access_token']);
-        await prefs.setString('username', data['user']['username']);
         // TODO: save token to storage
         if (mounted) {
           Navigator.pushReplacement(
@@ -52,7 +49,7 @@ class _AuthScreenState extends State<AuthScreen> {
         setState(() { error = data['detail'] ?? 'Something went wrong'; });
       }
     } catch (e) {
-      setState(() { error = 'Connection error'; });
+      setState(() { error = 'Error: $e'; });
     } finally {
       setState(() { loading = false; });
     }

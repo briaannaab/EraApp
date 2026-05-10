@@ -5,6 +5,7 @@ import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 import '../services/api_service.dart';
 import 'live_screen.dart';
+import 'profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,70 +27,16 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> loadPosts() async {
     try {
       final data = await ApiService.getPosts();
+      print('Posts Loaded: ${data.length}')
       setState(() {
         posts = data;
         loading = false;
       });
     } catch (e) {
+      print('Error loading posts: $e')
       setState(() => loading = false);
     }
   }
-  Widget _buildLiveBanner(BuildContext context) {
-  return GestureDetector(
-    onTap: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const LiveScreen(
-            channelName: "era_live_stream",
-            isBroadcaster: false, // They are joining to WATCH
-          ),
-        ),
-      );
-    },
-    child: Container(
-      margin: const EdgeInsets.all(12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFC9A84C), width: 1),
-      ),
-      child: Row(
-        children: [
-          const Stack(
-            alignment: Alignment.center,
-            children: [
-              Icon(Icons.circle, color: Colors.red, size: 12),
-              // Optional: You could add a pulsing animation here later
-            ],
-          ),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("LIVE NOW", 
-                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12)),
-                Text("Join the community era", 
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFFC9A84C),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Text("Watch", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -130,13 +77,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: ListView.builder(
                     itemCount: posts.length,
                     itemBuilder: (context, index) {
-                      //if (index == 0){
-                        //return _buildLiveBanner(context);
-                      
                       final post = posts[index];
                       return _PostCard(post: post, onLike: loadPosts);
-                    }
+                    },
                   ),
+                ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFFC9A84C),
         onPressed: () => _showCreatePost(context),
@@ -145,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-   void _showCreatePost(BuildContext context) {
+  void _showCreatePost(BuildContext context) {
     final controller = TextEditingController();
     Uint8List? selectedImageBytes;
     Uint8List? selectedVideoBytes;
@@ -205,7 +150,6 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  // --- PHOTO BUTTON ---
                   GestureDetector(
                     onTap: () async {
                       final result = await FilePicker.platform.pickFiles(type: FileType.image);
@@ -234,7 +178,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  // --- VIDEO BUTTON ---
                   GestureDetector(
                     onTap: () async {
                       final result = await FilePicker.platform.pickFiles(type: FileType.video);
@@ -263,7 +206,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  // --- LIVE BUTTON ---
                   GestureDetector(
                     onTap: () {
                       Navigator.pop(context);
@@ -296,7 +238,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              // --- POST BUTTON ---
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -355,36 +296,36 @@ class _PostCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-GestureDetector(
-  onTap: () => Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => ProfileScreen(username: post['username']),
-    ),
-  ),
-          child: Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: const Color(0xFF2A1A4A),
-                child: Text(
-                  post['username'][0].toUpperCase(),
-                  style: const TextStyle(color: Color(0xFFC9A84C)),
+          GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileScreen(username: post['username']),
+              ),
+            ),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: const Color(0xFF2A1A4A),
+                  child: Text(
+                    post['username'][0].toUpperCase(),
+                    style: const TextStyle(color: Color(0xFFC9A84C)),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('@${post['username']}',
-                      style: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                  Text(post['created_at'].toString().substring(0, 10),
-                      style: const TextStyle(color: Colors.white38, fontSize: 12)),
-                ],
-              ),
-            ],
+                const SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('@${post['username']}',
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text(post['created_at'].toString().substring(0, 10),
+                        style: const TextStyle(color: Colors.white38, fontSize: 12)),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
           const SizedBox(height: 12),
           Text(post['content'],
               style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.5)),
@@ -490,4 +431,3 @@ class _VideoPlayerState extends State<_VideoPlayer> {
     );
   }
 }
-

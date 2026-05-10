@@ -1,10 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from models.base import get_db
 from models.user import User
 from passlib.context import CryptContext
-from jose import JWTError, jwt
+from jose import jwt
 from datetime import datetime, timedelta
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -14,11 +13,9 @@ load_dotenv(dotenv_path='/workspaces/EraApp/backend/.env')
 
 SECRET_KEY = os.getenv("JWT_SECRET", "era-super-secret-key")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
-
 router = APIRouter()
 
 class RegisterRequest(BaseModel):
@@ -28,10 +25,9 @@ class RegisterRequest(BaseModel):
     bio: str = ""
     is_creator: bool = False
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-    user: dict
+class LoginRequest(BaseModel):
+    username: str
+    password: str
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -71,7 +67,7 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
     }}
 
 @router.post("/login")
-def login(request: RegisterRequest, db: Session = Depends(get_db)):
+def login(request: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == request.username).first()
     if not user or not verify_password(request.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid username or password")

@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/auth_screen.dart';
-import 'screens/home_screen.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  final prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString('token');
-  runApp(EraApp(isLoggedIn: token != null));
+void main() {
+  runApp(const EraApp());
 }
 
 class EraApp extends StatelessWidget {
-  final bool isLoggedIn;
-  const EraApp({super.key, required this.isLoggedIn});
+  const EraApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +23,7 @@ class EraApp extends StatelessWidget {
           surface: Color(0xFF1A1A1A),
         ),
       ),
-      home: isLoggedIn ? const HomeScreen() : const AuthScreen(),
+      home: const AuthScreen(),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/auth_screen.dart';
+import 'screens/main_screen.dart';
 
 void main() {
   runApp(const EraApp());

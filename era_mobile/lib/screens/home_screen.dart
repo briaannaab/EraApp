@@ -6,6 +6,7 @@ import 'package:chewie/chewie.dart';
 import '../services/api_service.dart';
 import 'live_screen.dart';
 import 'profile_screen.dart';
+import 'comments_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -80,11 +81,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                 ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFFC9A84C),
-        onPressed: () => _showCreatePost(context),
-        child: const Icon(Icons.add, color: Colors.black),
-      ),
     );
   }
 
@@ -333,30 +329,30 @@ class _PostCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 12),
               child: isVideo
-    ? Builder(
-        builder: (context) {
-          try {
-            return _VideoPlayer(url: post['media_url']);
-          } catch (e) {
-            return Container(
-              height: 200,
-              color: const Color(0xFF1A1A1A),
-              child: const Center(
-                child: Icon(Icons.videocam_off, color: Colors.white54),
-              ),
-            );
-          }
-        },
-      )
-    : ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: Image.network(
-          post['media_url'],
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: 300,
-        ),
-      ),
+                  ? Builder(
+                      builder: (context) {
+                        try {
+                          return _VideoPlayer(url: post['media_url']);
+                        } catch (e) {
+                          return Container(
+                            height: 200,
+                            color: const Color(0xFF1A1A1A),
+                            child: const Center(
+                              child: Icon(Icons.videocam_off, color: Colors.white54),
+                            ),
+                          );
+                        }
+                      },
+                    )
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        post['media_url'],
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: 300,
+                      ),
+                    ),
             ),
           const SizedBox(height: 12),
           Row(
@@ -372,6 +368,22 @@ class _PostCard extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text('${post['likes'] ?? 0}',
                         style: const TextStyle(color: Colors.white38, fontSize: 13)),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 24),
+              GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CommentsScreen(post: post),
+                  ),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.comment_outlined, color: Colors.white38, size: 18),
+                    SizedBox(width: 4),
+                    Text('Comment', style: TextStyle(color: Colors.white38, fontSize: 13)),
                   ],
                 ),
               ),

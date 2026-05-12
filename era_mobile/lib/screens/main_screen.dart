@@ -7,6 +7,7 @@ import 'messages_screen.dart';
 import 'profile_screen.dart';
 import 'live_screen.dart';
 import '../services/api_service.dart';
+import 'voice_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -138,6 +139,9 @@ class _MainScreenState extends State<MainScreen> {
                 }),
                 _createOption(Icons.mic_outlined, 'Voice', const Color(0xFFFF6B35), () {
                   Navigator.pop(context);
+                  Navigator.push(outerContext, MaterialPageRoute( 
+                    builder: (context) => const VoiceScreen(),  
+                  ));
                 }),
                 _createOption(Icons.sensors, 'Live', const Color(0xFFFF3B5C), () {
                   Navigator.pop(context);

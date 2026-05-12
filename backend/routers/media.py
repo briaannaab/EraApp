@@ -58,3 +58,18 @@ async def upload_video(file: UploadFile = File(...)):
         "duration": result.get("duration"),
         "format": result["format"]
     }
+@router.post("/upload/audio")
+async def upload_audio(file: UploadFile = File(...)):
+    """Upload audio to Cloudinary."""
+    contents = await file.read()
+    result = cloudinary.uploader.upload(
+        contents,
+        folder="era/audio",
+        resource_type="video"  # Cloudinary uses "video" for audio too
+    )
+    return {
+        "url": result["secure_url"],
+        "public_id": result["public_id"],
+        "duration": result.get("duration"),
+        "format": result["format"]
+    }

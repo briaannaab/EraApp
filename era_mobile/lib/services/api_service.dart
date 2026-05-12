@@ -113,4 +113,27 @@ class ApiService {
     );
     return jsonDecode(response.body);
   }
+
+  static Future<String?> uploadAudio(Uint8List bytes, String filename) async {
+    try {
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/media/upload/audio'),
+      );
+      request.files.add(http.MultipartFile.fromBytes(
+        'file',
+        bytes,
+        filename: filename,
+      ));
+      final response = await request.send();
+      final body = await response.stream.bytesToString();
+      if (response.statusCode == 200) {
+        final data = jsonDecode(body);
+        return data['url'];
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
 }

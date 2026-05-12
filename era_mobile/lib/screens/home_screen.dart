@@ -1,10 +1,7 @@
-import 'dart:typed_data';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 import '../services/api_service.dart';
-import 'live_screen.dart';
 import 'profile_screen.dart';
 import 'comments_screen.dart';
 
@@ -40,240 +37,78 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF080808),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF080808),
-        elevation: 0,
-        title: const Text(
-          'era.',
-          style: TextStyle(
-            color: Color(0xFFC9A84C),
-            fontSize: 24,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -0.5,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: Colors.white),
-            onPressed: () {},
-          ),
-        ],
-      ),
+      backgroundColor: const Color(0xFF050505),
+      extendBodyBehindAppBar: true,
       body: loading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFFC9A84C)))
           : posts.isEmpty
               ? const Center(
                   child: Text('No posts yet. Be first! 👑',
                       style: TextStyle(color: Colors.white54)))
-              : RefreshIndicator(
-                  onRefresh: loadPosts,
-                  color: const Color(0xFFC9A84C),
-                  child: ListView.builder(
-                    itemCount: posts.length,
-                    itemBuilder: (context, index) {
-                      final post = posts[index];
-                      return _PostCard(post: post, onLike: loadPosts);
-                    },
-                  ),
-                ),
-    );
-  }
-
-  void _showCreatePost(BuildContext context) {
-    final controller = TextEditingController();
-    Uint8List? selectedImageBytes;
-    Uint8List? selectedVideoBytes;
-    String? selectedVideoName;
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF1A1A1A),
-      isScrollControlled: true,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            left: 20, right: 20, top: 20,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('New Post', style: TextStyle(
-                color: Color(0xFFC9A84C),
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              )),
-              const SizedBox(height: 16),
-              TextField(
-                controller: controller,
-                style: const TextStyle(color: Colors.white),
-                maxLines: 4,
-                decoration: const InputDecoration(
-                  hintText: "What's your era?",
-                  hintStyle: TextStyle(color: Colors.white38),
-                  border: InputBorder.none,
-                ),
-              ),
-              if (selectedImageBytes != null)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.memory(selectedImageBytes!, height: 150, fit: BoxFit.cover),
-                ),
-              if (selectedVideoBytes != null)
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2A2A2A),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.videocam, color: Color(0xFFC9A84C)),
-                      const SizedBox(width: 8),
-                      Text(selectedVideoName ?? 'Video selected',
-                          style: const TextStyle(color: Colors.white54, fontSize: 13)),
-                    ],
-                  ),
-                ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () async {
-                      final result = await FilePicker.platform.pickFiles(type: FileType.image);
-                      if (result != null && result.files.first.bytes != null) {
-                        setModalState(() {
-                          selectedImageBytes = result.files.first.bytes;
-                          selectedVideoBytes = null;
-                          selectedVideoName = null;
-                        });
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xFF333333)),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.image_outlined, color: Colors.white54, size: 18),
-                          SizedBox(width: 6),
-                          Text('Photo', style: TextStyle(color: Colors.white54, fontSize: 13)),
-                        ],
-                      ),
+              : Stack(
+                  children: [
+                    PageView.builder(
+                      scrollDirection: Axis.vertical,
+                      itemCount: posts.length,
+                      itemBuilder: (context, index) {
+                        return _ImmersivePostCard(
+                          post: posts[index],
+                          onLike: loadPosts,
+                        );
+                      },
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  GestureDetector(
-                    onTap: () async {
-                      final result = await FilePicker.platform.pickFiles(type: FileType.video);
-                      if (result != null && result.files.first.bytes != null) {
-                        setModalState(() {
-                          selectedVideoBytes = result.files.first.bytes;
-                          selectedVideoName = result.files.first.name;
-                          selectedImageBytes = null;
-                        });
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xFF333333)),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
+                    // Floating header
+                    Positioned(
+                      top: 60,
+                      left: 20,
+                      right: 20,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Icon(Icons.videocam_outlined, color: Colors.white54, size: 18),
-                          SizedBox(width: 6),
-                          Text('Video', style: TextStyle(color: Colors.white54, fontSize: 13)),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LiveScreen(
-                            channelName: "era_live_stream",
-                            isBroadcaster: true,
+                          const Text(
+                            'era.',
+                            style: TextStyle(
+                              color: Color(0xFFC9A84C),
+                              fontSize: 28,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -1,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xFFC9A84C)),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.sensors, color: Color(0xFFC9A84C), size: 18),
-                          SizedBox(width: 6),
-                          Text('Live', style: TextStyle(color: Color(0xFFC9A84C), fontSize: 13, fontWeight: FontWeight.bold)),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.3),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.search, color: Colors.white, size: 20),
+                              ),
+                              const SizedBox(width: 12),
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.3),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.notifications_none, color: Colors.white, size: 20),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFC9A84C),
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  onPressed: () async {
-                    if (controller.text.isEmpty) return;
-                    String? mediaUrl;
-                    if (selectedImageBytes != null) {
-                      mediaUrl = await ApiService.uploadImage(selectedImageBytes!, 'post.jpg');
-                    } else if (selectedVideoBytes != null) {
-                      mediaUrl = await ApiService.uploadVideo(selectedVideoBytes!, selectedVideoName ?? 'video.mp4');
-                    }
-                    await ApiService.createPost(
-                      userId: 1,
-                      username: 'briaannaab',
-                      content: controller.text,
-                      mediaUrl: mediaUrl,
-                    );
-                    Navigator.pop(context);
-                    loadPosts();
-                  },
-                  child: const Text('Post', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
 
-class _PostCard extends StatelessWidget {
+class _ImmersivePostCard extends StatelessWidget {
   final Map<String, dynamic> post;
   final VoidCallback onLike;
 
-  const _PostCard({required this.post, required this.onLike});
+  const _ImmersivePostCard({required this.post, required this.onLike});
 
   @override
   Widget build(BuildContext context) {
@@ -281,124 +116,178 @@ class _PostCard extends StatelessWidget {
         (post['media_url'].toString().contains('.mp4') ||
          post['media_url'].toString().contains('.mov') ||
          post['media_url'].toString().contains('video'));
-
     final username = (post['username'] ?? 'unknown') as String;
+    final hasMedia = post['media_url'] != null;
 
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Color(0xFF1A1A1A))),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      color: const Color(0xFF050505),
+      child: Stack(
+        fit: StackFit.expand,
         children: [
-          GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProfileScreen(username: username),
+          // Background media
+          if (hasMedia)
+            isVideo
+                ? _VideoPlayer(url: post['media_url'])
+                : Image.network(
+                    post['media_url'],
+                    fit: BoxFit.cover,
+                    errorBuilder: (c, e, s) => Container(color: const Color(0xFF1A1A1A)),
+                  )
+          else
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF1A0A2A), Color(0xFF0A1A2A)],
+                ),
               ),
             ),
-            child: Row(
+
+          // Cinematic gradient overlay
+          Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.black.withOpacity(0.2),
+                Colors.transparent,
+                Colors.black.withOpacity(0.4),
+                Colors.black.withOpacity(0.95),
+              ],
+              stops: const [0.0, 0.3, 0.6, 1.0],
+            ),
+          ),
+        ),
+          // Right side actions
+          Positioned(
+            right: 16,
+            bottom: 120,
+            child: Column(
               children: [
-                CircleAvatar(
-                  backgroundColor: const Color(0xFF2A1A4A),
-                  child: Text(
-                    username[0].toUpperCase(),
-                    style: const TextStyle(color: Color(0xFFC9A84C)),
+                _ActionButton(
+                  icon: Icons.favorite_border,
+                  label: '${post['likes'] ?? 0}',
+                  onTap: () async {
+                    await ApiService.likePost(post['id']);
+                    onLike();
+                  },
+                ),
+                const SizedBox(height: 20),
+                _ActionButton(
+                  icon: Icons.comment_outlined,
+                  label: 'Comment',
+                  onTap: () => showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => CommentsScreen(post: post),
                   ),
                 ),
-                const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('@$username',
-                        style: const TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold)),
-                    Text(post['created_at'].toString().substring(0, 10),
-                        style: const TextStyle(color: Colors.white38, fontSize: 12)),
-                  ],
+                const SizedBox(height: 20),
+                _ActionButton(
+                  icon: Icons.monetization_on_outlined,
+                  label: '\$${(post['tips'] ?? 0.0).toStringAsFixed(0)}',
+                  color: const Color(0xFFC9A84C),
+                  onTap: () {},
+                ),
+                const SizedBox(height: 20),
+                _ActionButton(
+                  icon: Icons.share_outlined,
+                  label: 'Share',
+                  onTap: () {},
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 12),
-          Text(post['content'] ?? '',
-              style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.5)),
-          if (post['media_url'] != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 12),
-              child: isVideo
-                  ? Builder(
-                      builder: (context) {
-                        try {
-                          return _VideoPlayer(url: post['media_url']);
-                        } catch (e) {
-                          return Container(
-                            height: 200,
-                            color: const Color(0xFF1A1A1A),
-                            child: const Center(
-                              child: Icon(Icons.videocam_off, color: Colors.white54),
-                            ),
-                          );
-                        }
-                      },
-                    )
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        post['media_url'],
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: 300,
-                      ),
+
+          // Bottom info
+          Positioned(
+            left: 16,
+            right: 80,
+            bottom: 100,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfileScreen(username: username),
                     ),
-            ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () async {
-                  await ApiService.likePost(post['id']);
-                  onLike();
-                },
-                child: Row(
-                  children: [
-                    const Icon(Icons.favorite_border, color: Colors.white38, size: 18),
-                    const SizedBox(width: 4),
-                    Text('${post['likes'] ?? 0}',
-                        style: const TextStyle(color: Colors.white38, fontSize: 13)),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 24),
-              GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CommentsScreen(post: post),
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 18,
+                        backgroundColor: const Color(0xFF2A1A4A),
+                        child: Text(
+                          username[0].toUpperCase(),
+                          style: const TextStyle(color: Color(0xFFC9A84C), fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        '@$username',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.comment_outlined, color: Colors.white38, size: 18),
-                    SizedBox(width: 4),
-                    Text('Comment', style: TextStyle(color: Colors.white38, fontSize: 13)),
-                  ],
+                const SizedBox(height: 8),
+                Text(
+                  post['content'] ?? '',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    height: 1.4,
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              const SizedBox(width: 24),
-              Row(
-                children: [
-                  const Icon(Icons.monetization_on_outlined,
-                      color: Color(0xFFC9A84C), size: 18),
-                  const SizedBox(width: 4),
-                  Text('\$${(post['tips'] ?? 0.0).toStringAsFixed(2)}',
-                      style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 13)),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color color;
+
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.color = Colors.white,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.4),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(height: 4),
+          Text(label, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -425,12 +314,10 @@ class _VideoPlayerState extends State<_VideoPlayer> {
         setState(() {
           _chewieController = ChewieController(
             videoPlayerController: _videoController,
-            autoPlay: false,
-            looping: false,
+            autoPlay: true,
+            looping: true,
+            showControls: false,
             aspectRatio: _videoController.value.aspectRatio,
-            placeholder: const Center(
-              child: CircularProgressIndicator(color: Color(0xFFC9A84C)),
-            ),
           );
         });
       });
@@ -446,17 +333,16 @@ class _VideoPlayerState extends State<_VideoPlayer> {
   @override
   Widget build(BuildContext context) {
     if (_chewieController == null) {
-      return const SizedBox(
-        height: 200,
-        child: Center(child: CircularProgressIndicator(color: Color(0xFFC9A84C))),
-      );
+      return const Center(child: CircularProgressIndicator(color: Color(0xFFC9A84C)));
     }
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: AspectRatio(
-        aspectRatio: _chewieController!.videoPlayerController.value.aspectRatio,
-        child: Chewie(controller: _chewieController!),
+    return SizedBox.expand(
+      child: FittedBox(
+        fit: BoxFit.cover,
+        child: SizedBox(
+          width: _videoController.value.size.width,
+          height: _videoController.value.size.height,
+          child: Chewie(controller: _chewieController!),
+        ),
       ),
     );
   }
-}

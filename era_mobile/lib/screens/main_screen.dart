@@ -8,6 +8,7 @@ import 'profile_screen.dart';
 import 'live_screen.dart';
 import '../services/api_service.dart';
 import 'voice_screen.dart';
+import 'moment_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -157,6 +158,9 @@ class _MainScreenState extends State<MainScreen> {
                 }),
                 _createOption(Icons.auto_awesome, 'Moment', const Color(0xFFC9A84C), () {
                   Navigator.pop(context);
+                  Navigator.push(outercontext, MaterialPageRoute(
+                    builder: (context) => const MomentScreen(),
+                  ))
                 }),
               ],
             ),

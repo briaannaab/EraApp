@@ -11,6 +11,7 @@ class Post(Base):
     content = Column(String)
     media_url = Column(String, nullable=True)
     tags = Column(ARRAY(String), default=[])
+    vibe = Column(String, nullable=True)
     likes = Column(Integer, default=0)
     tips = Column(Float, default=0.0)
     created_at = Column(DateTime, server_default=func.now())

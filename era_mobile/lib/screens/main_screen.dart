@@ -176,6 +176,7 @@ class _MainScreenState extends State<MainScreen> {
     Uint8List? selectedImageBytes;
     Uint8List? selectedVideoBytes;
     String? selectedVideoName;
+    String? selectedVibe;
 
     showModalBottomSheet(
       context: context,
@@ -228,6 +229,37 @@ class _MainScreenState extends State<MainScreen> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 12),
+              const Text('Set a vibe (optional)',
+                  style: TextStyle(color: Colors.white38, fontSize: 12)),
+              const SizedBox(height: 8),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    'Peaceful', 'Healing', 'Inspired', 'Energized', 'Quiet', 'Safe', 'Grounded'
+                  ].map((vibe) {
+                    final isSelected = selectedVibe == vibe.toLowerCase();
+                    return GestureDetector(
+                      onTap: () => setModalState(() =>
+                          selectedVibe = isSelected ? null : vibe.toLowerCase()),
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: isSelected ? const Color(0xFFC9A84C) : const Color(0xFF2A2A2A),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(vibe,
+                            style: TextStyle(
+                                color: isSelected ? Colors.black : Colors.white54,
+                                fontSize: 12,
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
               const SizedBox(height: 12),
               Row(
                 children: [
@@ -309,6 +341,7 @@ class _MainScreenState extends State<MainScreen> {
                       username: 'briaannaab',
                       content: controller.text,
                       mediaUrl: mediaUrl,
+                      vibe: selectedVibe
                     );
                     Navigator.pop(context);
                     setState(() => _currentIndex = 0);

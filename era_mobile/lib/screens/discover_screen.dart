@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../services/api_service.dart';
 import 'profile_screen.dart';
+import 'vibe_screen.dart';
 
 class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen({super.key});
@@ -325,18 +326,27 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                           itemCount: vibes.length,
                           itemBuilder: (context, index) {
                             final vibe = vibes[index];
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: vibe['color'] as Color,
-                                borderRadius: BorderRadius.circular(12),
+                            final vibeName = (vibe['label'] as String).toLowerCase();
+                            return GestureDetector(
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => VibeScreen(vibe: vibeName),
+                                ),
                               ),
-                              child: Center(
-                                child: Text(
-                                  vibe['label'] as String,
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: vibe['color'] as Color,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    vibe['label'] as String,
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12),
+                                  ),
                                 ),
                               ),
                             );
@@ -344,7 +354,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                         ),
                       ),
                     ),
-
                     const SliverToBoxAdapter(child: SizedBox(height: 100)),
                   ],
                 ],

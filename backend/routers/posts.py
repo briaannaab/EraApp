@@ -15,6 +15,14 @@ class PostCreate(BaseModel):
     content: str
     media_url: Optional[str] = None
     tags: Optional[list[str]] = []
+    vibe: Optional[str] = None
+
+@router.get("/vibe/{vibe_name}")
+def get_posts_by_vibe(vibe_name: str, db: Session = Depends(get_db)):
+    """Get posts filtered by vibe."""
+    return db.query(Post).filter(
+        Post.vibe == vibe_name
+    ).order_by(Post.created_at.desc()).all()
 
 @router.get("/")
 def get_posts(db: Session = Depends(get_db)):

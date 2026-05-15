@@ -19,6 +19,7 @@ class ApiService {
     required String content,
     List<String> tags = const [],
     String? mediaUrl,
+    String? vibe,
   }) async {
     final response = await http.post(
       Uri.parse('$baseUrl/posts/'),
@@ -29,6 +30,7 @@ class ApiService {
         'content': content,
         'tags': tags,
         'media_url': mediaUrl,
+        'vibe': vibe,
       }),
     );
     if (response.statusCode == 200) {

@@ -303,7 +303,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           const SizedBox(height: 20),
 
                           // Creator earnings
-                          if (profile!['is_creator'] == true)
+                          if (profile!['is_creator'] == true && isOwnProfile)
                             Padding(
                               padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
                               child: Container(

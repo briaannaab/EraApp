@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 from models.base import get_db
 from models.post import Post
 from typing import Optional
+from collections import Counter
+import re
 
 router = APIRouter()
 
@@ -25,6 +27,23 @@ def create_post(post: PostCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_post)
     return new_post
+
+@router.get("/trending")
+def get_trending(db: Session = Depends(get_db)):
+    """Get trending hashtags from posts."""
+    posts = db.query(Post).all()
+    all_tags = []
+    for post in posts:
+        hashtags = re.findall(r'#\w+', post.content or '')
+        all_tags.extend([tag.lower() for tag in hashtags])
+        if post.tags:
+            all_tags.extend([f'#{tag.lower()}' for tag in post.tags])
+    counts = Counter(all_tags)
+    trending = [
+        {'tag': tag, 'posts': f'{count}'}
+        for tag, count in counts.most_common(10)
+    ]
+    return trending
 
 @router.get("/{post_id}")
 def get_post(post_id: int, db: Session = Depends(get_db)):

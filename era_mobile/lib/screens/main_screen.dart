@@ -158,9 +158,9 @@ class _MainScreenState extends State<MainScreen> {
                 }),
                 _createOption(Icons.auto_awesome, 'Moment', const Color(0xFFC9A84C), () {
                   Navigator.pop(context);
-                  Navigator.push(outercontext, MaterialPageRoute(
+                  Navigator.push(outerContext, MaterialPageRoute(
                     builder: (context) => const MomentScreen(),
-                  ))
+                  ));
                 }),
               ],
             ),

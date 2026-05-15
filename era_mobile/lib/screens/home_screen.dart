@@ -57,7 +57,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                     ),
-                    // Floating header
                     Positioned(
                       top: 60,
                       left: 20,
@@ -118,6 +117,7 @@ class _ImmersivePostCard extends StatelessWidget {
          post['media_url'].toString().contains('video'));
     final username = (post['username'] ?? 'unknown') as String;
     final hasMedia = post['media_url'] != null;
+    final isOwner = post['username'] == 'briaannaab';
 
     return Container(
       color: const Color(0xFF050505),
@@ -146,20 +146,21 @@ class _ImmersivePostCard extends StatelessWidget {
 
           // Cinematic gradient overlay
           Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black.withOpacity(0.2),
-                Colors.transparent,
-                Colors.black.withOpacity(0.4),
-                Colors.black.withOpacity(0.95),
-              ],
-              stops: const [0.0, 0.3, 0.6, 1.0],
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withOpacity(0.2),
+                  Colors.transparent,
+                  Colors.black.withOpacity(0.4),
+                  Colors.black.withOpacity(0.95),
+                ],
+                stops: const [0.0, 0.3, 0.6, 1.0],
+              ),
             ),
           ),
-        ),
+
           // Right side actions
           Positioned(
             right: 16,
@@ -198,6 +199,42 @@ class _ImmersivePostCard extends StatelessWidget {
                   label: 'Share',
                   onTap: () {},
                 ),
+                if (isOwner) ...[
+                  const SizedBox(height: 20),
+                  _ActionButton(
+                    icon: Icons.delete_outline,
+                    label: 'Delete',
+                    color: Colors.red.withOpacity(0.8),
+                    onTap: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          backgroundColor: const Color(0xFF1A1A1A),
+                          title: const Text('Delete post?',
+                              style: TextStyle(color: Colors.white)),
+                          content: const Text('This cannot be undone.',
+                              style: TextStyle(color: Colors.white54)),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Cancel',
+                                  style: TextStyle(color: Colors.white54)),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text('Delete',
+                                  style: TextStyle(color: Colors.red)),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirm == true) {
+                        await ApiService.deletePost(post['id']);
+                        onLike();
+                      }
+                    },
+                  ),
+                ],
               ],
             ),
           ),
@@ -224,7 +261,8 @@ class _ImmersivePostCard extends StatelessWidget {
                         backgroundColor: const Color(0xFF2A1A4A),
                         child: Text(
                           username[0].toUpperCase(),
-                          style: const TextStyle(color: Color(0xFFC9A84C), fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              color: Color(0xFFC9A84C), fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -287,7 +325,9 @@ class _ActionButton extends StatelessWidget {
             child: Icon(icon, color: color, size: 24),
           ),
           const SizedBox(height: 4),
-          Text(label, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w500)),
+          Text(label,
+              style: TextStyle(
+                  color: color, fontSize: 11, fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -333,7 +373,8 @@ class _VideoPlayerState extends State<_VideoPlayer> {
   @override
   Widget build(BuildContext context) {
     if (_chewieController == null) {
-      return const Center(child: CircularProgressIndicator(color: Color(0xFFC9A84C)));
+      return const Center(
+          child: CircularProgressIndicator(color: Color(0xFFC9A84C)));
     }
     return SizedBox.expand(
       child: FittedBox(

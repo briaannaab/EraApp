@@ -13,6 +13,10 @@ class ApiService {
     throw Exception('Failed to load posts');
   }
 
+  static Future<void> deletePost(int postId) async {
+    await http.delete(Uri.parse('$baseUrl/posts/$postId'));
+  }
+
   static Future<Map<String, dynamic>> createPost({
     required int userId,
     required String username,

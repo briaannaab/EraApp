@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../services/api_service.dart';
+import 'chat_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String username;
@@ -14,6 +15,24 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic>? profile;
   bool loading = true;
+  String selectedTheme = 'default';
+  final String currentUser = 'briaannaab';
+
+  final Map<String, List<Color>> themes = {
+    'default': [const Color(0xFF1a0033), const Color(0xFF080808)],
+    'cosmic': [const Color(0xFF0a0a2e), const Color(0xFF1a0040)],
+    'aurora': [const Color(0xFF002a1a), const Color(0xFF001a0a)],
+    'ember': [const Color(0xFF2a0a00), const Color(0xFF1a0500)],
+    'ocean': [const Color(0xFF001a2a), const Color(0xFF000a1a)],
+  };
+
+  final Map<String, Color> themeAccents = {
+    'default': const Color(0xFFC9A84C),
+    'cosmic': const Color(0xFF8B9FFF),
+    'aurora': const Color(0xFF4ECDC4),
+    'ember': const Color(0xFFFF6B35),
+    'ocean': const Color(0xFF4FC3F7),
+  };
 
   @override
   void initState() {
@@ -35,167 +54,404 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final gradient = themes[selectedTheme]!;
+    final accent = themeAccents[selectedTheme]!;
+    final isOwnProfile = widget.username == currentUser;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF080808),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF080808),
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: Text(
-          '@${widget.username}',
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-      ),
       body: loading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFFC9A84C)))
           : profile == null
               ? const Center(child: Text('User not found', style: TextStyle(color: Colors.white54)))
-              : SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Profile Header
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
+              : Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: gradient,
+                    ),
+                  ),
+                  child: SafeArea(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          // Top bar
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                CircleAvatar(
-                                  radius: 40,
-                                  backgroundColor: const Color(0xFF2A1A4A),
-                                  child: Text(
-                                    profile!['username'][0].toUpperCase(),
-                                    style: const TextStyle(
-                                      color: Color(0xFFC9A84C),
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 20),
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    children: [
-                                      _stat('${profile!['post_count']}', 'Posts'),
-                                      _stat('${profile!['followers']}', 'Followers'),
-                                      _stat('${profile!['following']}', 'Following'),
-                                    ],
-                                  ),
+                                if (Navigator.canPop(context))
+                                  GestureDetector(
+                                    onTap: () => Navigator.pop(context),
+                                    child: Icon(Icons.arrow_back_ios, color: accent, size: 20),
+                                  )
+                                else
+                                  const SizedBox(width: 20),
+                                Row(
+                                  children: [
+                                    if (isOwnProfile)
+                                      GestureDetector(
+                                        onTap: () {},
+                                        child: Icon(Icons.edit_outlined, color: accent, size: 20),
+                                      ),
+                                    const SizedBox(width: 16),
+                                    Icon(Icons.more_horiz, color: accent, size: 20),
+                                  ],
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 16),
-                            Text(
-                              '@${profile!['username']}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // Avatar with glow
+                          Container(
+                            width: 90,
+                            height: 90,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: accent.withOpacity(0.4),
+                                  blurRadius: 24,
+                                  spreadRadius: 4,
+                                ),
+                              ],
+                            ),
+                            child: CircleAvatar(
+                              radius: 45,
+                              backgroundColor: accent.withOpacity(0.2),
+                              child: Text(
+                                widget.username[0].toUpperCase(),
+                                style: TextStyle(
+                                  color: accent,
+                                  fontSize: 36,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                            if (profile!['is_creator'])
-                              Container(
-                                margin: const EdgeInsets.only(top: 4),
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFC9A84C).withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(2),
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          // Name and verified
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                widget.username,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                child: const Text('CREATOR',
-                                    style: TextStyle(
-                                        color: Color(0xFFC9A84C),
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 1)),
                               ),
-                            if (profile!['bio'] != null && profile!['bio'].isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8),
-                                child: Text(profile!['bio'],
-                                    style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                              if (profile!['is_creator'] == true) ...[
+                                const SizedBox(width: 6),
+                                Icon(Icons.verified, color: accent, size: 18),
+                              ],
+                            ],
+                          ),
+
+                          Text(
+                            '@${widget.username}',
+                            style: TextStyle(color: accent.withOpacity(0.7), fontSize: 13),
+                          ),
+
+                          if (profile!['bio'] != null && profile!['bio'].isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
+                              child: Text(
+                                profile!['bio'],
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.5),
                               ),
-                            const SizedBox(height: 16),
-                            if (profile!['is_creator'])
-                              Container(
-                                padding: const EdgeInsets.all(12),
+                            ),
+
+                          const SizedBox(height: 20),
+
+                          // Stats
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _stat('${profile!['post_count']}', 'Posts', accent),
+                              _divider(accent),
+                              _stat('${profile!['followers']}', 'Followers', accent),
+                              _divider(accent),
+                              _stat('${profile!['following']}', 'Following', accent),
+                            ],
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // Action buttons
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: Row(
+                              children: [
+                                if (!isOwnProfile) ...[
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () {},
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(vertical: 12),
+                                        decoration: BoxDecoration(
+                                          color: accent,
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Text('Follow',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ChatScreen(
+                                            currentUser: currentUser,
+                                            otherUser: widget.username,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(vertical: 12),
+                                        decoration: BoxDecoration(
+                                          color: accent.withOpacity(0.15),
+                                          borderRadius: BorderRadius.circular(12),
+                                          border: Border.all(color: accent.withOpacity(0.3)),
+                                        ),
+                                        child: Text('Message',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(color: accent, fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                  ),
+                                ] else
+                                  Expanded(
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      decoration: BoxDecoration(
+                                        color: accent.withOpacity(0.15),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(color: accent.withOpacity(0.3)),
+                                      ),
+                                      child: Text('Edit Profile',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(color: accent, fontWeight: FontWeight.bold)),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // Earnings for creators
+                          if (profile!['is_creator'] == true)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 24),
+                              child: Container(
+                                padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF1A1A1A),
-                                  borderRadius: BorderRadius.circular(8),
+                                  color: accent.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: accent.withOpacity(0.2)),
                                 ),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.monetization_on_outlined,
-                                        color: Color(0xFFC9A84C), size: 18),
-                                    const SizedBox(width: 8),
+                                    Icon(Icons.monetization_on_outlined, color: accent),
+                                    const SizedBox(width: 10),
                                     Text(
                                       '\$${profile!['tips_received'].toStringAsFixed(2)} earned',
-                                      style: const TextStyle(color: Color(0xFFC9A84C), fontWeight: FontWeight.bold),
+                                      style: TextStyle(color: accent, fontWeight: FontWeight.bold, fontSize: 15),
                                     ),
                                   ],
                                 ),
                               ),
-                            const SizedBox(height: 16),
-                            SizedBox(
-                              width: double.infinity,
-                              child: OutlinedButton(
-                                style: OutlinedButton.styleFrom(
-                                  side: const BorderSide(color: Color(0xFF333333)),
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                ),
-                                onPressed: () {},
-                                child: const Text('Follow'),
+                            ),
+
+                          const SizedBox(height: 24),
+
+                          // Themes section (own profile only)
+                          if (isOwnProfile) ...[
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text('Themes',
+                                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                                  Text('See all', style: TextStyle(color: accent, fontSize: 13)),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                      const Divider(color: Color(0xFF1A1A1A)),
-                      // Posts Grid
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding: const EdgeInsets.all(2),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 2,
-                          mainAxisSpacing: 2,
-                        ),
-                        itemCount: profile!['posts'].length,
-                        itemBuilder: (context, index) {
-                          final post = profile!['posts'][index];
-                          return Container(
-                            color: const Color(0xFF1A1A1A),
-                            child: post['media_url'] != null
-                                ? Image.network(post['media_url'], fit: BoxFit.cover,
-                                    errorBuilder: (c, e, s) => const Icon(
-                                      Icons.videocam, color: Color(0xFFC9A84C)))
-                                : Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8),
-                                      child: Text(post['content'],
-                                          maxLines: 3,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                            SizedBox(
+                              height: 48,
+                              child: ListView(
+                                scrollDirection: Axis.horizontal,
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                children: themes.keys.map((theme) {
+                                  final isSelected = selectedTheme == theme;
+                                  final colors = themes[theme]!;
+                                  return GestureDetector(
+                                    onTap: () => setState(() => selectedTheme = theme),
+                                    child: Container(
+                                      width: 44,
+                                      height: 44,
+                                      margin: const EdgeInsets.only(right: 12),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        gradient: LinearGradient(colors: colors),
+                                        border: Border.all(
+                                          color: isSelected ? themeAccents[theme]! : Colors.transparent,
+                                          width: 2.5,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                          );
-                        },
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                          ],
+
+                          // Pinned Moments
+                          if (profile!['posts'] != null && (profile!['posts'] as List).isNotEmpty) ...[
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text('Pinned Moments',
+                                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                                  Text('See all', style: TextStyle(color: accent, fontSize: 13)),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 120,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                itemCount: (profile!['posts'] as List).take(5).length,
+                                itemBuilder: (context, index) {
+                                  final post = profile!['posts'][index];
+                                  return Container(
+                                    width: 100,
+                                    height: 100,
+                                    margin: const EdgeInsets.only(right: 10),
+                                    decoration: BoxDecoration(
+                                      color: accent.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: accent.withOpacity(0.2)),
+                                    ),
+                                    child: post['media_url'] != null
+                                        ? ClipRRect(
+                                            borderRadius: BorderRadius.circular(12),
+                                            child: Image.network(
+                                              post['media_url'],
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (c, e, s) => Icon(
+                                                Icons.image_outlined,
+                                                color: accent,
+                                              ),
+                                            ),
+                                          )
+                                        : Center(
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(8),
+                                              child: Text(
+                                                post['content'] ?? '',
+                                                maxLines: 4,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(color: accent.withOpacity(0.8), fontSize: 10),
+                                              ),
+                                            ),
+                                          ),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                          ],
+
+                          // Posts grid
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                            child: const Row(
+                              children: [
+                                Text('Posts',
+                                    style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 3,
+                              mainAxisSpacing: 3,
+                            ),
+                            itemCount: (profile!['posts'] as List).length,
+                            itemBuilder: (context, index) {
+                              final post = profile!['posts'][index];
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: accent.withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: post['media_url'] != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(4),
+                                        child: Image.network(
+                                          post['media_url'],
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (c, e, s) =>
+                                              Icon(Icons.play_circle_outline, color: accent),
+                                        ),
+                                      )
+                                    : Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(6),
+                                          child: Text(
+                                            post['content'] ?? '',
+                                            maxLines: 3,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(color: accent.withOpacity(0.7), fontSize: 9),
+                                          ),
+                                        ),
+                                      ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 100),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
     );
   }
 
-  Widget _stat(String value, String label) {
+  Widget _stat(String value, String label, Color accent) {
     return Column(
       children: [
-        Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-        Text(label, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+        Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20)),
+        Text(label, style: TextStyle(color: accent.withOpacity(0.7), fontSize: 12)),
       ],
     );
+  }
+
+  Widget _divider(Color accent) {
+    return Container(width: 1, height: 30, color: accent.withOpacity(0.2));
   }
 }

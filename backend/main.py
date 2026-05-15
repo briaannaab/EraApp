@@ -1,19 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from routers import posts
-from routers import users
-from routers import ai
+from routers import posts, users, ai, payments, media, auth, comments, messages
 from models.base import Base, engine
-from models import user, post
-from routers import payments
-from routers import media
+from models import user, post, comment, message
 import os
-from routers import auth
-from models import user, post, comment
-from routers import comments
-
-
 
 load_dotenv(dotenv_path='/workspaces/EraApp/backend/.env')
 
@@ -38,5 +29,6 @@ app.include_router(payments.router, prefix="/payments", tags=["payments"])
 app.include_router(media.router, prefix="/media", tags=["media"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(comments.router, prefix="/comments", tags=["comments"])
+app.include_router(messages.router, prefix="/messages", tags=["messages"])
 
 Base.metadata.create_all(bind=engine)

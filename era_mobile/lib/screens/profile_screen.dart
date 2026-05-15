@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'dart:typed_data';
+import 'package:file_picker/file_picker.dart';
+import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../services/api_service.dart';
@@ -16,6 +19,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic>? profile;
   bool loading = true;
   String selectedTheme = 'default';
+  Color? customAccentColor;
+  String? profileImageUrl;
   final String currentUser = 'briaannaab';
 
   final Map<String, List<Color>> themes = {
@@ -52,10 +57,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> pickProfileImage() async {
+    final result = await FilePicker.platform.pickFiles(type: FileType.image);
+    if (result != null && result.files.first.bytes != null) {
+      final url = await ApiService.uploadImage(result.files.first.bytes!, 'profile.jpg');
+      if (url != null) setState(() => profileImageUrl = url);
+    }
+  }
+
+  Future<void> showColorPicker(Color currentColor) async {
+    Color picked = currentColor;
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        title: const Text('Pick a color', style: TextStyle(color: Colors.white)),
+        content: ColorPicker(
+          color: picked,
+          onColorChanged: (color) => picked = color,
+          width: 40,
+          height: 40,
+          borderRadius: 8,
+          pickersEnabled: const {
+            ColorPickerType.wheel: true,
+            ColorPickerType.primary: false,
+            ColorPickerType.accent: false,
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() => customAccentColor = picked);
+              Navigator.pop(context);
+            },
+            child: const Text('Apply', style: TextStyle(color: Color(0xFFC9A84C))),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final gradient = themes[selectedTheme]!;
-    final accent = themeAccents[selectedTheme]!;
+    final accent = customAccentColor ?? themeAccents[selectedTheme]!;
     final isOwnProfile = widget.username == currentUser;
 
     return Scaffold(
@@ -88,64 +133,75 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   )
                                 else
                                   const SizedBox(width: 20),
-                                Row(
-                                  children: [
-                                    if (isOwnProfile)
-                                      GestureDetector(
-                                        onTap: () {},
-                                        child: Icon(Icons.edit_outlined, color: accent, size: 20),
-                                      ),
-                                    const SizedBox(width: 16),
-                                    Icon(Icons.more_horiz, color: accent, size: 20),
-                                  ],
-                                ),
+                                Icon(Icons.more_horiz, color: accent, size: 20),
                               ],
                             ),
                           ),
 
                           const SizedBox(height: 20),
 
-                          // Avatar with glow
-                          Container(
-                            width: 90,
-                            height: 90,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: accent.withOpacity(0.4),
-                                  blurRadius: 24,
-                                  spreadRadius: 4,
+                          // Avatar with camera button
+                          Stack(
+                            children: [
+                              Container(
+                                width: 90,
+                                height: 90,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: accent.withOpacity(0.4),
+                                      blurRadius: 24,
+                                      spreadRadius: 4,
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            child: CircleAvatar(
-                              radius: 45,
-                              backgroundColor: accent.withOpacity(0.2),
-                              child: Text(
-                                widget.username[0].toUpperCase(),
-                                style: TextStyle(
-                                  color: accent,
-                                  fontSize: 36,
-                                  fontWeight: FontWeight.bold,
+                                child: CircleAvatar(
+                                  radius: 45,
+                                  backgroundColor: accent.withOpacity(0.2),
+                                  backgroundImage: profileImageUrl != null
+                                      ? NetworkImage(profileImageUrl!) : null,
+                                  child: profileImageUrl == null
+                                      ? Text(
+                                          widget.username[0].toUpperCase(),
+                                          style: TextStyle(
+                                            color: accent,
+                                            fontSize: 36,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        )
+                                      : null,
                                 ),
                               ),
-                            ),
+                              if (isOwnProfile)
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: GestureDetector(
+                                    onTap: pickProfileImage,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: accent,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(color: const Color(0xFF080808), width: 2),
+                                      ),
+                                      child: const Icon(Icons.camera_alt, color: Colors.black, size: 14),
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
 
                           const SizedBox(height: 12),
 
-                          // Name and verified
+                          // Name
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
                                 widget.username,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
                               ),
                               if (profile!['is_creator'] == true) ...[
                                 const SizedBox(width: 6),
@@ -154,10 +210,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ],
                           ),
 
-                          Text(
-                            '@${widget.username}',
-                            style: TextStyle(color: accent.withOpacity(0.7), fontSize: 13),
-                          ),
+                          Text('@${widget.username}',
+                              style: TextStyle(color: accent.withOpacity(0.7), fontSize: 13)),
 
                           if (profile!['bio'] != null && profile!['bio'].isNotEmpty)
                             Padding(
@@ -176,9 +230,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               _stat('${profile!['post_count']}', 'Posts', accent),
-                              _divider(accent),
+                              Container(width: 1, height: 30, color: accent.withOpacity(0.2)),
                               _stat('${profile!['followers']}', 'Followers', accent),
-                              _divider(accent),
+                              Container(width: 1, height: 30, color: accent.withOpacity(0.2)),
                               _stat('${profile!['following']}', 'Following', accent),
                             ],
                           ),
@@ -200,26 +254,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           color: accent,
                                           borderRadius: BorderRadius.circular(12),
                                         ),
-                                        child: Text('Follow',
+                                        child: const Text('Follow',
                                             textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold)),
+                                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                                       ),
                                     ),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: GestureDetector(
-                                      onTap: () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ChatScreen(
-                                            currentUser: currentUser,
-                                            otherUser: widget.username,
-                                          ),
+                                      onTap: () => Navigator.push(context, MaterialPageRoute(
+                                        builder: (context) => ChatScreen(
+                                          currentUser: currentUser,
+                                          otherUser: widget.username,
                                         ),
-                                      ),
+                                      )),
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(vertical: 12),
                                         decoration: BoxDecoration(
@@ -251,12 +300,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
 
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 20),
 
-                          // Earnings for creators
+                          // Creator earnings
                           if (profile!['is_creator'] == true)
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 24),
+                              padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
                               child: Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
@@ -268,55 +317,76 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   children: [
                                     Icon(Icons.monetization_on_outlined, color: accent),
                                     const SizedBox(width: 10),
-                                    Text(
-                                      '\$${profile!['tips_received'].toStringAsFixed(2)} earned',
-                                      style: TextStyle(color: accent, fontWeight: FontWeight.bold, fontSize: 15),
-                                    ),
+                                    Text('\$${profile!['tips_received'].toStringAsFixed(2)} earned',
+                                        style: TextStyle(color: accent, fontWeight: FontWeight.bold, fontSize: 15)),
                                   ],
                                 ),
                               ),
                             ),
 
-                          const SizedBox(height: 24),
-
-                          // Themes section (own profile only)
+                          // Themes
                           if (isOwnProfile) ...[
                             Padding(
                               padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text('Themes',
-                                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                                  Text('See all', style: TextStyle(color: accent, fontSize: 13)),
+                                  const Text('Themes', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                                  Text('Customize', style: TextStyle(color: accent, fontSize: 13)),
                                 ],
                               ),
                             ),
                             SizedBox(
-                              height: 48,
+                              height: 52,
                               child: ListView(
                                 scrollDirection: Axis.horizontal,
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                                children: themes.keys.map((theme) {
-                                  final isSelected = selectedTheme == theme;
-                                  final colors = themes[theme]!;
-                                  return GestureDetector(
-                                    onTap: () => setState(() => selectedTheme = theme),
+                                children: [
+                                  ...themes.keys.map((theme) {
+                                    final isSelected = selectedTheme == theme && customAccentColor == null;
+                                    final colors = themes[theme]!;
+                                    return GestureDetector(
+                                      onTap: () => setState(() {
+                                        selectedTheme = theme;
+                                        customAccentColor = null;
+                                      }),
+                                      child: Container(
+                                        width: 44,
+                                        height: 44,
+                                        margin: const EdgeInsets.only(right: 12),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          gradient: LinearGradient(colors: colors),
+                                          border: Border.all(
+                                            color: isSelected ? themeAccents[theme]! : Colors.transparent,
+                                            width: 2.5,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                  // Custom color picker
+                                  GestureDetector(
+                                    onTap: () => showColorPicker(customAccentColor ?? themeAccents[selectedTheme]!),
                                     child: Container(
                                       width: 44,
                                       height: 44,
                                       margin: const EdgeInsets.only(right: 12),
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
-                                        gradient: LinearGradient(colors: colors),
+                                        gradient: const SweepGradient(colors: [
+                                          Colors.red, Colors.yellow, Colors.green,
+                                          Colors.blue, Colors.purple, Colors.red,
+                                        ]),
                                         border: Border.all(
-                                          color: isSelected ? themeAccents[theme]! : Colors.transparent,
+                                          color: customAccentColor != null ? Colors.white : Colors.transparent,
                                           width: 2.5,
                                         ),
                                       ),
+                                      child: const Icon(Icons.colorize, color: Colors.white, size: 18),
                                     ),
-                                  );
-                                }).toList(),
+                                  ),
+                                ],
                               ),
                             ),
                             const SizedBox(height: 24),
@@ -329,8 +399,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text('Pinned Moments',
-                                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                                  const Text('Pinned Moments', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                                   Text('See all', style: TextStyle(color: accent, fontSize: 13)),
                                 ],
                               ),
@@ -355,24 +424,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     child: post['media_url'] != null
                                         ? ClipRRect(
                                             borderRadius: BorderRadius.circular(12),
-                                            child: Image.network(
-                                              post['media_url'],
-                                              fit: BoxFit.cover,
-                                              errorBuilder: (c, e, s) => Icon(
-                                                Icons.image_outlined,
-                                                color: accent,
-                                              ),
-                                            ),
+                                            child: Image.network(post['media_url'],
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (c, e, s) =>
+                                                    Icon(Icons.image_outlined, color: accent)),
                                           )
                                         : Center(
                                             child: Padding(
                                               padding: const EdgeInsets.all(8),
-                                              child: Text(
-                                                post['content'] ?? '',
-                                                maxLines: 4,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(color: accent.withOpacity(0.8), fontSize: 10),
-                                              ),
+                                              child: Text(post['content'] ?? '',
+                                                  maxLines: 4,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: TextStyle(color: accent.withOpacity(0.8), fontSize: 10)),
                                             ),
                                           ),
                                   );
@@ -383,13 +446,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ],
 
                           // Posts grid
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-                            child: const Row(
-                              children: [
-                                Text('Posts',
-                                    style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                              ],
+                          const Padding(
+                            padding: EdgeInsets.fromLTRB(20, 0, 20, 12),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text('Posts', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                             ),
                           ),
                           GridView.builder(
@@ -412,22 +473,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: post['media_url'] != null
                                     ? ClipRRect(
                                         borderRadius: BorderRadius.circular(4),
-                                        child: Image.network(
-                                          post['media_url'],
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (c, e, s) =>
-                                              Icon(Icons.play_circle_outline, color: accent),
-                                        ),
+                                        child: Image.network(post['media_url'],
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (c, e, s) =>
+                                                Icon(Icons.play_circle_outline, color: accent)),
                                       )
                                     : Center(
                                         child: Padding(
                                           padding: const EdgeInsets.all(6),
-                                          child: Text(
-                                            post['content'] ?? '',
-                                            maxLines: 3,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(color: accent.withOpacity(0.7), fontSize: 9),
-                                          ),
+                                          child: Text(post['content'] ?? '',
+                                              maxLines: 3,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(color: accent.withOpacity(0.7), fontSize: 9)),
                                         ),
                                       ),
                               );
@@ -449,9 +506,5 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Text(label, style: TextStyle(color: accent.withOpacity(0.7), fontSize: 12)),
       ],
     );
-  }
-
-  Widget _divider(Color accent) {
-    return Container(width: 1, height: 30, color: accent.withOpacity(0.2));
   }
 }

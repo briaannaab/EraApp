@@ -113,4 +113,30 @@ flutter run -d chrome
 
 ## 📄 License
 
-MIT — build on it, learn from it, make it yours.
+PROPRIETARY SOFTWARE LICENSE
+
+Copyright (c) 2026 Briana. All rights reserved.
+
+This software and its source code, documentation, and associated files
+("Software") are the exclusive property of Briana and are protected by
+copyright law and international treaties.
+
+RESTRICTIONS:
+- You may NOT copy, modify, merge, publish, distribute, sublicense, or
+  sell copies of this Software or any portion of it.
+- You may NOT use this Software for commercial or non-commercial purposes
+  without explicit written permission from the owner.
+- You may NOT reverse engineer, decompile, or disassemble this Software.
+- You may NOT remove or alter any proprietary notices or labels on this Software.
+
+PERMITTED USE:
+- Viewing this Software's source code for evaluation purposes only is
+  permitted, provided no copying or redistribution occurs.
+
+DISCLAIMER:
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED. IN NO EVENT SHALL THE OWNER BE LIABLE FOR ANY CLAIM, DAMAGES,
+OR OTHER LIABILITY ARISING FROM THE USE OF THIS SOFTWARE.
+
+For licensing inquiries or permissions, contact the owner directly.
+

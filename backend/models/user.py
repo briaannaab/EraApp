@@ -15,3 +15,4 @@ class User(Base):
     following = Column(Integer, default=0)
     tips_received = Column(Float, default=0.0)
     created_at = Column(DateTime, server_default=func.now())
+    voice_bio_url = Column(String, nullable=True)

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../services/api_service.dart';
 import 'chat_screen.dart';
+import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String username;
@@ -284,7 +285,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ] else
                                   Expanded(
-                                    child: Container(
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        final updated = await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => EditProfileScreen(profile: profile!),
+                                          ),
+                                        );
+                                        if (updated == true) loadProfile();
+                                      },
+                                      child: Container(
                                       padding: const EdgeInsets.symmetric(vertical: 12),
                                       decoration: BoxDecoration(
                                         color: accent.withOpacity(0.15),
@@ -294,6 +305,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       child: Text('Edit Profile',
                                           textAlign: TextAlign.center,
                                           style: TextStyle(color: accent, fontWeight: FontWeight.bold)),
+                                      ),
                                     ),
                                   ),
                               ],

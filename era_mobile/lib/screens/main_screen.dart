@@ -9,6 +9,8 @@ import 'live_screen.dart';
 import '../services/api_service.dart';
 import 'voice_screen.dart';
 import 'moment_screen.dart';
+import 'poll_screen.dart';
+import 'prayer_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -130,39 +132,55 @@ class _MainScreenState extends State<MainScreen> {
             const Text('What would you like to share?',
                 style: TextStyle(color: Colors.white38, fontSize: 14)),
             const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _createOption(Icons.edit_outlined, 'Post', const Color(0xFF6C63FF), () {
-                  Navigator.pop(context);
-                  setState(() => _currentIndex = 0);
-                  _showCreatePost(outerContext);
-                }),
-                _createOption(Icons.mic_outlined, 'Voice', const Color(0xFFFF6B35), () {
-                  Navigator.pop(context);
-                  Navigator.push(outerContext, MaterialPageRoute( 
-                    builder: (context) => const VoiceScreen(),  
-                  ));
-                }),
-                _createOption(Icons.sensors, 'Live', const Color(0xFFFF3B5C), () {
-                  Navigator.pop(context);
-                  Navigator.push(outerContext, MaterialPageRoute(
-                    builder: (context) => const LiveScreen(
-                      channelName: "era_live_stream",
-                      isBroadcaster: true,
-                    ),
-                  ));
-                }),
-                _createOption(Icons.bar_chart, 'Poll', const Color(0xFF00C9A7), () {
-                  Navigator.pop(context);
-                }),
-                _createOption(Icons.auto_awesome, 'Moment', const Color(0xFFC9A84C), () {
-                  Navigator.pop(context);
-                  Navigator.push(outerContext, MaterialPageRoute(
-                    builder: (context) => const MomentScreen(),
-                  ));
-                }),
-              ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _createOption(Icons.edit_outlined, 'Post', const Color(0xFF6C63FF), () {
+                    Navigator.pop(context);
+                    setState(() => _currentIndex = 0);
+                    _showCreatePost(outerContext);
+                  }),
+                  const SizedBox(width: 16),
+                  _createOption(Icons.mic_outlined, 'Voice', const Color(0xFFFF6B35), () {
+                    Navigator.pop(context);
+                    Navigator.push(outerContext, MaterialPageRoute(
+                      builder: (context) => const VoiceScreen(),
+                    ));
+                  }),
+                  const SizedBox(width: 16),
+                  _createOption(Icons.sensors, 'Live', const Color(0xFFFF3B5C), () {
+                    Navigator.pop(context);
+                    Navigator.push(outerContext, MaterialPageRoute(
+                      builder: (context) => const LiveScreen(
+                        channelName: "era_live_stream",
+                        isBroadcaster: true,
+                      ),
+                    ));
+                  }),
+                  const SizedBox(width: 16),
+                  _createOption(Icons.bar_chart, 'Poll', const Color(0xFF00C9A7), () {
+                    Navigator.pop(context);
+                    Navigator.push(outerContext, MaterialPageRoute(
+                      builder: (context) => const PollScreen(),
+                    ));
+                  }),
+                  const SizedBox(width: 16),
+                  _createOption(Icons.auto_awesome, 'Moment', const Color(0xFFC9A84C), () {
+                    Navigator.pop(context);
+                    Navigator.push(outerContext, MaterialPageRoute(
+                      builder: (context) => const MomentScreen(),
+                    ));
+                  }),
+                  const SizedBox(width: 16),
+                  _createOption(Icons.volunteer_activism, 'Prayer', const Color(0xFFC084FC), () {
+                    Navigator.pop(context);
+                    Navigator.push(outerContext, MaterialPageRoute(
+                      builder: (context) => const PrayerScreen(),
+                    ));
+                  }),
+                ],
+              ),
             ),
             const SizedBox(height: 32),
           ],
@@ -229,7 +247,7 @@ class _MainScreenState extends State<MainScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
+              const SizedBox(height: 12),
               const Text('Set a vibe (optional)',
                   style: TextStyle(color: Colors.white38, fontSize: 12)),
               const SizedBox(height: 8),
@@ -341,7 +359,7 @@ class _MainScreenState extends State<MainScreen> {
                       username: 'briaannaab',
                       content: controller.text,
                       mediaUrl: mediaUrl,
-                      vibe: selectedVibe
+                      vibe: selectedVibe,
                     );
                     Navigator.pop(context);
                     setState(() => _currentIndex = 0);

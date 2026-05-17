@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import '../services/api_service.dart';
 import 'chat_screen.dart';
 import 'edit_profile_screen.dart';
+import 'settings_screen.dart';
+import 'post_detail_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String username;
@@ -172,7 +174,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 const SizedBox(height: 20),
                                                 if (isOwnProfile) ...[
                                                   _menuItem(Icons.share_outlined, 'Share Profile', accent, () => Navigator.pop(context)),
-                                                  _menuItem(Icons.settings_outlined, 'Settings', accent, () => Navigator.pop(context)),
+                                                  _menuItem(Icons.settings_outlined, 'Settings', accent, () {
+                                                    Navigator.pop(context);
+                                                    Navigator.push(context, MaterialPageRoute(
+                                                      builder: (context) => const SettingsScreen(),
+                                                    ));
+                                                  }),
                                                 ] else ...[
                                                   _menuItem(Icons.share_outlined, 'Share Profile', accent, () => Navigator.pop(context)),
                                                   _menuItem(Icons.block_outlined, 'Block @${widget.username}', Colors.orange, () => Navigator.pop(context)),
@@ -452,7 +459,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 itemCount: (profile!['posts'] as List).take(5).length,
                                 itemBuilder: (context, index) {
                                   final post = profile!['posts'][index];
-                                  return Container(
+                                  return GestureDetector(
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => PostDetailScreen(post: Map<String, dynamic>.from(post)),
+                                      ),
+                                    ),
+                                    child: Container(
                                     width: 100,
                                     height: 100,
                                     margin: const EdgeInsets.only(right: 10),
@@ -478,6 +492,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   style: TextStyle(color: accent.withOpacity(0.8), fontSize: 10)),
                                             ),
                                           ),
+                                    );
                                   );
                                 },
                               ),

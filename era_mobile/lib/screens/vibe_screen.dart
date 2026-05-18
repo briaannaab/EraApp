@@ -55,6 +55,34 @@ const Map<String, Map<String, dynamic>> vibeThemes = {
     'accent': Color(0xFFD4A96A),
     'description': 'Mindful. Present. Connected.',
   },
+  'motivated': {
+  'label': 'Motivated',
+  'emoji': '💪',
+  'gradient': [Color(0xFF2A1A0A), Color(0xFF1A0A00)],
+  'accent': Color(0xFFFF9500),
+  'description': 'Push through. You\'ve got this.',
+},
+'creative': {
+  'label': 'Creative',
+  'emoji': '🎨',
+  'gradient': [Color(0xFF1A0A2A), Color(0xFF0A001A)],
+  'accent': Color(0xFFE040FB),
+  'description': 'Create freely. No limits here.',
+},
+'bold': {
+  'label': 'Bold',
+  'emoji': '🔥',
+  'gradient': [Color(0xFF2A0A00), Color(0xFF1A0000)],
+  'accent': Color(0xFFFF3B5C),
+  'description': 'Be unapologetically you.',
+},
+'chill': {
+  'label': 'Chill',
+  'emoji': '🌊',
+  'gradient': [Color(0xFF001A2A), Color(0xFF00101A)],
+  'accent': Color(0xFF4FC3F7),
+  'description': 'Slow down. Just breathe.',
+},
 };
 
 class VibeScreen extends StatefulWidget {

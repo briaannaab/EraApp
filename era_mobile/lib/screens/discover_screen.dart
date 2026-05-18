@@ -23,9 +23,14 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
   final List<Map<String, dynamic>> vibes = [
     {'label': 'Peaceful', 'color': const Color(0xFF1A3A4A)},
+    {'label': 'Healing', 'color': const Color(0xFF1A2A1A)},
+    {'label': 'Inspired', 'color': const Color(0xFF2A1A0A)},
+    {'label': 'Energized', 'color': const Color(0xFF3A1A1A)},
+    {'label': 'Quiet', 'color': const Color(0xFF1A1A3A)},
+    {'label': 'Safe', 'color': const Color(0xFF2A1A3A)},
+    {'label': 'Grounded', 'color': const Color(0xFF2A2A1A)},
     {'label': 'Motivated', 'color': const Color(0xFF2A1A4A)},
     {'label': 'Creative', 'color': const Color(0xFF3A1A2A)},
-    {'label': 'Inspired', 'color': const Color(0xFF1A4A2A)},
     {'label': 'Bold', 'color': const Color(0xFF4A2A1A)},
     {'label': 'Chill', 'color': const Color(0xFF1A2A4A)},
   ];

@@ -449,6 +449,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     onTap: () => Navigator.push(context, MaterialPageRoute(
                                       builder: (context) => PostDetailScreen(
                                         post: Map<String, dynamic>.from(post),
+                                        allPosts: (profile!['posts'] as List)
+                                            .map((p) => Map<String, dynamic>.from(p))
+                                            .toList(),
+                                        initialIndex: index,
                                       ),
                                     )),
                                     child: Container(
@@ -508,6 +512,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 onTap: () => Navigator.push(context, MaterialPageRoute(
                                   builder: (context) => PostDetailScreen(
                                     post: Map<String, dynamic>.from(post),
+                                    allPosts: (profile!['posts'] as List)
+                                        .map((p) => Map<String, dynamic>.from(p))
+                                        .toList(),
+                                    initialIndex: index,
                                   ),
                                 )),
                                 child: Container(

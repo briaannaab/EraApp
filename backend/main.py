@@ -5,6 +5,9 @@ from routers import posts, users, ai, payments, media, auth, comments, messages
 from models.base import Base, engine
 from models import user, post, comment, message
 import os
+from models import user, post, comment, message, notification
+from routers import notifications
+app.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
 
 load_dotenv(dotenv_path='/workspaces/EraApp/backend/.env')
 

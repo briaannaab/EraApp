@@ -4,6 +4,7 @@ import 'package:chewie/chewie.dart';
 import '../services/api_service.dart';
 import 'profile_screen.dart';
 import 'comments_screen.dart';
+import 'notifications_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -83,14 +84,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 child: const Icon(Icons.search, color: Colors.white, size: 20),
                               ),
-                              const SizedBox(width: 12),
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.3),
-                                  shape: BoxShape.circle,
+                              GestureDetector(
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const NotificationsScreen()),
                                 ),
-                                child: const Icon(Icons.notifications_none, color: Colors.white, size: 20),
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.3),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.notifications_none, color: Colors.white, size: 20),
+                                ),
                               ),
                             ],
                           ),

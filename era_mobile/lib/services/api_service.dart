@@ -12,7 +12,10 @@ class ApiService {
     }
     throw Exception('Failed to load posts');
   }
-
+  static Future<void> likeComment(int commentId) async {
+    await http.post(Uri.parse('$baseUrl/comments/$commentId/like'));
+  }
+  
   static Future<void> deletePost(int postId) async {
     await http.delete(Uri.parse('$baseUrl/posts/$postId'));
   }

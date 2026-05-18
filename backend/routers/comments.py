@@ -11,6 +11,15 @@ class CommentCreate(BaseModel):
     user_id: int
     username: str
     content: str
+@router.post("/{comment_id}/like")
+def like_comment(comment_id: int, db: Session = Depends(get_db)):
+    comment = db.query(Comment).filter(Comment.id == comment_id).first()
+    if not comment:
+        raise HTTPException(status_code=404, detail="Comment not found")
+    comment.likes += 1
+    db.commit()
+    db.refresh(comment)
+    return comment
 
 @router.get("/{post_id}")
 def get_comments(post_id: int, db: Session = Depends(get_db)):

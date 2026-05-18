@@ -47,8 +47,15 @@ class _CommentsScreenState extends State<CommentsScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF080808),
         iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text('Comments',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Row(
+          children: [
+            const Text('Comments',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            const SizedBox(width: 8),
+            Text('${comments.length}',
+                style: const TextStyle(color: Colors.white38, fontSize: 14)),
+          ],
+        ),
       ),
       body: Column(
         children: [
@@ -64,7 +71,8 @@ class _CommentsScreenState extends State<CommentsScreen> {
                         itemBuilder: (context, index) {
                           final comment = comments[index];
                           return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 10),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -73,7 +81,8 @@ class _CommentsScreenState extends State<CommentsScreen> {
                                   backgroundColor: const Color(0xFF2A1A4A),
                                   child: Text(
                                     (comment['username'] ?? '?')[0].toUpperCase(),
-                                    style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 12),
+                                    style: const TextStyle(
+                                        color: Color(0xFFC9A84C), fontSize: 12),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
@@ -88,7 +97,33 @@ class _CommentsScreenState extends State<CommentsScreen> {
                                               fontSize: 13)),
                                       const SizedBox(height: 4),
                                       Text(comment['content'],
-                                          style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                                          style: const TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: 14)),
+                                      const SizedBox(height: 6),
+                                      // Like button
+                                      GestureDetector(
+                                        onTap: () async {
+                                          await ApiService.likeComment(comment['id']);
+                                          loadComments();
+                                        },
+                                        child: Row(
+                                          children: [
+                                            const Icon(Icons.favorite_border,
+                                                color: Colors.white38, size: 14),
+                                            const SizedBox(width: 4),
+                                            Text('${comment['likes'] ?? 0}',
+                                                style: const TextStyle(
+                                                    color: Colors.white38,
+                                                    fontSize: 12)),
+                                            const SizedBox(width: 16),
+                                            const Text('Reply',
+                                                style: TextStyle(
+                                                    color: Colors.white38,
+                                                    fontSize: 12)),
+                                          ],
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -98,6 +133,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                         },
                       ),
           ),
+          // Input bar
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: const BoxDecoration(
@@ -106,6 +142,16 @@ class _CommentsScreenState extends State<CommentsScreen> {
             ),
             child: Row(
               children: [
+                const CircleAvatar(
+                  radius: 16,
+                  backgroundColor: Color(0xFF2A1A4A),
+                  child: Text('B',
+                      style: TextStyle(
+                          color: Color(0xFFC9A84C),
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(width: 10),
                 Expanded(
                   child: TextField(
                     controller: controller,
@@ -119,7 +165,15 @@ class _CommentsScreenState extends State<CommentsScreen> {
                 ),
                 GestureDetector(
                   onTap: submitComment,
-                  child: const Icon(Icons.send, color: Color(0xFFC9A84C)),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFC9A84C),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.send_rounded,
+                        color: Colors.black, size: 16),
+                  ),
                 ),
               ],
             ),

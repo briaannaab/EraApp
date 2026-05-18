@@ -9,7 +9,6 @@ import 'chat_screen.dart';
 import 'edit_profile_screen.dart';
 import 'settings_screen.dart';
 import 'post_detail_screen.dart';
-
 class ProfileScreen extends StatefulWidget {
   final String username;
   const ProfileScreen({super.key, required this.username});
@@ -124,83 +123,83 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         children: [
                           // Top bar
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  if (Navigator.canPop(context))
-                                    GestureDetector(
-                                      onTap: () => Navigator.pop(context),
-                                      child: Icon(Icons.arrow_back_ios, color: accent, size: 20),
-                                    )
-                                  else
-                                    const SizedBox(width: 20),
-                                  Row(
-                                    children: [
-                                      if (isOwnProfile)
-                                        GestureDetector(
-                                          onTap: () async {
-                                            final updated = await Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => EditProfileScreen(profile: profile!),
-                                              ),
-                                            );
-                                            if (updated == true) loadProfile();
-                                          },
-                                          child: Icon(Icons.edit_outlined, color: accent, size: 20),
-                                        ),
-                                      const SizedBox(width: 16),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                if (Navigator.canPop(context))
+                                  GestureDetector(
+                                    onTap: () => Navigator.pop(context),
+                                    child: Icon(Icons.arrow_back_ios, color: accent, size: 20),
+                                  )
+                                else
+                                  const SizedBox(width: 20),
+                                Row(
+                                  children: [
+                                    if (isOwnProfile)
                                       GestureDetector(
-                                        onTap: () => showModalBottomSheet(
-                                          context: context,
-                                          backgroundColor: const Color(0xFF1A1A1A),
-                                          shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                                          ),
-                                          builder: (context) => Padding(
-                                            padding: const EdgeInsets.all(24),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Container(
-                                                  width: 40, height: 4,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white24,
-                                                    borderRadius: BorderRadius.circular(2),
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 20),
-                                                if (isOwnProfile) ...[
-                                                  _menuItem(Icons.share_outlined, 'Share Profile', accent, () => Navigator.pop(context)),
-                                                  _menuItem(Icons.settings_outlined, 'Settings', accent, () {
-                                                    Navigator.pop(context);
-                                                    Navigator.push(context, MaterialPageRoute(
-                                                      builder: (context) => const SettingsScreen(),
-                                                    ));
-                                                  }),
-                                                ] else ...[
-                                                  _menuItem(Icons.share_outlined, 'Share Profile', accent, () => Navigator.pop(context)),
-                                                  _menuItem(Icons.block_outlined, 'Block @${widget.username}', Colors.orange, () => Navigator.pop(context)),
-                                                  _menuItem(Icons.flag_outlined, 'Report @${widget.username}', Colors.red, () => Navigator.pop(context)),
-                                                ],
-                                                const SizedBox(height: 8),
-                                              ],
+                                        onTap: () async {
+                                          final updated = await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => EditProfileScreen(profile: profile!),
                                             ),
+                                          );
+                                          if (updated == true) loadProfile();
+                                        },
+                                        child: Icon(Icons.edit_outlined, color: accent, size: 20),
+                                      ),
+                                    const SizedBox(width: 16),
+                                    GestureDetector(
+                                      onTap: () => showModalBottomSheet(
+                                        context: context,
+                                        backgroundColor: const Color(0xFF1A1A1A),
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                        ),
+                                        builder: (context) => Padding(
+                                          padding: const EdgeInsets.all(24),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Container(
+                                                width: 40, height: 4,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white24,
+                                                  borderRadius: BorderRadius.circular(2),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 20),
+                                              if (isOwnProfile) ...[
+                                                _menuItem(Icons.share_outlined, 'Share Profile', accent, () => Navigator.pop(context)),
+                                                _menuItem(Icons.settings_outlined, 'Settings', accent, () {
+                                                  Navigator.pop(context);
+                                                  Navigator.push(context, MaterialPageRoute(
+                                                    builder: (context) => const SettingsScreen(),
+                                                  ));
+                                                }),
+                                              ] else ...[
+                                                _menuItem(Icons.share_outlined, 'Share Profile', accent, () => Navigator.pop(context)),
+                                                _menuItem(Icons.block_outlined, 'Block @${widget.username}', Colors.orange, () => Navigator.pop(context)),
+                                                _menuItem(Icons.flag_outlined, 'Report @${widget.username}', Colors.red, () => Navigator.pop(context)),
+                                              ],
+                                              const SizedBox(height: 8),
+                                            ],
                                           ),
                                         ),
-                                        child: Icon(Icons.more_horiz, color: accent, size: 20),
                                       ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                                      child: Icon(Icons.more_horiz, color: accent, size: 20),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
+                          ),
 
                           const SizedBox(height: 20),
 
-                          // Avatar with camera button
+                          // Avatar
                           Stack(
                             children: [
                               Container(
@@ -224,11 +223,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   child: profileImageUrl == null
                                       ? Text(
                                           widget.username[0].toUpperCase(),
-                                          style: TextStyle(
-                                            color: accent,
-                                            fontSize: 36,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                          style: TextStyle(color: accent, fontSize: 36, fontWeight: FontWeight.bold),
                                         )
                                       : null,
                                 ),
@@ -255,14 +250,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                           const SizedBox(height: 12),
 
-                          // Name
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                widget.username,
-                                style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
-                              ),
+                              Text(widget.username,
+                                  style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
                               if (profile!['is_creator'] == true) ...[
                                 const SizedBox(width: 6),
                                 Icon(Icons.verified, color: accent, size: 18),
@@ -299,12 +291,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                           const SizedBox(height: 20),
 
-                          // Action buttons
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24),
-                            child: Row(
-                              children: [
-                                if (!isOwnProfile) ...[
+                          if (!isOwnProfile)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 24),
+                              child: Row(
+                                children: [
                                   Expanded(
                                     child: GestureDetector(
                                       onTap: () {},
@@ -342,14 +333,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                                     ),
                                   ),
-                                ] 
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
 
                           const SizedBox(height: 20),
 
-                          // Creator earnings
                           if (profile!['is_creator'] == true && isOwnProfile)
                             Padding(
                               padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
@@ -371,7 +360,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
 
-                          // Themes
                           if (isOwnProfile) ...[
                             Padding(
                               padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
@@ -412,7 +400,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                                     );
                                   }),
-                                  // Custom color picker
                                   GestureDetector(
                                     onTap: () => showColorPicker(customAccentColor ?? themeAccents[selectedTheme]!),
                                     child: Container(
@@ -439,7 +426,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             const SizedBox(height: 24),
                           ],
 
-                          // Pinned Moments
                           if (profile!['posts'] != null && (profile!['posts'] as List).isNotEmpty) ...[
                             Padding(
                               padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
@@ -460,39 +446,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 itemBuilder: (context, index) {
                                   final post = profile!['posts'][index];
                                   return GestureDetector(
-                                    onTap: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => PostDetailScreen(post: Map<String, dynamic>.from(post)),
+                                    onTap: () => Navigator.push(context, MaterialPageRoute(
+                                      builder: (context) => PostDetailScreen(
+                                        post: Map<String, dynamic>.from(post),
                                       ),
-                                    ),
+                                    )),
                                     child: Container(
-                                    width: 100,
-                                    height: 100,
-                                    margin: const EdgeInsets.only(right: 10),
-                                    decoration: BoxDecoration(
-                                      color: accent.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(color: accent.withOpacity(0.2)),
-                                    ),
-                                    child: post['media_url'] != null
-                                        ? ClipRRect(
-                                            borderRadius: BorderRadius.circular(12),
-                                            child: Image.network(post['media_url'],
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (c, e, s) =>
-                                                    Icon(Icons.image_outlined, color: accent)),
-                                          )
-                                        : Center(
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(8),
-                                              child: Text(post['content'] ?? '',
-                                                  maxLines: 4,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  style: TextStyle(color: accent.withOpacity(0.8), fontSize: 10)),
+                                      width: 100,
+                                      height: 100,
+                                      margin: const EdgeInsets.only(right: 10),
+                                      decoration: BoxDecoration(
+                                        color: accent.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(color: accent.withOpacity(0.2)),
+                                      ),
+                                      child: post['media_url'] != null
+                                          ? ClipRRect(
+                                              borderRadius: BorderRadius.circular(12),
+                                              child: Image.network(post['media_url'],
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (c, e, s) =>
+                                                      Icon(Icons.image_outlined, color: accent)),
+                                            )
+                                          : Center(
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8),
+                                                child: Text(post['content'] ?? '',
+                                                    maxLines: 4,
+                                                    overflow: TextOverflow.ellipsis,
+                                                    style: TextStyle(color: accent.withOpacity(0.8), fontSize: 10)),
+                                              ),
                                             ),
-                                          ),
-                                    );
+                                    ),
                                   );
                                 },
                               ),
@@ -500,7 +485,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             const SizedBox(height: 24),
                           ],
 
-                          // Posts grid
                           const Padding(
                             padding: EdgeInsets.fromLTRB(20, 0, 20, 12),
                             child: Align(
@@ -520,28 +504,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             itemCount: (profile!['posts'] as List).length,
                             itemBuilder: (context, index) {
                               final post = profile!['posts'][index];
-                              return Container(
-                                decoration: BoxDecoration(
-                                  color: accent.withOpacity(0.08),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: post['media_url'] != null
-                                    ? ClipRRect(
-                                        borderRadius: BorderRadius.circular(4),
-                                        child: Image.network(post['media_url'],
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (c, e, s) =>
-                                                Icon(Icons.play_circle_outline, color: accent)),
-                                      )
-                                    : Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(6),
-                                          child: Text(post['content'] ?? '',
-                                              maxLines: 3,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(color: accent.withOpacity(0.7), fontSize: 9)),
+                              return GestureDetector(
+                                onTap: () => Navigator.push(context, MaterialPageRoute(
+                                  builder: (context) => PostDetailScreen(
+                                    post: Map<String, dynamic>.from(post),
+                                  ),
+                                )),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: accent.withOpacity(0.08),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: post['media_url'] != null
+                                      ? ClipRRect(
+                                          borderRadius: BorderRadius.circular(4),
+                                          child: Image.network(post['media_url'],
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (c, e, s) =>
+                                                  Icon(Icons.play_circle_outline, color: accent)),
+                                        )
+                                      : Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(6),
+                                            child: Text(post['content'] ?? '',
+                                                maxLines: 3,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(color: accent.withOpacity(0.7), fontSize: 9)),
+                                          ),
                                         ),
-                                      ),
+                                ),
                               );
                             },
                           ),
@@ -553,21 +544,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
     );
   }
-Widget _menuItem(IconData icon, String label, Color color, VoidCallback onTap) {
-  return GestureDetector(
-    onTap: onTap,
-    child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      child: Row(
-        children: [
-          Icon(icon, color: color, size: 22),
-          const SizedBox(width: 16),
-          Text(label, style: TextStyle(color: color, fontSize: 15)),
-        ],
+
+  Widget _menuItem(IconData icon, String label, Color color, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        child: Row(
+          children: [
+            Icon(icon, color: color, size: 22),
+            const SizedBox(width: 16),
+            Text(label, style: TextStyle(color: color, fontSize: 15)),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
+
   Widget _stat(String value, String label, Color accent) {
     return Column(
       children: [

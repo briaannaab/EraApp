@@ -12,6 +12,38 @@ import 'moment_screen.dart';
 import 'poll_screen.dart';
 import 'prayer_screen.dart';
 
+//photo filters
+const List<Map<String, dynamic>> photoFilters = [
+  {
+    'name': 'None',
+    'matrix': <double>[1,0,0,0,0, 0,1,0,0,0, 0,0,1,0,0, 0,0,0,1,0],
+  },
+  {
+    'name': 'Warm',
+    'matrix': <double>[1.2,0,0,0,0, 0,1.0,0,0,0, 0,0,0.8,0,0, 0,0,0,1,0],
+  },
+  {
+    'name': 'Cool',
+    'matrix': <double>[0.8,0,0,0,0, 0,1.0,0,0,0, 0,0,1.2,0,0, 0,0,0,1,0],
+  },
+  {
+    'name': 'Noir',
+    'matrix': <double>[0.33,0.33,0.33,0,0, 0.33,0.33,0.33,0,0, 0.33,0.33,0.33,0,0, 0,0,0,1,0],
+  },
+  {
+    'name': 'Fade',
+    'matrix': <double>[1,0,0,0,40, 0,1,0,0,40, 0,0,1,0,40, 0,0,0,0.8,0],
+  },
+  {
+    'name': 'Vivid',
+    'matrix': <double>[1.4,0,0,0,-20, 0,1.4,0,0,-20, 0,0,1.4,0,-20, 0,0,0,1,0],
+  },
+  {
+    'name': 'Dusk',
+    'matrix': <double>[1.1,0,0,0,10, 0,0.9,0,0,0, 0,0,0.8,0,20, 0,0,0,1,0],
+  },
+];
+
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -195,6 +227,7 @@ class _MainScreenState extends State<MainScreen> {
     Uint8List? selectedVideoBytes;
     String? selectedVideoName;
     String? selectedVibe;
+    int selectedFilterIndex = 0;
 
     showModalBottomSheet(
       context: context,
@@ -226,11 +259,64 @@ class _MainScreenState extends State<MainScreen> {
                   border: InputBorder.none,
                 ),
               ),
-              if (selectedImageBytes != null)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.memory(selectedImageBytes!, height: 150, fit: BoxFit.cover),
+              if (selectedImageBytes != null) ...[
+                ColorFiltered(
+                  colorFilter: ColorFilter.matrix(
+                    List<double>.from(photoFilters[selectedFilterIndex]['matrix']),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.memory(selectedImageBytes!, height: 200, fit: BoxFit.cover, width: double.infinity),
+                  ),
                 ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 70,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: photoFilters.length,
+                    itemBuilder: (context, index) {
+                      final filter = photoFilters[index];
+                      final isSelected = selectedFilterIndex == index;
+                      return GestureDetector(
+                        onTap: () => setModalState(() => selectedFilterIndex = index),
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 8),
+                          child: Column(
+                            children: [
+                              Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: isSelected ? const Color(0xFFC9A84C) : Colors.transparent,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(6),
+                                  child: ColorFiltered(
+                                    colorFilter: ColorFilter.matrix(
+                                      List<double>.from(filter['matrix']),
+                                    ),
+                                    child: Image.memory(selectedImageBytes!, fit: BoxFit.cover),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(filter['name'] as String,
+                                  style: TextStyle(
+                                      color: isSelected ? const Color(0xFFC9A84C) : Colors.white38,
+                                      fontSize: 9)),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
               if (selectedVideoBytes != null)
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -347,7 +433,7 @@ class _MainScreenState extends State<MainScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   onPressed: () async {
-                    if (controller.text.isEmpty) return;
+                    if (controller.text.isEmpty && selectedImageBytes == null && selectedVideoBytes == null) return;
                     String? mediaUrl;
                     if (selectedImageBytes != null) {
                       mediaUrl = await ApiService.uploadImage(selectedImageBytes!, 'post.jpg');

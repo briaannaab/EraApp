@@ -53,9 +53,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF080808),
+      backgroundColor: const Color(0xFF0A0008),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF080808),
+        backgroundColor: const Color(0xFF0A0008),
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text('Edit Profile',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -85,7 +85,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 hintText: 'Tell your story...',
                 hintStyle: const TextStyle(color: Colors.white38),
                 filled: true,
-                fillColor: const Color(0xFF1A1A1A),
+                fillColor: const Color(0xFF1A0A1A),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -101,7 +101,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A),
+                color: const Color(0xFF1A0A1A),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -125,7 +125,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
+                  color: const Color(0xFF1A0A1A),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: voiceBioUrl != null

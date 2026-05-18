@@ -81,7 +81,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF080808),
+      backgroundColor: const Color(0xFF0A0008),
       body: SafeArea(
         child: loading
             ? const Center(child: CircularProgressIndicator(color: Color(0xFFC9A84C)))
@@ -109,7 +109,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               hintStyle: const TextStyle(color: Colors.white38),
                               prefixIcon: const Icon(Icons.search, color: Colors.white38),
                               filled: true,
-                              fillColor: const Color(0xFF1A1A1A),
+                              fillColor: const Color(0xFF1A0A1A),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide.none,
@@ -200,7 +200,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                               decoration: const BoxDecoration(
-                                  border: Border(bottom: BorderSide(color: Color(0xFF1A1A1A)))),
+                                  border: Border(bottom: BorderSide(color: Color(0xFF1A0A1A)))),
                               child: Row(
                                 children: [
                                   CircleAvatar(

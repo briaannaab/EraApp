@@ -39,13 +39,13 @@ class _PrayerScreenState extends State<PrayerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF080808),
+      backgroundColor: const Color(0xFF0A0008),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF1A0A2A), Color(0xFF080808)],
+            colors: [Color(0xFF1A0A2A), Color(0xFF0A0008)],
           ),
         ),
         child: SafeArea(
@@ -101,7 +101,7 @@ class _PrayerScreenState extends State<PrayerScreen> {
                               decoration: BoxDecoration(
                                 color: isSelected
                                     ? (cat['color'] as Color).withOpacity(0.2)
-                                    : const Color(0xFF1A1A1A),
+                                    : const Color(0xFF1A0A1A),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color: isSelected
@@ -147,7 +147,7 @@ class _PrayerScreenState extends State<PrayerScreen> {
                           hintText: 'Share your prayer request with the community...',
                           hintStyle: const TextStyle(color: Colors.white38, fontSize: 14),
                           filled: true,
-                          fillColor: const Color(0xFF1A1A1A),
+                          fillColor: const Color(0xFF1A0A1A),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -164,7 +164,7 @@ class _PrayerScreenState extends State<PrayerScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1A1A),
+                          color: const Color(0xFF1A0A1A),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(

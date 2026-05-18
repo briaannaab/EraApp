@@ -59,9 +59,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF080808),
+      backgroundColor: const Color(0xFF0A0008),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF080808),
+        backgroundColor: const Color(0xFF0A0008),
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text('Notifications',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -85,7 +85,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1A1A),
+                          color: const Color(0xFF1A0A1A),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(Icons.notifications_none,
@@ -113,7 +113,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
                     return Container(
                       color: isUnread
-                          ? const Color(0xFF1A1A1A)
+                          ? const Color(0xFF1A0A1A)
                           : Colors.transparent,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 14),

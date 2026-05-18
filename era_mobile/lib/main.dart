@@ -16,12 +16,12 @@ class EraApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF080808),
+        scaffoldBackgroundColor: const Color(0xFF0A0008),
         primaryColor: const Color(0xFFC9A84C),
         colorScheme: const ColorScheme.dark(
           primary: Color(0xFFC9A84C),
           secondary: Color(0xFFC9A84C),
-          surface: Color(0xFF1A1A1A),
+          surface: Color(0xFF150010),
         ),
       ),
       home: const AuthScreen(),

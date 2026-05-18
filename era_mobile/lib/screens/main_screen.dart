@@ -64,12 +64,12 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF080808),
+      backgroundColor: const Color(0xFF0A0008),
       body: _screens[_currentIndex],
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-          color: Color(0xFF0A0A0A),
-          border: Border(top: BorderSide(color: Color(0xFF1A1A1A))),
+          color: Color(0xFF0D000D),
+          border: Border(top: BorderSide(color: Color(0xFF1A0A1A))),
         ),
         child: SafeArea(
           child: Padding(
@@ -146,7 +146,7 @@ class _MainScreenState extends State<MainScreen> {
     final outerContext = context;
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: const Color(0xFF110011),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -231,7 +231,7 @@ class _MainScreenState extends State<MainScreen> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: const Color(0xFF1A0A1A),
       isScrollControlled: true,
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) => Padding(

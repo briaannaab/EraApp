@@ -42,7 +42,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF080808),
+      backgroundColor: const Color(0xFF0A0008),
       body: PageView.builder(
         controller: _pageController,
         scrollDirection: Axis.vertical,
@@ -223,7 +223,7 @@ class _PostDetailCardState extends State<_PostDetailCard> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1A1A1A),
+                        color: const Color(0xFF1A0A1A),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text('✨ ${post['vibe']}',
@@ -243,7 +243,7 @@ class _PostDetailCardState extends State<_PostDetailCard> {
   void _showOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: const Color(0xFF1A0A1A),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -265,7 +265,7 @@ class _PostDetailCardState extends State<_PostDetailCard> {
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (context) => AlertDialog(
-                  backgroundColor: const Color(0xFF1A1A1A),
+                  backgroundColor: const Color(0xFF1A0A1A),
                   title: const Text('Delete post?',
                       style: TextStyle(color: Colors.white)),
                   content: const Text('This cannot be undone.',

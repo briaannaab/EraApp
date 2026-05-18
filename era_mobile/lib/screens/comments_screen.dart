@@ -43,9 +43,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF080808),
+      backgroundColor: const Color(0xFF0A0008),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF080808),
+        backgroundColor: const Color(0xFF0A0008),
         iconTheme: const IconThemeData(color: Colors.white),
         title: Row(
           children: [
@@ -137,7 +137,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: const BoxDecoration(
-              color: Color(0xFF1A1A1A),
+              color: Color(0xFF1A0A1A),
               border: Border(top: BorderSide(color: Color(0xFF2A2A2A))),
             ),
             child: Row(

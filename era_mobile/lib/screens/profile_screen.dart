@@ -26,7 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final String currentUser = 'briaannaab';
 
   final Map<String, List<Color>> themes = {
-    'default': [const Color(0xFF1a0033), const Color(0xFF080808)],
+    'default': [const Color(0xFF1a0033), const Color(0xFF0A0008)],
     'cosmic': [const Color(0xFF0a0a2e), const Color(0xFF1a0040)],
     'aurora': [const Color(0xFF002a1a), const Color(0xFF001a0a)],
     'ember': [const Color(0xFF2a0a00), const Color(0xFF1a0500)],
@@ -72,7 +72,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: const Color(0xFF1A0A1A),
         title: const Text('Pick a color', style: TextStyle(color: Colors.white)),
         content: ColorPicker(
           color: picked,
@@ -154,7 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     GestureDetector(
                                       onTap: () => showModalBottomSheet(
                                         context: context,
-                                        backgroundColor: const Color(0xFF1A1A1A),
+                                        backgroundColor: const Color(0xFF1A0A1A),
                                         shape: const RoundedRectangleBorder(
                                           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                                         ),
@@ -239,7 +239,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       decoration: BoxDecoration(
                                         color: accent,
                                         shape: BoxShape.circle,
-                                        border: Border.all(color: const Color(0xFF080808), width: 2),
+                                        border: Border.all(color: const Color(0xFF0A0008), width: 2),
                                       ),
                                       child: const Icon(Icons.camera_alt, color: Colors.black, size: 14),
                                     ),

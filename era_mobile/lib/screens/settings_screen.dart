@@ -7,9 +7,9 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF080808),
+      backgroundColor: const Color(0xFF0A0008),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF080808),
+        backgroundColor: const Color(0xFF0A0008),
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text('Settings',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -80,7 +80,7 @@ class SettingsScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Color(0xFF1A1A1A))),
+          border: Border(bottom: BorderSide(color: Color(0xFF1A0A1A))),
         ),
         child: Row(
           children: [

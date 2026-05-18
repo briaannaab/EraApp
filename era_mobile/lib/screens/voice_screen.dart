@@ -20,9 +20,9 @@ class _VoiceScreenState extends State<VoiceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF080808),
+      backgroundColor: const Color(0xFF0A0008),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF080808),
+        backgroundColor: const Color(0xFF0A0008),
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text('Voice Post',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -46,7 +46,7 @@ class _VoiceScreenState extends State<VoiceScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
+                  color: const Color(0xFF1A0A1A),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: const Color(0xFFC9A84C).withOpacity(0.3)),
                 ),
@@ -112,7 +112,7 @@ class _VoiceScreenState extends State<VoiceScreen> {
                 hintText: 'Add a caption...',
                 hintStyle: const TextStyle(color: Colors.white38),
                 filled: true,
-                fillColor: const Color(0xFF1A1A1A),
+                fillColor: const Color(0xFF1A0A1A),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,

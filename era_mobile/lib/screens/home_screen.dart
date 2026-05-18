@@ -38,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF050505),
+      backgroundColor: const Color(0xFF080008),
       extendBodyBehindAppBar: true,
       body: loading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFFC9A84C)))
@@ -126,7 +126,7 @@ class _ImmersivePostCard extends StatelessWidget {
     final isOwner = post['username'] == 'briaannaab';
 
     return Container(
-      color: const Color(0xFF050505),
+      color: const Color(0xFF080008),
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -137,7 +137,7 @@ class _ImmersivePostCard extends StatelessWidget {
                 : Image.network(
                     post['media_url'],
                     fit: BoxFit.cover,
-                    errorBuilder: (c, e, s) => Container(color: const Color(0xFF1A1A1A)),
+                    errorBuilder: (c, e, s) => Container(color: const Color(0xFF1A0A1A)),
                   )
           else
             Container(
@@ -215,7 +215,7 @@ class _ImmersivePostCard extends StatelessWidget {
                       final confirm = await showDialog<bool>(
                         context: context,
                         builder: (context) => AlertDialog(
-                          backgroundColor: const Color(0xFF1A1A1A),
+                          backgroundColor: const Color(0xFF1A0A1A),
                           title: const Text('Delete post?',
                               style: TextStyle(color: Colors.white)),
                           content: const Text('This cannot be undone.',

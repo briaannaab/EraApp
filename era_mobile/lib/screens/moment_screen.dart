@@ -21,9 +21,9 @@ class _MomentScreenState extends State<MomentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF080808),
+      backgroundColor: const Color(0xFF0A0008),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF080808),
+        backgroundColor: const Color(0xFF0A0008),
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text('New Moment',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -60,7 +60,7 @@ class _MomentScreenState extends State<MomentScreen> {
                   width: double.infinity,
                   height: 260,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A1A),
+                    color: const Color(0xFF1A0A1A),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: _imageBytes != null
@@ -102,7 +102,7 @@ class _MomentScreenState extends State<MomentScreen> {
                   width: double.infinity,
                   height: 260,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A1A),
+                    color: const Color(0xFF1A0A1A),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: _videoBytes != null
@@ -173,7 +173,7 @@ class _MomentScreenState extends State<MomentScreen> {
                   hintText: 'Add a caption...',
                   hintStyle: const TextStyle(color: Colors.white38),
                   filled: true,
-                  fillColor: const Color(0xFF1A1A1A),
+                  fillColor: const Color(0xFF1A0A1A),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -240,7 +240,7 @@ class _MomentScreenState extends State<MomentScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFC9A84C) : const Color(0xFF1A1A1A),
+            color: isSelected ? const Color(0xFFC9A84C) : const Color(0xFF1A0A1A),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(

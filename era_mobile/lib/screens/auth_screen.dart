@@ -59,7 +59,7 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF080808),
+      backgroundColor: const Color(0xFF0A0008),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(32),
@@ -137,7 +137,7 @@ class _AuthScreenState extends State<AuthScreen> {
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.white38),
         filled: true,
-        fillColor: const Color(0xFF1A1A1A),
+        fillColor: const Color(0xFF1A0A1A),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(4),
           borderSide: BorderSide.none,

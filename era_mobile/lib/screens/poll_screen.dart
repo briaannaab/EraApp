@@ -25,9 +25,9 @@ class _PollScreenState extends State<PollScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF080808),
+      backgroundColor: const Color(0xFF0A0008),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF080808),
+        backgroundColor: const Color(0xFF0A0008),
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text('Create Poll',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -47,7 +47,7 @@ class _PollScreenState extends State<PollScreen> {
                 hintText: "What's on your mind?",
                 hintStyle: const TextStyle(color: Colors.white38),
                 filled: true,
-                fillColor: const Color(0xFF1A1A1A),
+                fillColor: const Color(0xFF1A0A1A),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
@@ -73,7 +73,7 @@ class _PollScreenState extends State<PollScreen> {
                           hintText: 'Option ${i + 1}',
                           hintStyle: const TextStyle(color: Colors.white38),
                           filled: true,
-                          fillColor: const Color(0xFF1A1A1A),
+                          fillColor: const Color(0xFF1A0A1A),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                             borderSide: BorderSide.none,

@@ -33,7 +33,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF080808),
+      backgroundColor: const Color(0xFF0A0008),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,7 +55,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1A1A1A),
+                        color: const Color(0xFF1A0A1A),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(Icons.edit_outlined,
@@ -72,7 +72,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
+                  color: const Color(0xFF1A0A1A),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Row(
@@ -101,7 +101,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                 width: 80,
                                 height: 80,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF1A1A1A),
+                                  color: const Color(0xFF1A0A1A),
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(Icons.chat_bubble_outline,
@@ -157,7 +157,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                 decoration: const BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                          color: Color(0xFF1A1A1A))),
+                                          color: Color(0xFF1A0A1A))),
                                 ),
                                 child: Row(
                                   children: [
@@ -186,7 +186,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                               color: const Color(0xFF4BCB6B),
                                               shape: BoxShape.circle,
                                               border: Border.all(
-                                                  color: const Color(0xFF080808),
+                                                  color: const Color(0xFF0A0008),
                                                   width: 2),
                                             ),
                                           ),
@@ -263,7 +263,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
     final controller = TextEditingController();
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: const Color(0xFF1A0A1A),
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

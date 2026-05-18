@@ -18,6 +18,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   List<dynamic> filteredPosts = [];
   List<dynamic> creators = [];
   List<dynamic> trending = [];
+  List<dynamic> filteredUsers = [];
   bool loading = true;
   bool isSearching = false;
 
@@ -57,20 +58,25 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   }
 
   void search(String query) {
-    setState(() {
-      isSearching = query.isNotEmpty;
-      if (query.isEmpty) {
-        filteredPosts = allPosts;
-      } else {
-        filteredPosts = allPosts.where((post) {
-          final content = (post['content'] ?? '').toLowerCase();
-          final username = (post['username'] ?? '').toLowerCase();
-          return content.contains(query.toLowerCase()) ||
-              username.contains(query.toLowerCase());
-        }).toList();
-      }
-    });
-  }
+  setState(() {
+    isSearching = query.isNotEmpty;
+    if (query.isEmpty) {
+      filteredPosts = allPosts;
+      filteredUsers = [];
+    } else {
+      filteredPosts = allPosts.where((post) {
+        final content = (post['content'] ?? '').toLowerCase();
+        final username = (post['username'] ?? '').toLowerCase();
+        return content.contains(query.toLowerCase()) ||
+            username.contains(query.toLowerCase());
+      }).toList();
+      filteredUsers = creators.where((user) {
+        final username = (user['username'] ?? '').toLowerCase();
+        return username.contains(query.toLowerCase());
+      }).toList();
+    }
+  });
+}
 
   @override
   Widget build(BuildContext context) {
@@ -117,6 +123,72 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   ),
 
                   if (isSearching) ...[
+                    // Users results
+                    if (filteredUsers.isNotEmpty)
+                      SliverToBoxAdapter(
+                        child: const Padding(
+                          padding: EdgeInsets.fromLTRB(20, 12, 20, 8),
+                          child: Text('People',
+                              style: TextStyle(color: Colors.white54, fontSize: 12, letterSpacing: 1)),
+                        ),
+                      ),
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final user = filteredUsers[index];
+                          final username = (user['username'] ?? 'unknown') as String;
+                          return GestureDetector(
+                            onTap: () => Navigator.push(context,
+                                MaterialPageRoute(builder: (context) => ProfileScreen(username: username))),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 22,
+                                    backgroundColor: const Color(0xFF2A1A4A),
+                                    child: Text(username[0].toUpperCase(),
+                                        style: const TextStyle(color: Color(0xFFC9A84C), fontWeight: FontWeight.bold)),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('@$username',
+                                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                        Text(user['bio'] ?? 'Era member',
+                                            style: const TextStyle(color: Colors.white38, fontSize: 12),
+                                            maxLines: 1, overflow: TextOverflow.ellipsis),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.purple[800],
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: const Text('View',
+                                        style: TextStyle(color: Colors.white, fontSize: 12)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                        childCount: filteredUsers.length,
+                      ),
+                    ),
+                    // Posts results
+                    if (filteredPosts.isNotEmpty)
+                      SliverToBoxAdapter(
+                        child: const Padding(
+                          padding: EdgeInsets.fromLTRB(20, 12, 20, 8),
+                          child: Text('Posts',
+                              style: TextStyle(color: Colors.white54, fontSize: 12, letterSpacing: 1)),
+                        ),
+                      ),
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
@@ -146,8 +218,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
                                         Text(post['content'] ?? '',
                                             style: const TextStyle(color: Colors.white54, fontSize: 12),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis),
+                                            maxLines: 2, overflow: TextOverflow.ellipsis),
                                       ],
                                     ),
                                   ),
@@ -159,6 +230,22 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                         childCount: filteredPosts.length,
                       ),
                     ),
+                    if (filteredUsers.isEmpty && filteredPosts.isEmpty)
+                      SliverToBoxAdapter(
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(40),
+                            child: Column(
+                              children: [
+                                const Icon(Icons.search_off, color: Colors.white24, size: 48),
+                                const SizedBox(height: 12),
+                                const Text('No results found',
+                                    style: TextStyle(color: Colors.white38, fontSize: 16)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                   ] else ...[
 
                     SliverToBoxAdapter(

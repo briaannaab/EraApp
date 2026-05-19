@@ -72,11 +72,15 @@ def update_user(user_id: int, data: UserUpdate, db: Session = Depends(get_db)):
     return user
 
 @router.post("/{user_id}/follow")
-def follow_user(user_id: int, db: Session = Depends(get_db)):
+def follow_user(user_id: int, follow_id: int = 1, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     user.followers += 1
+    # also increment follower's following count
+    follower = db.query(User).filter(User.id == follower_id).first()
+    if follower:
+        follower.following += 1
     db.commit()
     db.refresh(user)
     return user

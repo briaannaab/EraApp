@@ -12,10 +12,29 @@ class ApiService {
     }
     throw Exception('Failed to load posts');
   }
+
+  static Future<void> followUser(String username) async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/users/'));
+      if (response.statusCode == 200) {
+        final users = jsonDecode(response.body);
+        final user = (users as List).firstWhere(
+          (u) => u['username'] == username,
+          orElse: () => null,
+        );
+        if (user != null) {
+          await http.post(Uri.parse('$baseUrl/users/${user["id"]}/follow?follower_id=1'));
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+
   static Future<void> likeComment(int commentId) async {
     await http.post(Uri.parse('$baseUrl/comments/$commentId/like'));
   }
-  
+
   static Future<void> deletePost(int postId) async {
     await http.delete(Uri.parse('$baseUrl/posts/$postId'));
   }

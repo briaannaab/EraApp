@@ -78,7 +78,7 @@ def follow_user(user_id: int, follow_id: int = 1, db: Session = Depends(get_db))
         raise HTTPException(status_code=404, detail="User not found")
     user.followers += 1
     # also increment follower's following count
-    follower = db.query(User).filter(User.id == follower_id).first()
+    follower = db.query(User).filter(User.id == follow_id).first()
     if follower:
         follower.following += 1
     db.commit()

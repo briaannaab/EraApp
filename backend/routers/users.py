@@ -84,3 +84,13 @@ def follow_user(user_id: int, follow_id: int = 1, db: Session = Depends(get_db))
     db.commit()
     db.refresh(user)
     return user
+
+@router.get("/{user_id}/followers")
+def get_followers(user_id: int, db: Session = Depends(get_db)):
+    # For now return all users as placeholder
+    # In a full app you'd have a followers junction table
+    return db.query(User).all()
+
+@router.get("/{user_id}/following")
+def get_following(user_id: int, db: Session = Depends(get_db)):
+    return db.query(User).all()

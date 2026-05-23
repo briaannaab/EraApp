@@ -9,6 +9,7 @@ import 'chat_screen.dart';
 import 'edit_profile_screen.dart';
 import 'settings_screen.dart';
 import 'post_detail_screen.dart';
+import 'followers_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String username;
@@ -355,15 +356,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ],
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  _stat('${profile!["post_count"]}', 'Posts', accent),
-                                  Container(width: 1, height: 30, color: accent.withOpacity(0.2)),
-                                  _stat('${profile!["followers"]}', 'Followers', accent),
-                                  Container(width: 1, height: 30, color: accent.withOpacity(0.2)),
-                                  _stat('${profile!["following"]}', 'Following', accent),
-                                ],
-                              ),
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {},
+                                      child: _stat('${profile!["post_count"]}', 'Posts', accent),
+                                    ),
+                                    Container(width: 1, height: 30, color: accent.withOpacity(0.2)),
+                                    GestureDetector(
+                                      onTap: () => Navigator.push(context, MaterialPageRoute(
+                                        builder: (context) => FollowersScreen(username: widget.username),
+                                      )),
+                                      child: _stat('${profile!["followers"]}', 'Followers', accent),
+                                    ),
+                                    Container(width: 1, height: 30, color: accent.withOpacity(0.2)),
+                                    GestureDetector(
+                                      onTap: () => Navigator.push(context, MaterialPageRoute(
+                                        builder: (context) => FollowersScreen(username: widget.username, showFollowing: true),
+                                      )),
+                                      child: _stat('${profile!["following"]}', 'Following', accent),
+                                    ),
+                                  ],
+                                ),
                             ),
                           ),
 

@@ -42,6 +42,30 @@ const List<Map<String, dynamic>> photoFilters = [
     'name': 'Dusk',
     'matrix': <double>[1.1,0,0,0,10, 0,0.9,0,0,0, 0,0,0.8,0,20, 0,0,0,1,0],
   },
+  {
+    'name': 'Golden',
+    'matrix': <double>[1.3,0.1,0,0,10, 0.1,1.1,0,0,5, 0,0,0.7,0,0, 0,0,0,1,0],
+  },
+  {
+    'name': 'Moody',
+    'matrix': <double>[0.8,0,0,0,-10, 0,0.7,0,0,-10, 0,0,0.9,0,-10, 0,0,0,1,0],
+  },
+  {
+    'name': 'Soft',
+    'matrix': <double>[1,0,0,0,30, 0,1,0,0,30, 0,0,1,0,30, 0,0,0,0.85,0],
+  },
+  {
+    'name': 'Vintage',
+    'matrix': <double>[0.9,0.1,0.1,0,10, 0.1,0.8,0.1,0,5, 0,0.1,0.7,0,0, 0,0,0,1,0],
+  },
+  {
+    'name': 'Contrast',
+    'matrix': <double>[1.5,0,0,0,-40, 0,1.5,0,0,-40, 0,0,1.5,0,-40, 0,0,0,1,0],
+  },
+  {
+    'name': 'Rose',
+    'matrix': <double>[1.2,0,0.1,0,10, 0,0.9,0.1,0,0, 0,0,0.8,0,0, 0,0,0,1,0],
+  },
 ];
 
 class MainScreen extends StatefulWidget {

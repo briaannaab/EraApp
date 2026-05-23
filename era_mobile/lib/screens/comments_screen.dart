@@ -13,6 +13,8 @@ class _CommentsScreenState extends State<CommentsScreen> {
   List<dynamic> comments = [];
   bool loading = true;
   final controller = TextEditingController();
+  int? replyingToId;
+  String? replyingToUsername;
 
   @override
   void initState() {
@@ -35,10 +37,21 @@ class _CommentsScreenState extends State<CommentsScreen> {
       userId: 1,
       username: 'briaannaab',
       content: controller.text,
+      parentId: replyingToId,
     );
     controller.clear();
+    setState(() {
+      replyingToId = null;
+      replyingToUsername = null;
+    });
     loadComments();
   }
+
+  List<dynamic> get topLevelComments =>
+      comments.where((c) => c['parent_id'] == null).toList();
+
+  List<dynamic> repliesFor(int commentId) =>
+      comments.where((c) => c['parent_id'] == commentId).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -67,78 +80,50 @@ class _CommentsScreenState extends State<CommentsScreen> {
                         child: Text('No comments yet. Be first!',
                             style: TextStyle(color: Colors.white54)))
                     : ListView.builder(
-                        itemCount: comments.length,
+                        itemCount: topLevelComments.length,
                         itemBuilder: (context, index) {
-                          final comment = comments[index];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 10),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                CircleAvatar(
-                                  radius: 18,
-                                  backgroundColor: const Color(0xFF2A1A4A),
-                                  child: Text(
-                                    (comment['username'] ?? '?')[0].toUpperCase(),
-                                    style: const TextStyle(
-                                        color: Color(0xFFC9A84C), fontSize: 12),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text('@${comment['username']}',
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 13)),
-                                      const SizedBox(height: 4),
-                                      Text(comment['content'],
-                                          style: const TextStyle(
-                                              color: Colors.white70,
-                                              fontSize: 14)),
-                                      const SizedBox(height: 6),
-                                      // Like button
-                                      GestureDetector(
-                                        onTap: () async {
-                                          await ApiService.likeComment(comment['id']);
-                                          loadComments();
-                                        },
-                                        child: Row(
-                                          children: [
-                                            const Icon(Icons.favorite_border,
-                                                color: Colors.white38, size: 14),
-                                            const SizedBox(width: 4),
-                                            Text('${comment['likes'] ?? 0}',
-                                                style: const TextStyle(
-                                                    color: Colors.white38,
-                                                    fontSize: 12)),
-                                            const SizedBox(width: 16),
-                                            const Text('Reply',
-                                                style: TextStyle(
-                                                    color: Colors.white38,
-                                                    fontSize: 12)),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+                          final comment = topLevelComments[index];
+                          final replies = repliesFor(comment['id']);
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _commentTile(comment, isReply: false),
+                              // Replies
+                              ...replies.map((reply) => Padding(
+                                    padding: const EdgeInsets.only(left: 48),
+                                    child: _commentTile(reply, isReply: true),
+                                  )),
+                            ],
                           );
                         },
                       ),
           ),
+          // Reply indicator
+          if (replyingToUsername != null)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              color: const Color(0xFF1A0A1A),
+              child: Row(
+                children: [
+                  Text('Replying to @$replyingToUsername',
+                      style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 12)),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: () => setState(() {
+                      replyingToId = null;
+                      replyingToUsername = null;
+                    }),
+                    child: const Icon(Icons.close, color: Colors.white38, size: 16),
+                  ),
+                ],
+              ),
+            ),
           // Input bar
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: const BoxDecoration(
               color: Color(0xFF1A0A1A),
-              border: Border(top: BorderSide(color: Color(0xFF2A2A2A))),
+              border: Border(top: BorderSide(color: Color(0xFF2A1A2A))),
             ),
             child: Row(
               children: [
@@ -156,9 +141,11 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   child: TextField(
                     controller: controller,
                     style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
-                      hintText: 'Add a comment...',
-                      hintStyle: TextStyle(color: Colors.white38),
+                    decoration: InputDecoration(
+                      hintText: replyingToUsername != null
+                          ? 'Reply to @$replyingToUsername...'
+                          : 'Add a comment...',
+                      hintStyle: const TextStyle(color: Colors.white38),
                       border: InputBorder.none,
                     ),
                   ),
@@ -171,9 +158,77 @@ class _CommentsScreenState extends State<CommentsScreen> {
                       color: Color(0xFFC9A84C),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.send_rounded,
-                        color: Colors.black, size: 16),
+                    child: const Icon(Icons.send_rounded, color: Colors.black, size: 16),
                   ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _commentTile(Map<String, dynamic> comment, {required bool isReply}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            radius: isReply ? 14 : 18,
+            backgroundColor: const Color(0xFF2A1A4A),
+            child: Text(
+              (comment['username'] ?? '?')[0].toUpperCase(),
+              style: TextStyle(
+                  color: const Color(0xFFC9A84C),
+                  fontSize: isReply ? 10 : 12),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('@${comment['username']}',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13)),
+                const SizedBox(height: 4),
+                Text(comment['content'],
+                    style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        await ApiService.likeComment(comment['id']);
+                        loadComments();
+                      },
+                      child: Row(
+                        children: [
+                          const Icon(Icons.favorite_border,
+                              color: Colors.white38, size: 14),
+                          const SizedBox(width: 4),
+                          Text('${comment['likes'] ?? 0}',
+                              style: const TextStyle(
+                                  color: Colors.white38, fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    if (!isReply)
+                      GestureDetector(
+                        onTap: () => setState(() {
+                          replyingToId = comment['id'];
+                          replyingToUsername = comment['username'];
+                        }),
+                        child: const Text('Reply',
+                            style: TextStyle(
+                                color: Colors.white38, fontSize: 12)),
+                      ),
+                  ],
                 ),
               ],
             ),

@@ -11,4 +11,5 @@ class Comment(Base):
     username = Column(String)
     content = Column(String)
     likes = Column(Integer, default=0)
+    parent_id = Column(Integer, nullable=True)
     created_at = Column(DateTime, server_default=func.now())

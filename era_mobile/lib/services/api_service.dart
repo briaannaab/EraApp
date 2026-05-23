@@ -128,6 +128,7 @@ class ApiService {
     required int userId,
     required String username,
     required String content,
+    int? parentId,
   }) async {
     final response = await http.post(
       Uri.parse('$baseUrl/comments/'),
@@ -137,6 +138,7 @@ class ApiService {
         'user_id': userId,
         'username': username,
         'content': content,
+        'parent_id': parentId,
       }),
     );
     return jsonDecode(response.body);

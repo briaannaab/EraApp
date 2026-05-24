@@ -88,12 +88,12 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0008),
+      backgroundColor: const Color(0xFF000000),
       body: _screens[_currentIndex],
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-          color: Color(0xFF0D000D),
-          border: Border(top: BorderSide(color: Color(0xFF1A0A1A))),
+          color: Color(0xFF000000),
+          border: Border(top: BorderSide(color: Color(0xFF0A0A0A))),
         ),
         child: SafeArea(
           child: Padding(
@@ -123,14 +123,14 @@ class _MainScreenState extends State<MainScreen> {
         children: [
           Icon(
             isActive ? activeIcon : icon,
-            color: isActive ? const Color(0xFFC9A84C) : Colors.white38,
+            color: isActive ? const Color(0xFFFFFFFF) : Colors.white38,
             size: 24,
           ),
           const SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
-              color: isActive ? const Color(0xFFC9A84C) : Colors.white38,
+              color: isActive ? const Color(0xFFFFFFFF) : Colors.white38,
               fontSize: 10,
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
             ),
@@ -148,7 +148,7 @@ class _MainScreenState extends State<MainScreen> {
         height: 52,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFC9A84C), Color(0xFFE8C96A)],
+            colors: [Color(0xFFFFFFFF), Color(0xFFE0E0E0)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -170,7 +170,7 @@ class _MainScreenState extends State<MainScreen> {
     final outerContext = context;
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF110011),
+      backgroundColor: const Color(0xFF0A0A0A),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -222,7 +222,7 @@ class _MainScreenState extends State<MainScreen> {
                     ));
                   }),
                   const SizedBox(width: 16),
-                  _createOption(Icons.auto_awesome, 'Moment', const Color(0xFFC9A84C), () {
+                  _createOption(Icons.auto_awesome, 'Moment', const Color(0xFFFFFFFF), () {
                     Navigator.pop(context);
                     Navigator.push(outerContext, MaterialPageRoute(
                       builder: (context) => const MomentScreen(),
@@ -255,7 +255,7 @@ class _MainScreenState extends State<MainScreen> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1A0A1A),
+      backgroundColor: const Color(0xFF0A0A0A),
       isScrollControlled: true,
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) => Padding(
@@ -268,7 +268,7 @@ class _MainScreenState extends State<MainScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('New Post', style: TextStyle(
-                color: Color(0xFFC9A84C),
+                color: Color(0xFFFFFFFF),
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               )),
@@ -314,7 +314,7 @@ class _MainScreenState extends State<MainScreen> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: isSelected ? const Color(0xFFC9A84C) : Colors.transparent,
+                                    color: isSelected ? const Color(0xFFFFFFFF) : Colors.transparent,
                                     width: 2,
                                   ),
                                 ),
@@ -331,7 +331,7 @@ class _MainScreenState extends State<MainScreen> {
                               const SizedBox(height: 4),
                               Text(filter['name'] as String,
                                   style: TextStyle(
-                                      color: isSelected ? const Color(0xFFC9A84C) : Colors.white38,
+                                      color: isSelected ? const Color(0xFFFFFFFF) : Colors.white38,
                                       fontSize: 9)),
                             ],
                           ),
@@ -350,7 +350,7 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.videocam, color: Color(0xFFC9A84C)),
+                      const Icon(Icons.videocam, color: Color(0xFFFFFFFF)),
                       const SizedBox(width: 8),
                       Text(selectedVideoName ?? 'Video selected',
                           style: const TextStyle(color: Colors.white54, fontSize: 13)),
@@ -375,7 +375,7 @@ class _MainScreenState extends State<MainScreen> {
                         margin: const EdgeInsets.only(right: 8),
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                         decoration: BoxDecoration(
-                          color: isSelected ? const Color(0xFFC9A84C) : const Color(0xFF2A2A2A),
+                          color: isSelected ? const Color(0xFFFFFFFF) : const Color(0xFF2A2A2A),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(vibe,
@@ -452,7 +452,7 @@ class _MainScreenState extends State<MainScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFC9A84C),
+                    backgroundColor: const Color(0xFFFFFFFF),
                     foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),

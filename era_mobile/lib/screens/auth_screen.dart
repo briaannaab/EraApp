@@ -59,7 +59,7 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0008),
+      backgroundColor: const Color(0xFF000000),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(32),
@@ -68,7 +68,7 @@ class _AuthScreenState extends State<AuthScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('era.', style: TextStyle(
-                color: Color(0xFFC9A84C),
+                color: Color(0xFFFFFFFF),
                 fontSize: 48,
                 fontWeight: FontWeight.w900,
                 letterSpacing: -2,
@@ -100,7 +100,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFC9A84C),
+                    backgroundColor: const Color(0xFFFFFFFF),
                     foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(vertical: 18),
                   ),
@@ -137,7 +137,7 @@ class _AuthScreenState extends State<AuthScreen> {
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.white38),
         filled: true,
-        fillColor: const Color(0xFF1A0A1A),
+        fillColor: const Color(0xFF0A0A0A),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(4),
           borderSide: BorderSide.none,

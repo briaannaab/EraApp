@@ -22,9 +22,9 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0008),
+      backgroundColor: const Color(0xFF000000),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0A0008),
+        backgroundColor: const Color(0xFF000000),
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text('Privacy',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -32,7 +32,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Save',
-                style: TextStyle(color: Color(0xFFC9A84C), fontWeight: FontWeight.bold)),
+                style: TextStyle(color: Color(0xFFFFFFFF), fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -101,11 +101,11 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                 width: double.infinity,
                 height: 160,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A0A1A),
+                  color: const Color(0xFF0A0A0A),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: _imageBytes != null
-                        ? const Color(0xFFC9A84C)
+                        ? const Color(0xFFFFFFFF)
                         : const Color(0xFF333333),
                   ),
                 ),
@@ -118,7 +118,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.add_photo_alternate_outlined,
-                              color: Color(0xFFC9A84C), size: 36),
+                              color: Color(0xFFFFFFFF), size: 36),
                           SizedBox(height: 8),
                           Text('Add a privacy screen photo',
                               style: TextStyle(color: Colors.white38, fontSize: 13)),
@@ -136,7 +136,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                 hintText: 'e.g. This account is private. Follow to see my content.',
                 hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
                 filled: true,
-                fillColor: const Color(0xFF1A0A1A),
+                fillColor: const Color(0xFF0A0A0A),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -154,7 +154,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A0A1A),
+                color: const Color(0xFF0A0A0A),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Column(
@@ -162,7 +162,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.shield_outlined, color: Color(0xFFC9A84C), size: 20),
+                      Icon(Icons.shield_outlined, color: Color(0xFFFFFFFF), size: 20),
                       SizedBox(width: 10),
                       Text('Era Safe Space Protection',
                           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -194,12 +194,12 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A0A1A),
+        color: const Color(0xFF0A0A0A),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFFC9A84C), size: 20),
+          Icon(icon, color: const Color(0xFFFFFFFF), size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -215,7 +215,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: const Color(0xFFC9A84C),
+            activeColor: const Color(0xFFFFFFFF),
           ),
         ],
       ),

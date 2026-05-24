@@ -56,9 +56,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0008),
+      backgroundColor: const Color(0xFF000000),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0A0008),
+        backgroundColor: const Color(0xFF000000),
         iconTheme: const IconThemeData(color: Colors.white),
         title: Row(
           children: [
@@ -74,7 +74,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
         children: [
           Expanded(
             child: loading
-                ? const Center(child: CircularProgressIndicator(color: Color(0xFFC9A84C)))
+                ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFFFFF)))
                 : comments.isEmpty
                     ? const Center(
                         child: Text('No comments yet. Be first!',
@@ -102,11 +102,11 @@ class _CommentsScreenState extends State<CommentsScreen> {
           if (replyingToUsername != null)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              color: const Color(0xFF1A0A1A),
+              color: const Color(0xFF0A0A0A),
               child: Row(
                 children: [
                   Text('Replying to @$replyingToUsername',
-                      style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 12)),
+                      style: const TextStyle(color: Color(0xFFFFFFFF), fontSize: 12)),
                   const Spacer(),
                   GestureDetector(
                     onTap: () => setState(() {
@@ -122,17 +122,17 @@ class _CommentsScreenState extends State<CommentsScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: const BoxDecoration(
-              color: Color(0xFF1A0A1A),
+              color: Color(0xFF0A0A0A),
               border: Border(top: BorderSide(color: Color(0xFF2A1A2A))),
             ),
             child: Row(
               children: [
                 const CircleAvatar(
                   radius: 16,
-                  backgroundColor: Color(0xFF2A1A4A),
+                  backgroundColor: Color(0xFF1A1A1A),
                   child: Text('B',
                       style: TextStyle(
-                          color: Color(0xFFC9A84C),
+                          color: Color(0xFFFFFFFF),
                           fontSize: 12,
                           fontWeight: FontWeight.bold)),
                 ),
@@ -155,7 +155,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: const BoxDecoration(
-                      color: Color(0xFFC9A84C),
+                      color: Color(0xFFFFFFFF),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.send_rounded, color: Colors.black, size: 16),
@@ -177,11 +177,11 @@ class _CommentsScreenState extends State<CommentsScreen> {
         children: [
           CircleAvatar(
             radius: isReply ? 14 : 18,
-            backgroundColor: const Color(0xFF2A1A4A),
+            backgroundColor: const Color(0xFF1A1A1A),
             child: Text(
               (comment['username'] ?? '?')[0].toUpperCase(),
               style: TextStyle(
-                  color: const Color(0xFFC9A84C),
+                  color: const Color(0xFFFFFFFF),
                   fontSize: isReply ? 10 : 12),
             ),
           ),

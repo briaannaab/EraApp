@@ -52,16 +52,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'comment': return const Color(0xFF6C63FF);
       case 'follow': return const Color(0xFF00C9A7);
       case 'prayer': return const Color(0xFFC084FC);
-      default: return const Color(0xFFC9A84C);
+      default: return const Color(0xFFFFFFFF);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0008),
+      backgroundColor: const Color(0xFF000000),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0A0008),
+        backgroundColor: const Color(0xFF000000),
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text('Notifications',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -70,12 +70,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             TextButton(
               onPressed: markAllRead,
               child: const Text('Mark all read',
-                  style: TextStyle(color: Color(0xFFC9A84C), fontSize: 12)),
+                  style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 12)),
             ),
         ],
       ),
       body: loading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFFC9A84C)))
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFFFFF)))
           : notifications.isEmpty
               ? Center(
                   child: Column(
@@ -85,7 +85,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A0A1A),
+                          color: const Color(0xFF0A0A0A),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(Icons.notifications_none,
@@ -113,7 +113,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
                     return Container(
                       color: isUnread
-                          ? const Color(0xFF1A0A1A)
+                          ? const Color(0xFF0A0A0A)
                           : Colors.transparent,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 14),
@@ -155,7 +155,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               width: 8,
                               height: 8,
                               decoration: const BoxDecoration(
-                                color: Color(0xFFC9A84C),
+                                color: Color(0xFFFFFFFF),
                                 shape: BoxShape.circle,
                               ),
                             ),

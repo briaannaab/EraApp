@@ -53,9 +53,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0008),
+      backgroundColor: const Color(0xFF000000),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0A0008),
+        backgroundColor: const Color(0xFF000000),
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text('Edit Profile',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -64,7 +64,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             onPressed: _saving ? null : saveProfile,
             child: Text(_saving ? 'Saving...' : 'Save',
                 style: const TextStyle(
-                    color: Color(0xFFC9A84C), fontWeight: FontWeight.bold)),
+                    color: Color(0xFFFFFFFF), fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -85,7 +85,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 hintText: 'Tell your story...',
                 hintStyle: const TextStyle(color: Colors.white38),
                 filled: true,
-                fillColor: const Color(0xFF1A0A1A),
+                fillColor: const Color(0xFF0A0A0A),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -101,7 +101,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A0A1A),
+                color: const Color(0xFF0A0A0A),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -125,11 +125,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A0A1A),
+                  color: const Color(0xFF0A0A0A),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: voiceBioUrl != null
-                        ? const Color(0xFFC9A84C)
+                        ? const Color(0xFFFFFFFF)
                         : const Color(0xFF333333),
                   ),
                 ),
@@ -138,12 +138,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFC9A84C).withOpacity(0.15),
+                        color: const Color(0xFFFFFFFF).withOpacity(0.15),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         voiceBioUrl != null ? Icons.mic : Icons.mic_none,
-                        color: const Color(0xFFC9A84C),
+                        color: const Color(0xFFFFFFFF),
                         size: 20,
                       ),
                     ),
@@ -156,7 +156,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             voiceBioUrl != null ? 'Voice bio uploaded ✓' : 'Add a voice bio',
                             style: TextStyle(
                               color: voiceBioUrl != null
-                                  ? const Color(0xFFC9A84C)
+                                  ? const Color(0xFFFFFFFF)
                                   : Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 14,

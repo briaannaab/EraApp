@@ -33,7 +33,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0008),
+      backgroundColor: const Color(0xFF000000),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,11 +55,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1A0A1A),
+                        color: const Color(0xFF0A0A0A),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(Icons.edit_outlined,
-                          color: Color(0xFFC9A84C), size: 20),
+                          color: Color(0xFFFFFFFF), size: 20),
                     ),
                   ),
                 ],
@@ -72,7 +72,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A0A1A),
+                  color: const Color(0xFF0A0A0A),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Row(
@@ -91,7 +91,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
             Expanded(
               child: loading
                   ? const Center(
-                      child: CircularProgressIndicator(color: Color(0xFFC9A84C)))
+                      child: CircularProgressIndicator(color: Color(0xFFFFFFFF)))
                   : conversations.isEmpty
                       ? Center(
                           child: Column(
@@ -101,7 +101,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                 width: 80,
                                 height: 80,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF1A0A1A),
+                                  color: const Color(0xFF0A0A0A),
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(Icons.chat_bubble_outline,
@@ -124,7 +124,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 24, vertical: 12),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFC9A84C),
+                                    color: const Color(0xFFFFFFFF),
                                     borderRadius: BorderRadius.circular(24),
                                   ),
                                   child: const Text('New Message',
@@ -157,7 +157,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                 decoration: const BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                          color: Color(0xFF1A0A1A))),
+                                          color: Color(0xFF0A0A0A))),
                                 ),
                                 child: Row(
                                   children: [
@@ -167,11 +167,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                         CircleAvatar(
                                           radius: 28,
                                           backgroundColor:
-                                              const Color(0xFF2A1A4A),
+                                              const Color(0xFF1A1A1A),
                                           child: Text(
                                             username[0].toUpperCase(),
                                             style: const TextStyle(
-                                                color: Color(0xFFC9A84C),
+                                                color: Color(0xFFFFFFFF),
                                                 fontSize: 20,
                                                 fontWeight: FontWeight.bold),
                                           ),
@@ -186,7 +186,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                               color: const Color(0xFF4BCB6B),
                                               shape: BoxShape.circle,
                                               border: Border.all(
-                                                  color: const Color(0xFF0A0008),
+                                                  color: const Color(0xFF000000),
                                                   width: 2),
                                             ),
                                           ),
@@ -263,7 +263,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
     final controller = TextEditingController();
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1A0A1A),
+      backgroundColor: const Color(0xFF0A0A0A),
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -287,7 +287,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
             const SizedBox(height: 20),
             const Text('New Message',
                 style: TextStyle(
-                    color: Color(0xFFC9A84C),
+                    color: Color(0xFFFFFFFF),
                     fontSize: 18,
                     fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
@@ -313,7 +313,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFC9A84C),
+                  backgroundColor: const Color(0xFFFFFFFF),
                   foregroundColor: Colors.black,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(

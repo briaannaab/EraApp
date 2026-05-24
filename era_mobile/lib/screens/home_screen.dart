@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: const Color(0xFF080008),
       extendBodyBehindAppBar: true,
       body: loading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFFC9A84C)))
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFFFFF)))
           : posts.isEmpty
               ? const Center(
                   child: Text('No posts yet. Be first! 👑',
@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           const Text(
                             'era.',
                             style: TextStyle(
-                              color: Color(0xFFC9A84C),
+                              color: Color(0xFFFFFFFF),
                               fontSize: 28,
                               fontWeight: FontWeight.w900,
                               letterSpacing: -1,
@@ -137,7 +137,7 @@ class _ImmersivePostCard extends StatelessWidget {
                 : Image.network(
                     post['media_url'],
                     fit: BoxFit.cover,
-                    errorBuilder: (c, e, s) => Container(color: const Color(0xFF1A0A1A)),
+                    errorBuilder: (c, e, s) => Container(color: const Color(0xFF0A0A0A)),
                   )
           else
             Container(
@@ -196,7 +196,7 @@ class _ImmersivePostCard extends StatelessWidget {
                 _ActionButton(
                   icon: Icons.monetization_on_outlined,
                   label: '\$${(post['tips'] ?? 0.0).toStringAsFixed(0)}',
-                  color: const Color(0xFFC9A84C),
+                  color: const Color(0xFFFFFFFF),
                   onTap: () {},
                 ),
                 const SizedBox(height: 20),
@@ -215,7 +215,7 @@ class _ImmersivePostCard extends StatelessWidget {
                       final confirm = await showDialog<bool>(
                         context: context,
                         builder: (context) => AlertDialog(
-                          backgroundColor: const Color(0xFF1A0A1A),
+                          backgroundColor: const Color(0xFF0A0A0A),
                           title: const Text('Delete post?',
                               style: TextStyle(color: Colors.white)),
                           content: const Text('This cannot be undone.',
@@ -264,11 +264,11 @@ class _ImmersivePostCard extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 18,
-                        backgroundColor: const Color(0xFF2A1A4A),
+                        backgroundColor: const Color(0xFF1A1A1A),
                         child: Text(
                           username[0].toUpperCase(),
                           style: const TextStyle(
-                              color: Color(0xFFC9A84C), fontWeight: FontWeight.bold),
+                              color: Color(0xFFFFFFFF), fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -380,7 +380,7 @@ class _VideoPlayerState extends State<_VideoPlayer> {
   Widget build(BuildContext context) {
     if (_chewieController == null) {
       return const Center(
-          child: CircularProgressIndicator(color: Color(0xFFC9A84C)));
+          child: CircularProgressIndicator(color: Color(0xFFFFFFFF)));
     }
     return SizedBox.expand(
       child: FittedBox(

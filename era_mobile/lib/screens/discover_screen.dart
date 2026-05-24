@@ -30,7 +30,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     {'label': 'Quiet', 'color': const Color(0xFF1A1A3A)},
     {'label': 'Safe', 'color': const Color(0xFF2A1A3A)},
     {'label': 'Grounded', 'color': const Color(0xFF2A2A1A)},
-    {'label': 'Motivated', 'color': const Color(0xFF2A1A4A)},
+    {'label': 'Motivated', 'color': const Color(0xFF1A1A1A)},
     {'label': 'Creative', 'color': const Color(0xFF3A1A2A)},
     {'label': 'Bold', 'color': const Color(0xFF4A2A1A)},
     {'label': 'Chill', 'color': const Color(0xFF1A2A4A)},
@@ -81,10 +81,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0008),
+      backgroundColor: const Color(0xFF000000),
       body: SafeArea(
         child: loading
-            ? const Center(child: CircularProgressIndicator(color: Color(0xFFC9A84C)))
+            ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFFFFF)))
             : CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(
@@ -109,7 +109,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               hintStyle: const TextStyle(color: Colors.white38),
                               prefixIcon: const Icon(Icons.search, color: Colors.white38),
                               filled: true,
-                              fillColor: const Color(0xFF1A0A1A),
+                              fillColor: const Color(0xFF0A0A0A),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide.none,
@@ -146,9 +146,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                 children: [
                                   CircleAvatar(
                                     radius: 22,
-                                    backgroundColor: const Color(0xFF2A1A4A),
+                                    backgroundColor: const Color(0xFF1A1A1A),
                                     child: Text(username[0].toUpperCase(),
-                                        style: const TextStyle(color: Color(0xFFC9A84C), fontWeight: FontWeight.bold)),
+                                        style: const TextStyle(color: Color(0xFFFFFFFF), fontWeight: FontWeight.bold)),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
@@ -200,14 +200,14 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                               decoration: const BoxDecoration(
-                                  border: Border(bottom: BorderSide(color: Color(0xFF1A0A1A)))),
+                                  border: Border(bottom: BorderSide(color: Color(0xFF0A0A0A)))),
                               child: Row(
                                 children: [
                                   CircleAvatar(
                                     radius: 20,
-                                    backgroundColor: const Color(0xFF2A1A4A),
+                                    backgroundColor: const Color(0xFF1A1A1A),
                                     child: Text(username[0].toUpperCase(),
-                                        style: const TextStyle(color: Color(0xFFC9A84C), fontWeight: FontWeight.bold)),
+                                        style: const TextStyle(color: Color(0xFFFFFFFF), fontWeight: FontWeight.bold)),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
@@ -342,10 +342,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                 children: [
                                   CircleAvatar(
                                     radius: 24,
-                                    backgroundColor: const Color(0xFF2A1A4A),
+                                    backgroundColor: const Color(0xFF1A1A1A),
                                     child: Text(username[0].toUpperCase(),
                                         style: const TextStyle(
-                                            color: Color(0xFFC9A84C),
+                                            color: Color(0xFFFFFFFF),
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold)),
                                   ),

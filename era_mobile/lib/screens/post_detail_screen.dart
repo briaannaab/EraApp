@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import '../services/api_service.dart';
 import 'comments_screen.dart';
 import 'profile_screen.dart';
@@ -42,7 +44,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0008),
+      backgroundColor: const Color(0xFF000000),
       body: PageView.builder(
         controller: _pageController,
         scrollDirection: Axis.vertical,
@@ -98,7 +100,6 @@ class _PostDetailCardState extends State<_PostDetailCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // App bar
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -109,17 +110,15 @@ class _PostDetailCardState extends State<_PostDetailCard> {
                     onTap: () => Navigator.pop(context),
                     child: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
                   ),
-                  if (isOwner)
-                    GestureDetector(
-                      onTap: () => _showOptions(context),
-                      child: const Icon(Icons.more_horiz, color: Colors.white, size: 24),
-                    ),
+                  GestureDetector(
+                    onTap: () => _showOptions(context),
+                    child: const Icon(Icons.more_horiz, color: Colors.white, size: 24),
+                  ),
                 ],
               ),
             ),
           ),
 
-          // Media
           if (hasMedia)
             Image.network(
               post['media_url'],
@@ -133,7 +132,6 @@ class _PostDetailCardState extends State<_PostDetailCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // User info
                 GestureDetector(
                   onTap: () => Navigator.push(context, MaterialPageRoute(
                     builder: (context) => ProfileScreen(username: username),
@@ -142,10 +140,10 @@ class _PostDetailCardState extends State<_PostDetailCard> {
                     children: [
                       CircleAvatar(
                         radius: 20,
-                        backgroundColor: const Color(0xFF2A1A4A),
+                        backgroundColor: const Color(0xFF1A1A1A),
                         child: Text(username[0].toUpperCase(),
                             style: const TextStyle(
-                                color: Color(0xFFC9A84C), fontWeight: FontWeight.bold)),
+                                color: Colors.white, fontWeight: FontWeight.bold)),
                       ),
                       const SizedBox(width: 10),
                       Column(
@@ -170,7 +168,6 @@ class _PostDetailCardState extends State<_PostDetailCard> {
 
                 const SizedBox(height: 20),
 
-                // Actions
                 Row(
                   children: [
                     GestureDetector(
@@ -208,10 +205,10 @@ class _PostDetailCardState extends State<_PostDetailCard> {
                     Row(
                       children: [
                         const Icon(Icons.monetization_on_outlined,
-                            color: Color(0xFFC9A84C), size: 22),
+                            color: Colors.white, size: 22),
                         const SizedBox(width: 6),
                         Text('\$${(post['tips'] ?? 0.0).toStringAsFixed(2)}',
-                            style: const TextStyle(color: Color(0xFFC9A84C), fontSize: 14)),
+                            style: const TextStyle(color: Colors.white, fontSize: 14)),
                       ],
                     ),
                   ],
@@ -223,7 +220,7 @@ class _PostDetailCardState extends State<_PostDetailCard> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1A0A1A),
+                        color: const Color(0xFF0A0A0A),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text('✨ ${post['vibe']}',
@@ -241,9 +238,11 @@ class _PostDetailCardState extends State<_PostDetailCard> {
   }
 
   void _showOptions(BuildContext context) {
+    final username = (post['username'] ?? 'unknown') as String;
+    final isOwner = username == widget.currentUser;
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1A0A1A),
+      backgroundColor: const Color(0xFF0A0A0A),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -260,39 +259,162 @@ class _PostDetailCardState extends State<_PostDetailCard> {
               ),
             ),
             const SizedBox(height: 20),
-            _optionTile(Icons.delete_outline, 'Delete Post', Colors.red, () async {
+            if (isOwner)
+              _optionTile(Icons.delete_outline, 'Delete Post', Colors.red, () async {
+                Navigator.pop(context);
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: const Color(0xFF0A0A0A),
+                    title: const Text('Delete post?',
+                        style: TextStyle(color: Colors.white)),
+                    content: const Text('This cannot be undone.',
+                        style: TextStyle(color: Colors.white54)),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('Cancel',
+                            style: TextStyle(color: Colors.white54)),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text('Delete',
+                            style: TextStyle(color: Colors.red)),
+                      ),
+                    ],
+                  ),
+                );
+                if (confirm == true) {
+                  await ApiService.deletePost(post['id']);
+                  widget.onDeleted();
+                }
+              }),
+            _optionTile(Icons.flag_outlined, 'Report Post', Colors.orange, () {
               Navigator.pop(context);
-              final confirm = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  backgroundColor: const Color(0xFF1A0A1A),
-                  title: const Text('Delete post?',
-                      style: TextStyle(color: Colors.white)),
-                  content: const Text('This cannot be undone.',
-                      style: TextStyle(color: Colors.white54)),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Cancel',
-                          style: TextStyle(color: Colors.white54)),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      child: const Text('Delete',
-                          style: TextStyle(color: Colors.red)),
-                    ),
-                  ],
-                ),
-              );
-              if (confirm == true) {
-                await ApiService.deletePost(post['id']);
-                widget.onDeleted();
-              }
+              _showReportDialog(context);
             }),
             _optionTile(Icons.share_outlined, 'Share', Colors.white, () {
               Navigator.pop(context);
             }),
           ],
+        ),
+      ),
+    );
+  }
+
+  void _showReportDialog(BuildContext context) {
+    String selectedReason = 'Spam';
+    final reasons = ['Spam', 'Harassment', 'Hate Speech', 'Violence', 'Misinformation', 'Other'];
+    final descController = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF0A0A0A),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 20, right: 20, top: 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 40, height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white24,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text('Report Post',
+                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              const Text('Help us understand what\'s wrong',
+                  style: TextStyle(color: Colors.white38, fontSize: 13)),
+              const SizedBox(height: 20),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: reasons.map((reason) {
+                  final isSelected = selectedReason == reason;
+                  return GestureDetector(
+                    onTap: () => setModalState(() => selectedReason = reason),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isSelected ? Colors.white : const Color(0xFF1A1A1A),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(reason,
+                          style: TextStyle(
+                              color: isSelected ? Colors.black : Colors.white54,
+                              fontSize: 13,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: descController,
+                style: const TextStyle(color: Colors.white),
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: 'Additional details (optional)',
+                  hintStyle: const TextStyle(color: Colors.white38),
+                  filled: true,
+                  fillColor: const Color(0xFF1A1A1A),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () async {
+                    await http.post(
+                      Uri.parse('$baseUrl/reports/'),
+                      headers: {'Content-Type': 'application/json'},
+                      body: jsonEncode({
+                        'reporter_username': widget.currentUser,
+                        'reported_username': post['username'],
+                        'post_id': post['id'],
+                        'reason': selectedReason,
+                        'description': descController.text,
+                      }),
+                    );
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Report submitted. Thank you for keeping Era safe.'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  },
+                  child: const Text('Submit Report',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );

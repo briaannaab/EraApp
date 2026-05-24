@@ -28,15 +28,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final String currentUser = 'briaannaab';
 
   final Map<String, List<Color>> themes = {
-    'default': [const Color(0xFF2A0040), const Color(0xFF0A0008)],
-    'cosmic': [const Color(0xFF0a0a2e), const Color(0xFF0D000D)],
+    'default': [const Color(0xFF000000), const Color(0xFF000000)],
+    'cosmic': [const Color(0xFF0a0a2e), const Color(0xFF000000)],
     'aurora': [const Color(0xFF002a1a), const Color(0xFF00080A)],
     'ember': [const Color(0xFF2a0a00), const Color(0xFF0A0000)],
     'ocean': [const Color(0xFF001a2a), const Color(0xFF00080D)],
   };
 
   final Map<String, Color> themeAccents = {
-    'default': const Color(0xFFC9A84C),
+    'default': const Color(0xFFFFFFFF),
     'cosmic': const Color(0xFF8B9FFF),
     'aurora': const Color(0xFF4ECDC4),
     'ember': const Color(0xFFFF6B35),
@@ -74,7 +74,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A0A1A),
+        backgroundColor: const Color(0xFF0A0A0A),
         title: const Text('Pick your aura color', style: TextStyle(color: Colors.white)),
         content: ColorPicker(
           color: picked,
@@ -94,7 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               setState(() => customAccentColor = picked);
               Navigator.pop(context);
             },
-            child: const Text('Apply', style: TextStyle(color: Color(0xFFC9A84C))),
+            child: const Text('Apply', style: TextStyle(color: Color(0xFFFFFFFF))),
           ),
         ],
       ),
@@ -109,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       body: loading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFFC9A84C)))
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFFFFF)))
           : profile == null
               ? const Center(child: Text('User not found', style: TextStyle(color: Colors.white54)))
               : Container(
@@ -181,7 +181,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       GestureDetector(
                                         onTap: () => showModalBottomSheet(
                                           context: context,
-                                          backgroundColor: const Color(0xFF1A0A1A),
+                                          backgroundColor: const Color(0xFF0A0A0A),
                                           shape: const RoundedRectangleBorder(
                                             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                                           ),
@@ -294,7 +294,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         decoration: BoxDecoration(
                                           color: accent,
                                           shape: BoxShape.circle,
-                                          border: Border.all(color: const Color(0xFF0A0008), width: 2),
+                                          border: Border.all(color: const Color(0xFF000000), width: 2),
                                         ),
                                         child: const Icon(Icons.camera_alt, color: Colors.black, size: 12),
                                       ),

@@ -21,9 +21,9 @@ class _MomentScreenState extends State<MomentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0008),
+      backgroundColor: const Color(0xFF000000),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0A0008),
+        backgroundColor: const Color(0xFF000000),
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text('New Moment',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -60,11 +60,11 @@ class _MomentScreenState extends State<MomentScreen> {
                   width: double.infinity,
                   height: 260,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A0A1A),
+                    color: const Color(0xFF0A0A0A),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: _imageBytes != null
-                          ? const Color(0xFFC9A84C)
+                          ? const Color(0xFFFFFFFF)
                           : const Color(0xFF333333),
                     ),
                   ),
@@ -77,7 +77,7 @@ class _MomentScreenState extends State<MomentScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(Icons.add_photo_alternate_outlined,
-                                color: Color(0xFFC9A84C), size: 48),
+                                color: Color(0xFFFFFFFF), size: 48),
                             SizedBox(height: 12),
                             Text('Tap to add a photo',
                                 style: TextStyle(color: Colors.white54, fontSize: 16)),
@@ -102,11 +102,11 @@ class _MomentScreenState extends State<MomentScreen> {
                   width: double.infinity,
                   height: 260,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A0A1A),
+                    color: const Color(0xFF0A0A0A),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: _videoBytes != null
-                          ? const Color(0xFFC9A84C)
+                          ? const Color(0xFFFFFFFF)
                           : const Color(0xFF333333),
                     ),
                   ),
@@ -114,7 +114,7 @@ class _MomentScreenState extends State<MomentScreen> {
                       ? Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.videocam, color: Color(0xFFC9A84C), size: 48),
+                            const Icon(Icons.videocam, color: Color(0xFFFFFFFF), size: 48),
                             const SizedBox(height: 12),
                             Text(_videoName ?? 'Video selected',
                                 style: const TextStyle(color: Colors.white54, fontSize: 14)),
@@ -124,7 +124,7 @@ class _MomentScreenState extends State<MomentScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(Icons.video_call_outlined,
-                                color: Color(0xFFC9A84C), size: 48),
+                                color: Color(0xFFFFFFFF), size: 48),
                             SizedBox(height: 12),
                             Text('Tap to add a video',
                                 style: TextStyle(color: Colors.white54, fontSize: 16)),
@@ -144,7 +144,7 @@ class _MomentScreenState extends State<MomentScreen> {
                     colors: [Color(0xFF1A0A2A), Color(0xFF0A1A2A)],
                   ),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFFC9A84C).withOpacity(0.3)),
+                  border: Border.all(color: const Color(0xFFFFFFFF).withOpacity(0.3)),
                 ),
                 child: TextField(
                   controller: captionController,
@@ -173,7 +173,7 @@ class _MomentScreenState extends State<MomentScreen> {
                   hintText: 'Add a caption...',
                   hintStyle: const TextStyle(color: Colors.white38),
                   filled: true,
-                  fillColor: const Color(0xFF1A0A1A),
+                  fillColor: const Color(0xFF0A0A0A),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -187,7 +187,7 @@ class _MomentScreenState extends State<MomentScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFC9A84C),
+                  backgroundColor: const Color(0xFFFFFFFF),
                   foregroundColor: Colors.black,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -240,7 +240,7 @@ class _MomentScreenState extends State<MomentScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFC9A84C) : const Color(0xFF1A0A1A),
+            color: isSelected ? const Color(0xFFFFFFFF) : const Color(0xFF0A0A0A),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(

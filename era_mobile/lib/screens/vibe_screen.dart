@@ -24,7 +24,7 @@ const Map<String, Map<String, dynamic>> vibeThemes = {
     'label': 'Inspired',
     'emoji': '✨',
     'gradient': [Color(0xFF2A1A0A), Color(0xFF1A0A00)],
-    'accent': Color(0xFFC9A84C),
+    'accent': Color(0xFFFFFFFF),
     'description': 'Fuel your fire. Big ideas welcome.',
   },
   'energized': {

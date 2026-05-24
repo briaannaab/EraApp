@@ -39,9 +39,9 @@ class _FollowersScreenState extends State<FollowersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0008),
+      backgroundColor: const Color(0xFF000000),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0A0008),
+        backgroundColor: const Color(0xFF000000),
         iconTheme: const IconThemeData(color: Colors.white),
         title: Text(
           widget.showFollowing ? 'Following' : 'Followers',
@@ -49,7 +49,7 @@ class _FollowersScreenState extends State<FollowersScreen> {
         ),
       ),
       body: loading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFFC9A84C)))
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFFFFF)))
           : users.isEmpty
               ? Center(
                   child: Text(
@@ -75,11 +75,11 @@ class _FollowersScreenState extends State<FollowersScreen> {
                           children: [
                             CircleAvatar(
                               radius: 24,
-                              backgroundColor: const Color(0xFF2A1A4A),
+                              backgroundColor: const Color(0xFF1A1A1A),
                               child: Text(
                                 username[0].toUpperCase(),
                                 style: const TextStyle(
-                                    color: Color(0xFFC9A84C),
+                                    color: Color(0xFFFFFFFF),
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold),
                               ),
@@ -107,12 +107,12 @@ class _FollowersScreenState extends State<FollowersScreen> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 8),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF2A1A4A),
+                                color: const Color(0xFF1A1A1A),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: const Text('View',
                                   style: TextStyle(
-                                      color: Color(0xFFC9A84C),
+                                      color: Color(0xFFFFFFFF),
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold)),
                             ),

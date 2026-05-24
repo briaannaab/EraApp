@@ -70,9 +70,9 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0008),
+      backgroundColor: const Color(0xFF000000),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0A0008),
+        backgroundColor: const Color(0xFF000000),
         elevation: 0,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
@@ -84,11 +84,11 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 CircleAvatar(
                   radius: 18,
-                  backgroundColor: const Color(0xFF2A1A4A),
+                  backgroundColor: const Color(0xFF1A1A1A),
                   child: Text(
                     widget.otherUser[0].toUpperCase(),
                     style: const TextStyle(
-                        color: Color(0xFFC9A84C), fontWeight: FontWeight.bold),
+                        color: Color(0xFFFFFFFF), fontWeight: FontWeight.bold),
                   ),
                 ),
                 Positioned(
@@ -100,7 +100,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     decoration: BoxDecoration(
                       color: const Color(0xFF4BCB6B),
                       shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0xFF0A0008), width: 1.5),
+                      border: Border.all(color: const Color(0xFF000000), width: 1.5),
                     ),
                   ),
                 ),
@@ -129,7 +129,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: const Color(0xFF1A0A1A)),
+          child: Container(height: 1, color: const Color(0xFF0A0A0A)),
         ),
       ),
       body: Column(
@@ -137,7 +137,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: loading
                 ? const Center(
-                    child: CircularProgressIndicator(color: Color(0xFFC9A84C)))
+                    child: CircularProgressIndicator(color: Color(0xFFFFFFFF)))
                 : messages.isEmpty
                     ? Center(
                         child: Column(
@@ -145,11 +145,11 @@ class _ChatScreenState extends State<ChatScreen> {
                           children: [
                             CircleAvatar(
                               radius: 40,
-                              backgroundColor: const Color(0xFF1A0A1A),
+                              backgroundColor: const Color(0xFF0A0A0A),
                               child: Text(
                                 widget.otherUser[0].toUpperCase(),
                                 style: const TextStyle(
-                                    color: Color(0xFFC9A84C),
+                                    color: Color(0xFFFFFFFF),
                                     fontSize: 28,
                                     fontWeight: FontWeight.bold),
                               ),
@@ -204,8 +204,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                   ),
                                   decoration: BoxDecoration(
                                     color: isMe
-                                        ? const Color(0xFFC9A84C)
-                                        : const Color(0xFF1A0A1A),
+                                        ? const Color(0xFFFFFFFF)
+                                        : const Color(0xFF0A0A0A),
                                     borderRadius: BorderRadius.only(
                                       topLeft: const Radius.circular(18),
                                       topRight: const Radius.circular(18),
@@ -233,8 +233,8 @@ class _ChatScreenState extends State<ChatScreen> {
           Container(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
             decoration: const BoxDecoration(
-              color: Color(0xFF0D000D),
-              border: Border(top: BorderSide(color: Color(0xFF1A0A1A))),
+              color: Color(0xFF000000),
+              border: Border(top: BorderSide(color: Color(0xFF0A0A0A))),
             ),
             child: Row(
               children: [
@@ -242,7 +242,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1A0A1A),
+                      color: const Color(0xFF0A0A0A),
                       borderRadius: BorderRadius.circular(24),
                     ),
                     child: TextField(
@@ -265,7 +265,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     width: 44,
                     height: 44,
                     decoration: const BoxDecoration(
-                      color: Color(0xFFC9A84C),
+                      color: Color(0xFFFFFFFF),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.send_rounded,

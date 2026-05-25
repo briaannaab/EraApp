@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'screens/auth_screen.dart';
 import 'screens/main_screen.dart';
+import 'services/auth_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AuthService.tryAutoLogin();
   runApp(const EraApp());
 }
 
@@ -24,7 +27,7 @@ class EraApp extends StatelessWidget {
           surface: Color(0xFF0A0A0A),
         ),
       ),
-      home: const AuthScreen(),
+      home: AuthService.isLoggedIn ? const MainScreen() : const AuthScreen(),
     );
   }
 }

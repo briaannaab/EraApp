@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../services/api_service.dart';
+import '../services/auth_service.dart';
 import 'chat_screen.dart';
 
 class MessagesScreen extends StatefulWidget {
@@ -14,7 +15,7 @@ class MessagesScreen extends StatefulWidget {
 class _MessagesScreenState extends State<MessagesScreen> {
   List<dynamic> conversations = [];
   bool loading = true;
-  final String currentUser = 'briaannaab';
+  final String currentUser = AuthService.username ?? AuthService.username ?? 'briaannaab';
 
   @override
   void initState() {

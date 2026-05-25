@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from routers import posts, users, ai, payments, media, auth, comments, messages, notifications, reports
+from routers import posts, users, ai, payments, media, auth, comments, messages, notifications, reports, subscriptions
 from models.base import Base, engine
 from models import user, post, comment, message, notification
 import os
@@ -32,5 +32,6 @@ app.include_router(comments.router, prefix="/comments", tags=["comments"])
 app.include_router(messages.router, prefix="/messages", tags=["messages"])
 app.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
 app.include_router(reports.router, prefix="/reports", tags=["reports"])
+app.include_router(subscriptions.router, prefix="/subscriptions", tags=["subscriptions"])
 
 Base.metadata.create_all(bind=engine)

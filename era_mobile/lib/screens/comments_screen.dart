@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../services/auth_service.dart';
 
 class CommentsScreen extends StatefulWidget {
   final Map<String, dynamic> post;
@@ -34,8 +35,8 @@ class _CommentsScreenState extends State<CommentsScreen> {
     if (controller.text.isEmpty) return;
     await ApiService.createComment(
       postId: widget.post['id'],
-      userId: 1,
-      username: 'briaannaab',
+      userId: AuthService.userId ?? 1,
+      username: AuthService.username ?? 'briaannaab',
       content: controller.text,
       parentId: replyingToId,
     );

@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import '../services/api_service.dart';
+import '../services/auth_service.dart';
 
 class VoiceScreen extends StatefulWidget {
   const VoiceScreen({super.key});
@@ -136,8 +137,8 @@ class _VoiceScreenState extends State<VoiceScreen> {
                       _audioName ?? 'voice.mp3',
                     );
                     await ApiService.createPost(
-                      userId: 1,
-                      username: 'briaannaab',
+                      userId: AuthService.userId ?? 1,
+                      username: AuthService.username ?? 'briaannaab',
                       content: captionController.text.isEmpty
                           ? '🎙️ Voice post'
                           : captionController.text,

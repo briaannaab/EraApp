@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../services/auth_service.dart';
 
 class PollScreen extends StatefulWidget {
   const PollScreen({super.key});
@@ -120,8 +121,8 @@ class _PollScreenState extends State<PollScreen> {
                         final content =
                             '📊 ${questionController.text}\n${options.asMap().entries.map((e) => '${e.key + 1}. ${e.value}').join('\n')}';
                         await ApiService.createPost(
-                          userId: 1,
-                          username: 'briaannaab',
+                          userId: AuthService.userId ?? 1,
+                          username: AuthService.username ?? 'briaannaab',
                           content: content,
                         );
                         setState(() => _processing = false);

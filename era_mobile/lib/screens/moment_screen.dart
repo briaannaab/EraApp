@@ -1,7 +1,8 @@
 import 'dart:typed_data';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../services/api_service.dart';
+import '../services/auth_service.dart';
 
 class MomentScreen extends StatefulWidget {
   const MomentScreen({super.key});
@@ -16,7 +17,32 @@ class _MomentScreenState extends State<MomentScreen> {
   String? _videoName;
   final captionController = TextEditingController();
   bool _processing = false;
-  String _type = 'photo'; // photo, video, text
+  String _type = 'photo';
+
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: source);
+    if (image != null) {
+      final bytes = await image.readAsBytes();
+      setState(() {
+        _imageBytes = bytes;
+        _videoBytes = null;
+      });
+    }
+  }
+
+  Future<void> _pickVideo(ImageSource source) async {
+    final picker = ImagePicker();
+    final video = await picker.pickVideo(source: source);
+    if (video != null) {
+      final bytes = await video.readAsBytes();
+      setState(() {
+        _videoBytes = bytes;
+        _videoName = video.name;
+        _imageBytes = null;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,95 +70,116 @@ class _MomentScreenState extends State<MomentScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Media picker
-            if (_type == 'photo')
-              GestureDetector(
-                onTap: () async {
-                  final result = await FilePicker.platform.pickFiles(type: FileType.image);
-                  if (result != null && result.files.first.bytes != null) {
-                    setState(() {
-                      _imageBytes = result.files.first.bytes;
-                      _videoBytes = null;
-                    });
-                  }
-                },
-                child: Container(
-                  width: double.infinity,
-                  height: 260,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0A0A0A),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: _imageBytes != null
-                          ? const Color(0xFFFFFFFF)
-                          : const Color(0xFF333333),
+            // Photo
+            if (_type == 'photo') ...[
+              Container(
+                width: double.infinity,
+                height: 220,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0A0A0A),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: _imageBytes != null
+                        ? Colors.white
+                        : const Color(0xFF333333),
+                  ),
+                ),
+                child: _imageBytes != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.memory(_imageBytes!, fit: BoxFit.cover),
+                      )
+                    : const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add_photo_alternate_outlined,
+                              color: Colors.white54, size: 48),
+                          SizedBox(height: 12),
+                          Text('Select a source below',
+                              style: TextStyle(color: Colors.white38, fontSize: 14)),
+                        ],
+                      ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _sourceButton(
+                      Icons.camera_alt_outlined,
+                      'Camera',
+                      () => _pickImage(ImageSource.camera),
                     ),
                   ),
-                  child: _imageBytes != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.memory(_imageBytes!, fit: BoxFit.cover),
-                        )
-                      : const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.add_photo_alternate_outlined,
-                                color: Color(0xFFFFFFFF), size: 48),
-                            SizedBox(height: 12),
-                            Text('Tap to add a photo',
-                                style: TextStyle(color: Colors.white54, fontSize: 16)),
-                          ],
-                        ),
-                ),
-              ),
-
-            if (_type == 'video')
-              GestureDetector(
-                onTap: () async {
-                  final result = await FilePicker.platform.pickFiles(type: FileType.video);
-                  if (result != null && result.files.first.bytes != null) {
-                    setState(() {
-                      _videoBytes = result.files.first.bytes;
-                      _videoName = result.files.first.name;
-                      _imageBytes = null;
-                    });
-                  }
-                },
-                child: Container(
-                  width: double.infinity,
-                  height: 260,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0A0A0A),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: _videoBytes != null
-                          ? const Color(0xFFFFFFFF)
-                          : const Color(0xFF333333),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _sourceButton(
+                      Icons.photo_library_outlined,
+                      'Gallery',
+                      () => _pickImage(ImageSource.gallery),
                     ),
                   ),
-                  child: _videoBytes != null
-                      ? Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.videocam, color: Color(0xFFFFFFFF), size: 48),
-                            const SizedBox(height: 12),
-                            Text(_videoName ?? 'Video selected',
-                                style: const TextStyle(color: Colors.white54, fontSize: 14)),
-                          ],
-                        )
-                      : const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.video_call_outlined,
-                                color: Color(0xFFFFFFFF), size: 48),
-                            SizedBox(height: 12),
-                            Text('Tap to add a video',
-                                style: TextStyle(color: Colors.white54, fontSize: 16)),
-                          ],
-                        ),
-                ),
+                ],
               ),
+            ],
 
+            // Video
+            if (_type == 'video') ...[
+              Container(
+                width: double.infinity,
+                height: 220,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0A0A0A),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: _videoBytes != null
+                        ? Colors.white
+                        : const Color(0xFF333333),
+                  ),
+                ),
+                child: _videoBytes != null
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.videocam, color: Colors.white, size: 48),
+                          const SizedBox(height: 12),
+                          Text(_videoName ?? 'Video selected',
+                              style: const TextStyle(color: Colors.white54, fontSize: 14)),
+                        ],
+                      )
+                    : const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.video_call_outlined,
+                              color: Colors.white54, size: 48),
+                          SizedBox(height: 12),
+                          Text('Select a source below',
+                              style: TextStyle(color: Colors.white38, fontSize: 14)),
+                        ],
+                      ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _sourceButton(
+                      Icons.videocam_outlined,
+                      'Record',
+                      () => _pickVideo(ImageSource.camera),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _sourceButton(
+                      Icons.video_library_outlined,
+                      'Gallery',
+                      () => _pickVideo(ImageSource.gallery),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+
+            // Text moment
             if (_type == 'text')
               Container(
                 width: double.infinity,
@@ -141,10 +188,10 @@ class _MomentScreenState extends State<MomentScreen> {
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [Color(0xFF1A0A2A), Color(0xFF0A1A2A)],
+                    colors: [Color(0xFF0A0A0A), Color(0xFF1A1A1A)],
                   ),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFFFFFFFF).withOpacity(0.3)),
+                  border: Border.all(color: Colors.white.withOpacity(0.15)),
                 ),
                 child: TextField(
                   controller: captionController,
@@ -163,7 +210,6 @@ class _MomentScreenState extends State<MomentScreen> {
 
             const SizedBox(height: 20),
 
-            // Caption (for photo/video)
             if (_type != 'text')
               TextField(
                 controller: captionController,
@@ -187,7 +233,7 @@ class _MomentScreenState extends State<MomentScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFFFFFF),
+                  backgroundColor: Colors.white,
                   foregroundColor: Colors.black,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -211,8 +257,8 @@ class _MomentScreenState extends State<MomentScreen> {
                         }
 
                         await ApiService.createPost(
-                          userId: 1,
-                          username: 'briaannaab',
+                          userId: AuthService.userId ?? 1,
+                          username: AuthService.username ?? 'briaannaab',
                           content: captionController.text.isEmpty ? '✨ Moment' : captionController.text,
                           mediaUrl: mediaUrl,
                         );
@@ -232,6 +278,29 @@ class _MomentScreenState extends State<MomentScreen> {
     );
   }
 
+  Widget _sourceButton(IconData icon, String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white.withOpacity(0.12)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Text(label,
+                style: const TextStyle(color: Colors.white, fontSize: 13)),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _typeTab(String type, IconData icon, String label) {
     final isSelected = _type == type;
     return Expanded(
@@ -240,7 +309,7 @@ class _MomentScreenState extends State<MomentScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFFFFFFF) : const Color(0xFF0A0A0A),
+            color: isSelected ? Colors.white : const Color(0xFF0A0A0A),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(

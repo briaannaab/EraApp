@@ -166,4 +166,59 @@ class ApiService {
       return null;
     }
   }
+
+  static Future<bool> checkSubscription(String creatorUsername, int subscriberId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('\$baseUrl/subscriptions/check/\$creatorUsername/\$subscriberId'),
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['is_subscribed'] ?? false;
+      }
+    } catch (e) {}
+    return false;
+  }
+
+  static Future<void> subscribe(String creatorUsername, int subscriberId, String subscriberUsername) async {
+    await http.post(
+      Uri.parse('\$baseUrl/subscriptions/subscribe'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'subscriber_id': subscriberId,
+        'subscriber_username': subscriberUsername,
+        'creator_username': creatorUsername,
+      }),
+    );
+  }
+
+  static Future<void> unsubscribe(String creatorUsername, int subscriberId) async {
+    await http.delete(
+      Uri.parse('\$baseUrl/subscriptions/unsubscribe/\$creatorUsername/\$subscriberId'),
+    );
+  }
+
+  static Future<int> getSubscriberCount(String creatorUsername) async {
+    try {
+      final response = await http.get(
+        Uri.parse('\$baseUrl/subscriptions/subscribers/\$creatorUsername'),
+      );
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body)['count'] ?? 0;
+      }
+    } catch (e) {}
+    return 0;
+  }
+
+  static Future<double> getCreatorEarnings(String creatorUsername) async {
+    try {
+      final response = await http.get(
+        Uri.parse('\$baseUrl/subscriptions/creator-earnings/\$creatorUsername'),
+      );
+      if (response.statusCode == 200) {
+        return (jsonDecode(response.body)['total'] ?? 0.0).toDouble();
+      }
+    } catch (e) {}
+    return 0.0;
+  }
 }

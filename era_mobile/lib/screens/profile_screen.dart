@@ -5,11 +5,31 @@ import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../services/api_service.dart';
+import '../services/auth_service.dart';
 import 'chat_screen.dart';
 import 'edit_profile_screen.dart';
 import 'settings_screen.dart';
 import 'post_detail_screen.dart';
 import 'followers_screen.dart';
+
+
+String? getVideoThumbnail(String? url) {
+  if (url == null) return null;
+  if (url.contains('/video/upload/')) {
+    return url
+        .replaceAll('/video/upload/', '/video/upload/so_0,f_jpg/')
+        .replaceAll('.mp4', '.jpg')
+        .replaceAll('.mov', '.jpg');
+  }
+  return url;
+}
+
+bool isVideo(String? url) {
+  if (url == null) return false;
+  return url.contains('/video/upload/') ||
+      url.contains('.mp4') ||
+      url.contains('.mov');
+}
 
 class ProfileScreen extends StatefulWidget {
   final String username;
@@ -25,7 +45,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String selectedTheme = 'default';
   Color? customAccentColor;
   String? profileImageUrl;
-  final String currentUser = 'briaannaab';
+  final String currentUser = AuthService.username ?? AuthService.username ?? 'briaannaab';
+  bool isSubscribed = false;
+  int subscriberCount = 0;
+  double creatorEarnings = 0.0;
 
   final Map<String, List<Color>> themes = {
     'default': [const Color(0xFF000000), const Color(0xFF000000)],
@@ -47,6 +70,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     loadProfile();
+    loadSubscriptionData();
+  }
+
+  Future<void> loadSubscriptionData() async {
+    final count = await ApiService.getSubscriberCount(widget.username);
+    final earnings = await ApiService.getCreatorEarnings(widget.username);
+    final subscribed = await ApiService.checkSubscription(
+      widget.username, AuthService.userId ?? 1);
+    setState(() {
+      subscriberCount = count;
+      creatorEarnings = earnings;
+      isSubscribed = subscribed;
+    });
   }
 
   Future<void> loadProfile() async {
@@ -94,7 +130,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               setState(() => customAccentColor = picked);
               Navigator.pop(context);
             },
-            child: const Text('Apply', style: TextStyle(color: Color(0xFFFFFFFF))),
+            child: const Text('Apply', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -109,7 +145,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       body: loading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFFFFF)))
+          ? const Center(child: CircularProgressIndicator(color: Colors.white))
           : profile == null
               ? const Center(child: Text('User not found', style: TextStyle(color: Colors.white54)))
               : Container(
@@ -208,8 +244,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   }),
                                                 ] else ...[
                                                   _menuItem(Icons.share_outlined, 'Share Profile', accent, () => Navigator.pop(context)),
-                                                  _menuItem(Icons.block_outlined, 'Block @\${widget.username}', Colors.orange, () => Navigator.pop(context)),
-                                                  _menuItem(Icons.flag_outlined, 'Report @\${widget.username}', Colors.red, () => Navigator.pop(context)),
+                                                  _menuItem(Icons.block_outlined, 'Block @${widget.username}', Colors.orange, () => Navigator.pop(context)),
+                                                  _menuItem(Icons.flag_outlined, 'Report @${widget.username}', Colors.red, () => Navigator.pop(context)),
                                                 ],
                                                 const SizedBox(height: 8),
                                               ],
@@ -232,9 +268,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
 
-                                                    const SizedBox(height: 32),
+                          const SizedBox(height: 32),
 
-                          // Hero avatar with aura glow
+                          // Avatar
                           Center(
                             child: Stack(
                               alignment: Alignment.center,
@@ -274,11 +310,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     child: profileImageUrl == null
                                         ? Text(
                                             widget.username[0].toUpperCase(),
-                                            style: TextStyle(
-                                              color: accent,
-                                              fontSize: 40,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                            style: TextStyle(color: accent, fontSize: 40, fontWeight: FontWeight.bold),
                                           )
                                         : null,
                                   ),
@@ -294,7 +326,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         decoration: BoxDecoration(
                                           color: accent,
                                           shape: BoxShape.circle,
-                                          border: Border.all(color: const Color(0xFF000000), width: 2),
+                                          border: Border.all(color: Colors.black, width: 2),
                                         ),
                                         child: const Icon(Icons.camera_alt, color: Colors.black, size: 12),
                                       ),
@@ -306,6 +338,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                           const SizedBox(height: 16),
 
+                          // Name
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -315,10 +348,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       fontSize: 24,
                                       fontWeight: FontWeight.w900,
                                       letterSpacing: -0.5)),
-                              if (profile!['is_creator'] == true) ...[
-                                const SizedBox(width: 6),
-                                Icon(Icons.verified, color: accent, size: 20),
-                              ],
+                              const SizedBox(width: 6),
+                              Icon(Icons.verified, color: accent, size: 20),
                             ],
                           ),
 
@@ -339,7 +370,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                           const SizedBox(height: 24),
 
-                          // Floating glass stats card
+                          // Stats
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 32),
                             child: Container(
@@ -348,41 +379,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 color: Colors.white.withOpacity(0.05),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(color: accent.withOpacity(0.2)),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: accent.withOpacity(0.05),
-                                    blurRadius: 20,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {},
+                                    child: _stat('${profile!["post_count"]}', 'Posts', accent),
+                                  ),
+                                  Container(width: 1, height: 30, color: accent.withOpacity(0.2)),
+                                  GestureDetector(
+                                    onTap: () => Navigator.push(context, MaterialPageRoute(
+                                      builder: (context) => FollowersScreen(username: widget.username),
+                                    )),
+                                    child: _stat('${profile!["followers"]}', 'Followers', accent),
+                                  ),
+                                  Container(width: 1, height: 30, color: accent.withOpacity(0.2)),
+                                  GestureDetector(
+                                    onTap: () => Navigator.push(context, MaterialPageRoute(
+                                      builder: (context) => FollowersScreen(username: widget.username, showFollowing: true),
+                                    )),
+                                    child: _stat('${profile!["following"]}', 'Following', accent),
                                   ),
                                 ],
                               ),
-                              child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {},
-                                      child: _stat('${profile!["post_count"]}', 'Posts', accent),
-                                    ),
-                                    Container(width: 1, height: 30, color: accent.withOpacity(0.2)),
-                                    GestureDetector(
-                                      onTap: () => Navigator.push(context, MaterialPageRoute(
-                                        builder: (context) => FollowersScreen(username: widget.username),
-                                      )),
-                                      child: _stat('${profile!["followers"]}', 'Followers', accent),
-                                    ),
-                                    Container(width: 1, height: 30, color: accent.withOpacity(0.2)),
-                                    GestureDetector(
-                                      onTap: () => Navigator.push(context, MaterialPageRoute(
-                                        builder: (context) => FollowersScreen(username: widget.username, showFollowing: true),
-                                      )),
-                                      child: _stat('${profile!["following"]}', 'Following', accent),
-                                    ),
-                                  ],
-                                ),
                             ),
                           ),
 
                           const SizedBox(height: 20),
 
+                          // Action buttons
                           if (!isOwnProfile)
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -390,10 +416,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 children: [
                                   Expanded(
                                     child: GestureDetector(
-                                              onTap: () async {
-                                                await ApiService.followUser(widget.username);
-                                                loadProfile();
-                                              },
+                                      onTap: () async {
+                                        await ApiService.followUser(widget.username);
+                                        loadProfile();
+                                      },
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(vertical: 14),
                                         decoration: BoxDecoration(
@@ -401,22 +427,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             colors: [accent, accent.withOpacity(0.7)],
                                           ),
                                           borderRadius: BorderRadius.circular(16),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: accent.withOpacity(0.3),
-                                              blurRadius: 12,
-                                            ),
-                                          ],
                                         ),
                                         child: const Text('Follow',
                                             textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 15)),
+                                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15)),
                                       ),
                                     ),
                                   ),
+                                  if (profile!['is_creator_subscription'] == true) ...[
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () async {
+                                          if (isSubscribed) {
+                                            await ApiService.unsubscribe(widget.username, AuthService.userId ?? 1);
+                                          } else {
+                                            await ApiService.subscribe(
+                                              widget.username,
+                                              AuthService.userId ?? 1,
+                                              AuthService.username ?? 'briaannaab',
+                                            );
+                                          }
+                                          loadSubscriptionData();
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(vertical: 14),
+                                          decoration: BoxDecoration(
+                                            color: isSubscribed ? Colors.white.withOpacity(0.08) : Colors.white,
+                                            borderRadius: BorderRadius.circular(16),
+                                            border: isSubscribed ? Border.all(color: Colors.white.withOpacity(0.3)) : null,
+                                          ),
+                                          child: Text(
+                                            isSubscribed ? 'Subscribed ✓' : 'Subscribe \$${profile!['subscription_price']?.toStringAsFixed(2) ?? '4.99'}/mo',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: isSubscribed ? Colors.white54 : Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: GestureDetector(
@@ -435,10 +488,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ),
                                         child: Text('Message',
                                             textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                color: accent,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 15)),
+                                            style: TextStyle(color: accent, fontWeight: FontWeight.bold, fontSize: 15)),
                                       ),
                                     ),
                                   ),
@@ -448,41 +498,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                           const SizedBox(height: 24),
 
-                          if (profile!['is_creator'] == true && isOwnProfile)
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(32, 0, 32, 20),
-                              child: Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: accent.withOpacity(0.08),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: accent.withOpacity(0.2)),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: accent.withOpacity(0.15),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(Icons.monetization_on_outlined, color: accent, size: 18),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text('\$${profile!["tips_received"].toStringAsFixed(2)}',
-                                            style: TextStyle(color: accent, fontWeight: FontWeight.bold, fontSize: 18)),
-                                        const Text('Total earned',
-                                            style: TextStyle(color: Colors.white38, fontSize: 11)),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-
+                          // Aura themes
                           if (isOwnProfile) ...[
                             Padding(
                               padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
@@ -551,6 +567,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             const SizedBox(height: 24),
                           ],
 
+                          // Moments
                           if (profile!['posts'] != null && (profile!['posts'] as List).isNotEmpty) ...[
                             Padding(
                               padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
@@ -594,8 +611,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               child: Stack(
                                                 fit: StackFit.expand,
                                                 children: [
-                                                  Image.network(post['media_url'], fit: BoxFit.cover,
-                                                      errorBuilder: (c, e, s) => Icon(Icons.image_outlined, color: accent)),
+                                                  Image.network(
+                                                    getVideoThumbnail(post['media_url']) ?? post['media_url'],
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (c, e, s) => Container(
+                                                      color: const Color(0xFF1A1A1A),
+                                                      child: const Center(
+                                                        child: Icon(Icons.play_circle_outline, color: Colors.white54, size: 32),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  if (isVideo(post['media_url']))
+                                                    const Positioned(
+                                                      top: 8, right: 8,
+                                                      child: Icon(Icons.play_circle_outline, color: Colors.white70, size: 20),
+                                                    ),
                                                   Container(
                                                     decoration: BoxDecoration(
                                                       gradient: LinearGradient(
@@ -623,6 +653,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             const SizedBox(height: 24),
                           ],
 
+                          // Posts grid
                           if (profile!['posts'] != null && (profile!['posts'] as List).isNotEmpty) ...[
                             Padding(
                               padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
@@ -663,8 +694,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               child: Stack(
                                                 fit: StackFit.expand,
                                                 children: [
-                                                  Image.network(post['media_url'], fit: BoxFit.cover,
-                                                      errorBuilder: (c, e, s) => Center(child: Icon(Icons.play_circle_outline, color: accent, size: 32))),
+                                                  Image.network(
+                                                    getVideoThumbnail(post['media_url']) ?? post['media_url'],
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (c, e, s) => Container(
+                                                      color: const Color(0xFF1A1A1A),
+                                                      child: const Center(
+                                                        child: Icon(Icons.play_circle_outline, color: Colors.white54, size: 40),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  if (isVideo(post['media_url']))
+                                                    const Positioned(
+                                                      top: 8, right: 8,
+                                                      child: Icon(Icons.play_circle_fill, color: Colors.white70, size: 24),
+                                                    ),
                                                   Container(
                                                     decoration: BoxDecoration(
                                                       gradient: LinearGradient(
@@ -701,7 +745,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         color: accent.withOpacity(0.15),
                                                         borderRadius: BorderRadius.circular(8),
                                                       ),
-                                                      child: Text('✨ ${post["vibe"]}',
+                                                      child: Text('✨ \${post["vibe"]}',
                                                           style: TextStyle(color: accent, fontSize: 9)),
                                                     ),
                                                   Expanded(

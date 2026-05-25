@@ -2,8 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../services/api_service.dart';
-import 'home_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../services/auth_service.dart';
 import 'main_screen.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -38,7 +37,11 @@ class _AuthScreenState extends State<AuthScreen> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        // TODO: save token to storage
+        await AuthService.login(
+          id: data['user_id'],
+          name: data['username'],
+          tok: data['token'] ?? '',
+        );
         if (mounted) {
           Navigator.pushReplacement(
             context,

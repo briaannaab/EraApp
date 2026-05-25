@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../services/auth_service.dart';
 
 // Words that are not allowed in prayer posts
 const List<String> _blockedWords = [
@@ -240,11 +241,11 @@ class _PrayerScreenState extends State<PrayerScreen> {
                                   }
 
                                   setState(() => _processing = true);
-                                  final username = _anonymous ? 'Anonymous' : 'briaannaab';
+                                  final username = _anonymous ? 'Anonymous' : AuthService.username ?? 'briaannaab';
                                   final content = '🙏 $_category prayer\n\n${prayerController.text}';
 
                                   await ApiService.createPost(
-                                    userId: 1,
+                                    userId: AuthService.userId ?? 1,
                                     username: username,
                                     content: content,
                                     vibe: 'grounded',

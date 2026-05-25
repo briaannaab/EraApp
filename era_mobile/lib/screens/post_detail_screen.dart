@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../services/api_service.dart';
+import '../services/auth_service.dart';
 import 'comments_screen.dart';
 import 'profile_screen.dart';
 
@@ -25,7 +26,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   late PageController _pageController;
   late int currentIndex;
   late List<Map<String, dynamic>> posts;
-  final String currentUser = 'briaannaab';
+  final String currentUser = AuthService.username ?? AuthService.username ?? 'briaannaab';
 
   @override
   void initState() {
@@ -200,16 +201,6 @@ class _PostDetailCardState extends State<_PostDetailCard> {
                               style: TextStyle(color: Colors.white54, fontSize: 14)),
                         ],
                       ),
-                    ),
-                    const SizedBox(width: 24),
-                    Row(
-                      children: [
-                        const Icon(Icons.monetization_on_outlined,
-                            color: Colors.white, size: 22),
-                        const SizedBox(width: 6),
-                        Text('\$${(post['tips'] ?? 0.0).toStringAsFixed(2)}',
-                            style: const TextStyle(color: Colors.white, fontSize: 14)),
-                      ],
                     ),
                   ],
                 ),

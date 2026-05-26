@@ -15,6 +15,7 @@ class AuthService {
     await prefs.setInt('user_id', id);
     await prefs.setString('username', name);
     await prefs.setString('token', tok);
+    print('Saved: id=$id name=$name');
   }
 
   static Future<void> logout() async {
@@ -22,7 +23,9 @@ class AuthService {
     username = null;
     token = null;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    await prefs.remove('user_id');
+    await prefs.remove('username');
+    await prefs.remove('token');
   }
 
   static Future<bool> tryAutoLogin() async {
@@ -30,12 +33,15 @@ class AuthService {
     final id = prefs.getInt('user_id');
     final name = prefs.getString('username');
     final tok = prefs.getString('token');
+    print('AutoLogin: id=$id name=$name');
     if (id != null && name != null) {
       userId = id;
       username = name;
       token = tok ?? '';
+      print('AutoLogin success!');
       return true;
     }
+    print('AutoLogin failed - no saved data');
     return false;
   }
 }

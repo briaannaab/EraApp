@@ -45,7 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String selectedTheme = 'default';
   Color? customAccentColor;
   String? profileImageUrl;
-  final String currentUser = AuthService.username ?? AuthService.username ?? 'briaannaab';
+  String get currentUser => AuthService.username ?? 'briaannaab';
   bool isSubscribed = false;
   int subscriberCount = 0;
   double creatorEarnings = 0.0;
@@ -93,6 +93,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         profile = jsonDecode(response.body);
         loading = false;
+        if (profile!['profile_picture_url'] != null) {
+          profileImageUrl = profile!['profile_picture_url'];
+        }
       });
     }
   }
@@ -101,7 +104,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final result = await FilePicker.platform.pickFiles(type: FileType.image);
     if (result != null && result.files.first.bytes != null) {
       final url = await ApiService.uploadImage(result.files.first.bytes!, 'profile.jpg');
-      if (url != null) setState(() => profileImageUrl = url);
+      if (url != null) {
+        setState(() => profileImageUrl = url);
+        // Save to database
+        await http.post(
+          Uri.parse('\$baseUrl/users/\${AuthService.userId ?? 1}/profile-picture?url=\${Uri.encodeComponent(url)}'),
+        );
+      }
     }
   }
 

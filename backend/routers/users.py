@@ -48,7 +48,11 @@ def get_profile(username: str, db: Session = Depends(get_db)):
         "following": user.following,
         "tips_received": user.tips_received,
         "post_count": len(posts),
-        "posts": posts
+        "posts": posts,
+        "profile_picture_url": user.profile_picture_url,
+        "voice_bio_url": user.voice_bio_url,
+        "subscription_price": user.subscription_price if hasattr(user, 'subscription_price') else 0,
+        "is_creator_subscription": user.is_creator_subscription if hasattr(user, 'is_creator_subscription') else False,
     }
 
 @router.get("/{user_id}")
@@ -94,3 +98,13 @@ def get_followers(user_id: int, db: Session = Depends(get_db)):
 @router.get("/{user_id}/following")
 def get_following(user_id: int, db: Session = Depends(get_db)):
     return db.query(User).all()
+
+@router.post("/{user_id}/profile-picture")
+def update_profile_picture(user_id: int, url: str, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.voice_bio_url = url  # reusing this field for profile pic for now
+    db.commit()
+    return {"message": "Profile picture updated"}
+

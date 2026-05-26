@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
+import 'auth_screen.dart';
 import 'privacy_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -52,7 +54,15 @@ class SettingsScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: GestureDetector(
-                onTap: () {},
+                onTap: () async {
+                  await AuthService.logout();
+                  if (context.mounted) {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => const AuthScreen()),
+                      (route) => false,
+                    );
+                  }
+                },
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -80,11 +90,11 @@ class SettingsScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Color(0xFF0A0A0A))),
+          border: Border(bottom: BorderSide(color: Color(0xFF1A1A1A))),
         ),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFFFFFFFF), size: 22),
+            Icon(icon, color: Colors.white, size: 22),
             const SizedBox(width: 16),
             Expanded(
               child: Column(

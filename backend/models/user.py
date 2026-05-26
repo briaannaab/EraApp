@@ -16,3 +16,4 @@ class User(Base):
     tips_received = Column(Float, default=0.0)
     created_at = Column(DateTime, server_default=func.now())
     voice_bio_url = Column(String, nullable=True)
+    profile_picture_url = Column(String, nullable=True)

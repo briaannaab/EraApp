@@ -8,7 +8,8 @@ load_dotenv(dotenv_path='/workspaces/EraApp/backend/.env')
 
 
 router = APIRouter()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+api_key = os.getenv('OPENAI_API_KEY')
+client = OpenAI(api_key=api_key) if api_key else None
 
 class CaptionRequest(BaseModel):
     content: str

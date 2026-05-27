@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 
-const String baseUrl = 'https://improved-giggle-4qwv56rvwgrf9vg-8000.app.github.dev';
+const String baseUrl = 'https://eraapp-production.up.railway.app';
 
 class ApiService {
   static Future<List<dynamic>> getPosts() async {

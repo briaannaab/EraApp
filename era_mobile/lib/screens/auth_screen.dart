@@ -38,8 +38,8 @@ class _AuthScreenState extends State<AuthScreen> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         await AuthService.login(
-          id: data['user_id'],
-          name: data['username'],
+          id: data['user']['id'],
+          name: data['user']['username'],
           tok: data['token'] ?? '',
         );
         if (mounted) {

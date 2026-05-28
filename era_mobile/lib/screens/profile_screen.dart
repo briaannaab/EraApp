@@ -107,9 +107,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (url != null) {
         setState(() => profileImageUrl = url);
         // Save to database
-        await http.post(
-          Uri.parse('\$baseUrl/users/\${AuthService.userId ?? 1}/profile-picture?url=\${Uri.encodeComponent(url)}'),
+        final response = await http.post(
+          Uri.parse('$baseUrl/users/${AuthService.userId ?? 1}/profile-picture?url=${Uri.encodeComponent(url)}'),
         );
+        print('Profile picture save response: \${response.statusCode} \${response.body}');
       }
     }
   }

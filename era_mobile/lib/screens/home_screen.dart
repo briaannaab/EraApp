@@ -219,7 +219,7 @@ class _ImmersivePostCardState extends State<_ImmersivePostCard>
         widget.onRefresh();
       },
       onLongPressStart: (_) => _showRadialRing(),
-      onLongPressEnd: (_) => _hideRadialRing(),
+      // onLongPressEnd: (_) => _hideRadialRing(),
       child: Container(
         color: Colors.black,
         child: Stack(
@@ -401,8 +401,10 @@ class _ImmersivePostCardState extends State<_ImmersivePostCard>
             // Radial ring
             if (_showRing)
               Positioned.fill(
-                child: Container(
-                  color: Colors.black.withOpacity(0.5),
+                child: GestureDetector(
+                  onTap: _hideRadialRing,
+                  child: Container(
+                    color: Colors.black.withOpacity(0.5),
                   child: Center(
                     child: ScaleTransition(
                       scale: _ringAnimation,
@@ -430,14 +432,18 @@ class _ImmersivePostCardState extends State<_ImmersivePostCard>
                                 border: Border.all(color: Colors.white.withOpacity(0.08), width: 1),
                               ),
                             ),
-                            // Center dot
-                            Container(
-                              width: 20,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white.withOpacity(0.15),
-                                border: Border.all(color: Colors.white.withOpacity(0.3)),
+                            // Center dot - tap to close
+                            GestureDetector(
+                              onTap: _hideRadialRing,
+                              child: Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withOpacity(0.15),
+                                  border: Border.all(color: Colors.white.withOpacity(0.3)),
+                                ),
+                                child: const Icon(Icons.close, color: Colors.white54, size: 12),
                               ),
                             ),
                             // Like - top
@@ -494,6 +500,7 @@ class _ImmersivePostCardState extends State<_ImmersivePostCard>
                     ),
                   ),
                 ),
+              ),
               ),
           ],
         ),

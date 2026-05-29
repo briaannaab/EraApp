@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -101,16 +102,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> pickProfileImage() async {
-    final result = await FilePicker.platform.pickFiles(type: FileType.image);
-    if (result != null && result.files.first.bytes != null) {
-      final url = await ApiService.uploadImage(result.files.first.bytes!, 'profile.jpg');
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      final bytes = await image.readAsBytes();
+      final url = await ApiService.uploadImage(bytes, 'profile.jpg');
       if (url != null) {
         setState(() => profileImageUrl = url);
         // Save to database
-        final response = await http.post(
+        await http.post(
           Uri.parse('$baseUrl/users/${AuthService.userId ?? 1}/profile-picture?url=${Uri.encodeComponent(url)}'),
         );
-        print('Profile picture save response: \${response.statusCode} \${response.body}');
       }
     }
   }
@@ -468,7 +470,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             border: isSubscribed ? Border.all(color: Colors.white.withOpacity(0.3)) : null,
                                           ),
                                           child: Text(
-                                            isSubscribed ? 'Subscribed ✓' : 'Subscribe \$${profile!['subscription_price']?.toStringAsFixed(2) ?? '4.99'}/mo',
+                                            isSubscribed ? 'Subscribed ✓' : 'Subscribe \$${profile!["subscription_price"]?.toStringAsFixed(2) ?? "4.99"}/mo',
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                               color: isSubscribed ? Colors.white54 : Colors.black,
@@ -755,7 +757,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         color: accent.withOpacity(0.15),
                                                         borderRadius: BorderRadius.circular(8),
                                                       ),
-                                                      child: Text('✨ \${post["vibe"]}',
+                                                      child: Text('✨ ${post["vibe"]}',
                                                           style: TextStyle(color: accent, fontSize: 9)),
                                                     ),
                                                   Expanded(

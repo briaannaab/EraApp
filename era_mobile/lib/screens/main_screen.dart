@@ -164,7 +164,9 @@ class _MainScreenState extends State<MainScreen> {
       backgroundColor: const Color(0xFF0A0A0A),
       isScrollControlled: true,
       builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => SingleChildScrollView(
+        builder: (context, setModalState) => GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: SingleChildScrollView(
           child: Padding(
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom + 20,
@@ -371,6 +373,7 @@ class _MainScreenState extends State<MainScreen> {
               const SizedBox(height: 20),
             ],
           ),
+        ),
         ),
         ),
       ),

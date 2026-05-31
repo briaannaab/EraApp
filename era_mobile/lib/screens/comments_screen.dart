@@ -83,6 +83,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                         child: Text('No comments yet. Be first!',
                             style: TextStyle(color: Colors.white54)))
                     : ListView.builder(
+                        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                         itemCount: topLevelComments.length,
                         itemBuilder: (context, index) {
                           final comment = topLevelComments[index];

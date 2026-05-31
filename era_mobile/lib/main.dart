@@ -27,6 +27,10 @@ class EraApp extends StatelessWidget {
           surface: Color(0xFF0A0A0A),
         ),
       ),
+      builder: (context, child) => GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: child!,
+      ),
       home: AuthService.isLoggedIn ? const MainScreen() : const AuthScreen(),
     );
   }

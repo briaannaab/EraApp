@@ -61,6 +61,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF000000),
         iconTheme: const IconThemeData(color: Colors.white),
+        toolbarHeight: 70,
         title: Row(
           children: [
             const Text('Comments',

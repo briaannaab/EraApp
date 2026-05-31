@@ -152,6 +152,7 @@ class _MainScreenState extends State<MainScreen> {
 
   void _showCreatePost(BuildContext context) {
     final controller = TextEditingController();
+    bool _posting = false;
     Uint8List? selectedImageBytes;
     Uint8List? selectedVideoBytes;
     String? selectedVideoName;
@@ -342,6 +343,8 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                   onPressed: () async {
                     if (controller.text.isEmpty && selectedImageBytes == null && selectedVideoBytes == null) return;
+                    FocusScope.of(context).unfocus();
+                    setModalState(() => _posting = true);
                     String? mediaUrl;
                     if (selectedImageBytes != null) {
                       mediaUrl = await ApiService.uploadImage(selectedImageBytes!, 'post.jpg');
@@ -357,7 +360,11 @@ class _MainScreenState extends State<MainScreen> {
                     );
                     Navigator.pop(context);
                   },
-                  child: const Text('Post', style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: _posting
+                      ? const SizedBox(
+                          height: 20, width: 20,
+                          child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
+                      : const Text('Post', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
               const SizedBox(height: 20),

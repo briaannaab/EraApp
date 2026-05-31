@@ -357,46 +357,7 @@ class _ImmersivePostCardState extends State<_ImmersivePostCard>
               ),
             ),
 
-            // Delete button for owner
-            if (isOwner)
-              Positioned(
-                top: 60,
-                right: 16,
-                child: GestureDetector(
-                  onTap: () async {
-                    final confirm = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        backgroundColor: const Color(0xFF0A0A0A),
-                        title: const Text('Delete post?', style: TextStyle(color: Colors.white)),
-                        content: const Text('This cannot be undone.', style: TextStyle(color: Colors.white54)),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, true),
-                            child: const Text('Delete', style: TextStyle(color: Colors.red)),
-                          ),
-                        ],
-                      ),
-                    );
-                    if (confirm == true) {
-                      await ApiService.deletePost(widget.post['id']);
-                      widget.onRefresh();
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.4),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.delete_outline, color: Colors.red, size: 18),
-                  ),
-                ),
-              ),
+
 
             // Radial ring
             if (_showRing)
@@ -432,18 +393,50 @@ class _ImmersivePostCardState extends State<_ImmersivePostCard>
                                 border: Border.all(color: Colors.white.withOpacity(0.08), width: 1),
                               ),
                             ),
-                            // Center dot - tap to close
+                            // Center - delete if owner, close if not
                             GestureDetector(
-                              onTap: _hideRadialRing,
+                              onTap: () async {
+                                if (isOwner) {
+                                  _hideRadialRing();
+                                  final confirm = await showDialog<bool>(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      backgroundColor: const Color(0xFF0A0A0A),
+                                      title: const Text('Delete post?', style: TextStyle(color: Colors.white)),
+                                      content: const Text('This cannot be undone.', style: TextStyle(color: Colors.white54)),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context, false),
+                                          child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+                                        ),
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context, true),
+                                          child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                  if (confirm == true) {
+                                    await ApiService.deletePost(widget.post['id']);
+                                    widget.onRefresh();
+                                  }
+                                } else {
+                                  _hideRadialRing();
+                                }
+                              },
                               child: Container(
-                                width: 20,
-                                height: 20,
+                                width: 44,
+                                height: 44,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.white.withOpacity(0.15),
-                                  border: Border.all(color: Colors.white.withOpacity(0.3)),
+                                  color: isOwner ? Colors.red.withOpacity(0.2) : Colors.white.withOpacity(0.15),
+                                  border: Border.all(color: isOwner ? Colors.red.withOpacity(0.5) : Colors.white.withOpacity(0.3)),
                                 ),
-                                child: const Icon(Icons.close, color: Colors.white54, size: 12),
+                                child: Icon(
+                                  isOwner ? Icons.delete_outline : Icons.close,
+                                  color: isOwner ? Colors.red : Colors.white54,
+                                  size: 18,
+                                ),
                               ),
                             ),
                             // Like - top

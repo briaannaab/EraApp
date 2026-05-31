@@ -13,6 +13,7 @@ class Post(Base):
     tags = Column(ARRAY(String), default=[])
     vibe = Column(String, nullable=True)
     is_exclusive = Column(Boolean, default=False)
+    is_moment = Column(Boolean, default=False)
     likes = Column(Integer, default=0)
     tips = Column(Float, default=0.0)
     created_at = Column(DateTime, server_default=func.now())

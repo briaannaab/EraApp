@@ -78,3 +78,20 @@ def like_post(post_id: int, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(post)
     return post
+
+@router.get("/moments/")
+def get_moments(db: Session = Depends(get_db)):
+    from datetime import datetime, timedelta
+    cutoff = datetime.utcnow() - timedelta(hours=24)
+    moments = db.query(Post).filter(
+        Post.is_moment == True,
+        Post.created_at >= cutoff
+    ).order_by(Post.created_at.desc()).all()
+    return moments
+
+@router.get("/feed/")
+def get_feed(db: Session = Depends(get_db)):
+    posts = db.query(Post).filter(
+        Post.is_moment == False
+    ).order_by(Post.created_at.desc()).all()
+    return posts

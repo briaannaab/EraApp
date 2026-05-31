@@ -17,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> posts = [];
+  List<dynamic> moments = [];
   bool loading = true;
   int currentIndex = 0;
   final PageController _pageController = PageController();
@@ -30,13 +31,21 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> loadPosts() async {
     try {
       final data = await ApiService.getPosts();
+      final momentData = await ApiService.getMoments();
       setState(() {
         posts = data;
+        moments = momentData;
         loading = false;
       });
     } catch (e) {
       setState(() => loading = false);
     }
+  }
+
+  void _showMomentViewer(BuildContext context, int startIndex) {
+    Navigator.push(context, MaterialPageRoute(
+      builder: (context) => _MomentViewer(moments: moments, startIndex: startIndex),
+    ));
   }
 
   @override
@@ -64,6 +73,59 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                     ),
+
+                    // Story strip
+                    if (moments.isNotEmpty)
+                      Positioned(
+                        top: 110,
+                        left: 0,
+                        right: 0,
+                        child: SizedBox(
+                          height: 90,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            itemCount: moments.length,
+                            itemBuilder: (context, index) {
+                              final moment = moments[index];
+                              return GestureDetector(
+                                onTap: () => _showMomentViewer(context, index),
+                                child: Container(
+                                  margin: const EdgeInsets.only(right: 12),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        width: 60,
+                                        height: 60,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(color: Colors.white, width: 2),
+                                          image: moment['media_url'] != null
+                                              ? DecorationImage(
+                                                  image: NetworkImage(moment['media_url']),
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : null,
+                                          color: const Color(0xFF1A1A1A),
+                                        ),
+                                        child: moment['media_url'] == null
+                                            ? const Icon(Icons.auto_awesome, color: Colors.white, size: 24)
+                                            : null,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        moment['username'] ?? '',
+                                        style: const TextStyle(color: Colors.white70, fontSize: 10),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
 
                     // Header
                     Positioned(
@@ -200,6 +262,12 @@ class _ImmersivePostCardState extends State<_ImmersivePostCard>
     _ringController.reverse().then((_) {
       if (mounted) setState(() => _showRing = false);
     });
+  }
+
+  void _showMomentViewer(BuildContext context, int startIndex) {
+    Navigator.push(context, MaterialPageRoute(
+      builder: (context) => _MomentViewer(moments: moments, startIndex: startIndex),
+    ));
   }
 
   @override
@@ -509,6 +577,12 @@ class _RingAction extends StatelessWidget {
 
   const _RingAction({required this.icon, required this.label, required this.onTap});
 
+  void _showMomentViewer(BuildContext context, int startIndex) {
+    Navigator.push(context, MaterialPageRoute(
+      builder: (context) => _MomentViewer(moments: moments, startIndex: startIndex),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -572,6 +646,12 @@ class _VideoPlayerState extends State<_VideoPlayer> {
     super.dispose();
   }
 
+  void _showMomentViewer(BuildContext context, int startIndex) {
+    Navigator.push(context, MaterialPageRoute(
+      builder: (context) => _MomentViewer(moments: moments, startIndex: startIndex),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_chewieController == null) {
@@ -584,6 +664,198 @@ class _VideoPlayerState extends State<_VideoPlayer> {
           width: _videoController.value.size.width,
           height: _videoController.value.size.height,
           child: Chewie(controller: _chewieController!),
+        ),
+      ),
+    );
+  }
+}
+
+class _MomentViewer extends StatefulWidget {
+  final List<dynamic> moments;
+  final int startIndex;
+  const _MomentViewer({required this.moments, required this.startIndex});
+
+  @override
+  State<_MomentViewer> createState() => _MomentViewerState();
+}
+
+class _MomentViewerState extends State<_MomentViewer>
+    with SingleTickerProviderStateMixin {
+  late int currentIndex;
+  late AnimationController _progressController;
+
+  @override
+  void initState() {
+    super.initState();
+    currentIndex = widget.startIndex;
+    _progressController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 5),
+    )..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _next();
+        }
+      });
+    _progressController.forward();
+  }
+
+  void _next() {
+    if (currentIndex < widget.moments.length - 1) {
+      setState(() => currentIndex++);
+      _progressController.reset();
+      _progressController.forward();
+    } else {
+      Navigator.pop(context);
+    }
+  }
+
+  void _prev() {
+    if (currentIndex > 0) {
+      setState(() => currentIndex--);
+      _progressController.reset();
+      _progressController.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _progressController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final moment = widget.moments[currentIndex];
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: GestureDetector(
+        onTapDown: (details) {
+          final x = details.globalPosition.dx;
+          final width = MediaQuery.of(context).size.width;
+          if (x < width / 2) {
+            _prev();
+          } else {
+            _next();
+          }
+        },
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Media
+            if (moment['media_url'] != null)
+              Image.network(moment['media_url'], fit: BoxFit.cover)
+            else
+              Container(
+                color: const Color(0xFF0A0A0A),
+                child: Center(
+                  child: Text(
+                    moment['content'] ?? '',
+                    style: const TextStyle(color: Colors.white, fontSize: 24),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+
+            // Gradient
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.6),
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.4),
+                  ],
+                ),
+              ),
+            ),
+
+            // Progress bars
+            Positioned(
+              top: 60,
+              left: 12,
+              right: 12,
+              child: Row(
+                children: List.generate(widget.moments.length, (i) {
+                  return Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 2),
+                      height: 2,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                      child: i < currentIndex
+                          ? Container(color: Colors.white)
+                          : i == currentIndex
+                              ? AnimatedBuilder(
+                                  animation: _progressController,
+                                  builder: (context, child) => FractionallySizedBox(
+                                    alignment: Alignment.centerLeft,
+                                    widthFactor: _progressController.value,
+                                    child: Container(color: Colors.white),
+                                  ),
+                                )
+                              : null,
+                    ),
+                  );
+                }),
+              ),
+            ),
+
+            // User info
+            Positioned(
+              top: 72,
+              left: 16,
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 16,
+                    backgroundColor: const Color(0xFF1A1A1A),
+                    child: Text(
+                      (moment['username'] ?? '?')[0].toUpperCase(),
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '@${moment['username']}',
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+
+            // Close button
+            Positioned(
+              top: 60,
+              right: 16,
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.4),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close, color: Colors.white, size: 20),
+                ),
+              ),
+            ),
+
+            // Caption
+            if (moment['content'] != null && moment['content'].isNotEmpty && moment['media_url'] != null)
+              Positioned(
+                bottom: 60,
+                left: 16,
+                right: 16,
+                child: Text(
+                  moment['content'],
+                  style: const TextStyle(color: Colors.white, fontSize: 15),
+                ),
+              ),
+          ],
         ),
       ),
     );

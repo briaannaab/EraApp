@@ -223,3 +223,11 @@ class ApiService {
     return 0.0;
   }
 }
+
+  static Future<List<dynamic>> getMoments() async {
+    try {
+      final response = await http.get(Uri.parse('\$baseUrl/posts/moments/'));
+      if (response.statusCode == 200) return jsonDecode(response.body);
+    } catch (e) {}
+    return [];
+  }

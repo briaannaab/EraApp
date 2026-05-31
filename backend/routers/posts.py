@@ -16,6 +16,7 @@ class PostCreate(BaseModel):
     media_url: Optional[str] = None
     tags: Optional[list[str]] = []
     vibe: Optional[str] = None
+    is_moment: Optional[bool] = False
 
 @router.get("/vibe/{vibe_name}")
 def get_posts_by_vibe(vibe_name: str, db: Session = Depends(get_db)):

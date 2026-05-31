@@ -261,6 +261,7 @@ class _MomentScreenState extends State<MomentScreen> {
                           username: AuthService.username ?? 'briaannaab',
                           content: captionController.text.isEmpty ? '✨ Moment' : captionController.text,
                           mediaUrl: mediaUrl,
+                          isMoment: true,
                         );
                         setState(() => _processing = false);
                         if (mounted) Navigator.pop(context);

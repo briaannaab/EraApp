@@ -58,6 +58,7 @@ class ApiService {
         'tags': tags,
         'media_url': mediaUrl,
         'vibe': vibe,
+        'is_moment': isMoment,
       }),
     );
     if (response.statusCode == 200) {

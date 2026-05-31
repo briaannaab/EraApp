@@ -460,11 +460,11 @@ class _ImmersivePostCardState extends State<_ImmersivePostCard>
                                 label: 'comment',
                                 onTap: () {
                                   _hideRadialRing();
-                                  showModalBottomSheet(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    backgroundColor: Colors.transparent,
-                                    builder: (context) => CommentsScreen(post: widget.post),
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CommentsScreen(post: widget.post),
+                                    ),
                                   );
                                 },
                               ),

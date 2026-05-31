@@ -164,9 +164,10 @@ class _MainScreenState extends State<MainScreen> {
       backgroundColor: const Color(0xFF0A0A0A),
       isScrollControlled: true,
       builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Padding(
+        builder: (context, setModalState) => SingleChildScrollView(
+          child: Padding(
           padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
             left: 20, right: 20, top: 20,
           ),
           child: Column(
@@ -370,6 +371,7 @@ class _MainScreenState extends State<MainScreen> {
               const SizedBox(height: 20),
             ],
           ),
+        ),
         ),
       ),
     );

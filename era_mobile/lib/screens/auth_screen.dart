@@ -124,6 +124,95 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                 ),
               ),
+              if (isLogin) ...[
+                const SizedBox(height: 16),
+                GestureDetector(
+                  onTap: () => _showForgotPassword(context),
+                  child: const Center(
+                    child: Text('Forgot password?',
+                        style: TextStyle(color: Colors.white38, fontSize: 13)),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showForgotPassword(BuildContext context) {
+    final emailController = TextEditingController();
+    final newPasswordController = TextEditingController();
+    String? message;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF0A0A0A),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 24, right: 24, top: 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Reset Password',
+                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              const Text('Enter your email and new password',
+                  style: TextStyle(color: Colors.white38, fontSize: 13)),
+              const SizedBox(height: 24),
+              if (message != null)
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.green.withOpacity(0.3)),
+                  ),
+                  child: Text(message!, style: const TextStyle(color: Colors.green, fontSize: 13)),
+                ),
+              _input('Email', emailController),
+              const SizedBox(height: 12),
+              _input('New Password', newPasswordController, obscure: true),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: () async {
+                    final response = await http.post(
+                      Uri.parse('\$baseUrl/auth/reset-password'),
+                      headers: {'Content-Type': 'application/json'},
+                      body: jsonEncode({
+                        'email': emailController.text,
+                        'new_password': newPasswordController.text,
+                      }),
+                    );
+                    if (response.statusCode == 200) {
+                      setModalState(() => message = 'Password reset! You can now sign in.');
+                    } else {
+                      final data = jsonDecode(response.body);
+                      setModalState(() => message = data['detail'] ?? 'Something went wrong');
+                    }
+                  },
+                  child: const Text('Reset Password', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ),
+              const SizedBox(height: 32),
             ],
           ),
         ),

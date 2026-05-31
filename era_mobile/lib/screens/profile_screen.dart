@@ -435,14 +435,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(vertical: 14),
                                         decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [accent, accent.withOpacity(0.7)],
-                                          ),
+                                          color: Colors.transparent,
                                           borderRadius: BorderRadius.circular(16),
+                                          border: Border.all(color: Colors.white.withOpacity(0.4)),
                                         ),
                                         child: const Text('Follow',
                                             textAlign: TextAlign.center,
-                                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15)),
+                                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
                                       ),
                                     ),
                                   ),
@@ -465,18 +464,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(vertical: 14),
                                           decoration: BoxDecoration(
-                                            color: isSubscribed ? Colors.white.withOpacity(0.08) : Colors.white,
+                                            color: isSubscribed ? Colors.white.withOpacity(0.05) : Colors.transparent,
                                             borderRadius: BorderRadius.circular(16),
-                                            border: isSubscribed ? Border.all(color: Colors.white.withOpacity(0.3)) : null,
-                                          ),
-                                          child: Text(
-                                            isSubscribed ? 'Subscribed ✓' : 'Subscribe \$${profile!["subscription_price"]?.toStringAsFixed(2) ?? "4.99"}/mo',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: isSubscribed ? Colors.white54 : Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 13,
+                                            border: Border.all(
+                                              color: isSubscribed ? Colors.white.withOpacity(0.2) : Colors.white.withOpacity(0.4),
                                             ),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                isSubscribed ? Icons.check_circle_outline : Icons.stars_outlined,
+                                                color: isSubscribed ? Colors.white38 : Colors.white,
+                                                size: 16,
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                isSubscribed ? 'Subscribed' : 'Subscribe',
+                                                style: TextStyle(
+                                                  color: isSubscribed ? Colors.white38 : Colors.white,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ),
@@ -494,13 +505,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(vertical: 14),
                                         decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.08),
+                                          color: Colors.transparent,
                                           borderRadius: BorderRadius.circular(16),
-                                          border: Border.all(color: accent.withOpacity(0.3)),
+                                          border: Border.all(color: Colors.white.withOpacity(0.4)),
                                         ),
-                                        child: Text('Message',
+                                        child: const Text('Message',
                                             textAlign: TextAlign.center,
-                                            style: TextStyle(color: accent, fontWeight: FontWeight.bold, fontSize: 15)),
+                                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
                                       ),
                                     ),
                                   ),

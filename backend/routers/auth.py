@@ -79,3 +79,16 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
         "email": user.email,
         "is_creator": user.is_creator
     }}
+
+class ResetPasswordRequest(BaseModel):
+    email: str
+    new_password: str
+
+@router.post("/reset-password")
+def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == request.email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="No account found with that email")
+    user.password = hash_password(request.new_password)
+    db.commit()
+    return {"message": "Password reset successfully"}

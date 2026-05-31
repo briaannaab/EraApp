@@ -11,6 +11,8 @@ class User(Base):
     password = Column(String, nullable=False, default="")
     bio = Column(String, nullable=True)
     is_creator = Column(Boolean, default=False)
+    is_creator_subscription = Column(Boolean, default=False)
+    subscription_price = Column(Float, default=0.0)
     followers = Column(Integer, default=0)
     following = Column(Integer, default=0)
     tips_received = Column(Float, default=0.0)

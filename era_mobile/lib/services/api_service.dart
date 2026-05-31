@@ -47,6 +47,7 @@ class ApiService {
     List<String> tags = const [],
     String? mediaUrl,
     String? vibe,
+    bool isMoment = false,
   }) async {
     final response = await http.post(
       Uri.parse('$baseUrl/posts/'),

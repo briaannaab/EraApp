@@ -80,7 +80,13 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GestureDetector(
+      onHorizontalDragEnd: (details) {
+        if (details.primaryVelocity! > 300) {
+          Navigator.pop(context);
+        }
+      },
+      child: Scaffold(
       backgroundColor: const Color(0xFF000000),
       body: SafeArea(
         child: loading
@@ -450,6 +456,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   ],
                 ],
               ),
+        ),
       ),
     );
   }

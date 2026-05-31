@@ -264,12 +264,6 @@ class _ImmersivePostCardState extends State<_ImmersivePostCard>
     });
   }
 
-  void _showMomentViewer(BuildContext context, int startIndex) {
-    Navigator.push(context, MaterialPageRoute(
-      builder: (context) => _MomentViewer(moments: moments, startIndex: startIndex),
-    ));
-  }
-
   @override
   Widget build(BuildContext context) {
     final username = (widget.post['username'] ?? 'unknown') as String;
@@ -577,12 +571,6 @@ class _RingAction extends StatelessWidget {
 
   const _RingAction({required this.icon, required this.label, required this.onTap});
 
-  void _showMomentViewer(BuildContext context, int startIndex) {
-    Navigator.push(context, MaterialPageRoute(
-      builder: (context) => _MomentViewer(moments: moments, startIndex: startIndex),
-    ));
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -644,12 +632,6 @@ class _VideoPlayerState extends State<_VideoPlayer> {
     _videoController.dispose();
     _chewieController?.dispose();
     super.dispose();
-  }
-
-  void _showMomentViewer(BuildContext context, int startIndex) {
-    Navigator.push(context, MaterialPageRoute(
-      builder: (context) => _MomentViewer(moments: moments, startIndex: startIndex),
-    ));
   }
 
   @override

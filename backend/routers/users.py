@@ -104,7 +104,7 @@ def update_profile_picture(user_id: int, url: str, db: Session = Depends(get_db)
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    user.voice_bio_url = url  # reusing this field for profile pic for now
+    user.profile_picture_url = url
     db.commit()
     return {"message": "Profile picture updated"}
 

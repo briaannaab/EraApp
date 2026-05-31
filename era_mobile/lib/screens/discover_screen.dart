@@ -82,7 +82,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onHorizontalDragEnd: (details) {
-        if (details.primaryVelocity! > 300) {
+        if (details.primaryVelocity! > 200) {
           Navigator.pop(context);
         }
       },

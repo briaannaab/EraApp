@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
@@ -74,55 +75,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
 
-                    // Story strip
+                    // Orbit moments view
                     if (moments.isNotEmpty)
                       Positioned(
-                        top: 110,
+                        top: 100,
                         left: 0,
                         right: 0,
                         child: SizedBox(
-                          height: 90,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            itemCount: moments.length,
-                            itemBuilder: (context, index) {
-                              final moment = moments[index];
-                              return GestureDetector(
-                                onTap: () => _showMomentViewer(context, index),
-                                child: Container(
-                                  margin: const EdgeInsets.only(right: 12),
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        width: 60,
-                                        height: 60,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(color: Colors.white, width: 2),
-                                          image: moment['media_url'] != null
-                                              ? DecorationImage(
-                                                  image: NetworkImage(moment['media_url']),
-                                                  fit: BoxFit.cover,
-                                                )
-                                              : null,
-                                          color: const Color(0xFF1A1A1A),
-                                        ),
-                                        child: moment['media_url'] == null
-                                            ? const Icon(Icons.auto_awesome, color: Colors.white, size: 24)
-                                            : null,
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        moment['username'] ?? '',
-                                        style: const TextStyle(color: Colors.white70, fontSize: 10),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
+                          height: 200,
+                          child: _OrbitView(
+                            moments: moments,
+                            onTap: (index) => _showMomentViewer(context, index),
                           ),
                         ),
                       ),
@@ -842,4 +805,113 @@ class _MomentViewerState extends State<_MomentViewer>
       ),
     );
   }
+}
+
+class _OrbitView extends StatelessWidget {
+  final List<dynamic> moments;
+  final Function(int) onTap;
+
+  const _OrbitView({required this.moments, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cx = constraints.maxWidth / 2;
+        final cy = constraints.maxHeight / 2;
+        final radius = constraints.maxHeight * 0.38;
+
+        return Stack(
+          children: [
+            // Orbit rings
+            Positioned.fill(
+              child: CustomPaint(painter: _OrbitPainter()),
+            ),
+            // Center label
+            Positioned(
+              left: cx - 30,
+              top: cy - 30,
+              child: Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.black,
+                  border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+                ),
+                child: const Center(
+                  child: Text('era.', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: -0.5)),
+                ),
+              ),
+            ),
+            // Orbit items
+            ...List.generate(moments.length.clamp(0, 6), (i) {
+              final angle = (i / moments.length.clamp(1, 6)) * 2 * 3.14159 - 3.14159 / 2;
+              final x = cx + radius * (angle == -3.14159/2 ? 0 : (i % 2 == 0 ? 1 : -1) * 0.7) - 24;
+              final dx = cx + radius * cos(angle) - 24;
+              final dy = cy + radius * sin(angle) - 24;
+              final moment = moments[i];
+              return Positioned(
+                left: dx,
+                top: dy,
+                child: GestureDetector(
+                  onTap: () => onTap(i),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white.withOpacity(0.6), width: 1.5),
+                          color: const Color(0xFF1A1A1A),
+                          image: moment['media_url'] != null
+                              ? DecorationImage(
+                                  image: NetworkImage(moment['media_url']),
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
+                        ),
+                        child: moment['media_url'] == null
+                            ? const Icon(Icons.auto_awesome, color: Colors.white54, size: 18)
+                            : null,
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        '@${(moment['username'] ?? '').toString().length > 8 ? (moment['username'] ?? '').toString().substring(0, 8) : moment['username'] ?? ''}',
+                        style: const TextStyle(color: Colors.white38, fontSize: 7, letterSpacing: 0.5),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ],
+        );
+      },
+    );
+  }
+
+  double cos(double angle) => angle == 0 ? 1 : (angle == 3.14159 ? -1 : (angle > 0 ? (angle < 1.5708 ? (1 - angle * angle / 2) : (angle < 3.14159 ? -(angle - 3.14159/2) : -1)) : 1));
+  double sin(double angle) => cos(angle - 3.14159 / 2);
+}
+
+class _OrbitPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.06)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+
+    canvas.drawCircle(Offset(cx, cy), size.height * 0.38, paint);
+    paint.color = Colors.white.withOpacity(0.03);
+    canvas.drawCircle(Offset(cx, cy), size.height * 0.22, paint);
+  }
+
+  @override
+  bool shouldRepaint(_) => false;
 }

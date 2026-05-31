@@ -50,6 +50,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool isSubscribed = false;
   int subscriberCount = 0;
   double creatorEarnings = 0.0;
+  int selectedTab = 0; // 0=posts, 1=moments, 2=vibes
 
   final Map<String, List<Color>> themes = {
     'default': [const Color(0xFF000000), const Color(0xFF000000)],

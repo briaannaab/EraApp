@@ -1,6 +1,6 @@
 import 'dart:typed_data';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
 
@@ -12,28 +12,66 @@ class MomentScreen extends StatefulWidget {
 }
 
 class _MomentScreenState extends State<MomentScreen> {
-  Uint8List? _mediaBytes;
-  String? _videoName;
+  CameraController? _cameraController;
+  List<CameraDescription> _cameras = [];
+  bool _cameraReady = false;
+  bool _isRecording = false;
+  bool _isFrontCamera = true;
+  Uint8List? _capturedBytes;
   bool _isVideo = false;
+  String? _videoPath;
   final captionController = TextEditingController();
-  bool _processing = false;
   bool _showCaption = false;
+  bool _processing = false;
 
-  Future<void> _pickMedia(ImageSource source, {bool video = false}) async {
-    final picker = ImagePicker();
-    if (video) {
-      final v = await picker.pickVideo(source: source);
-      if (v != null) {
-        final bytes = await v.readAsBytes();
-        setState(() { _mediaBytes = bytes; _videoName = v.name; _isVideo = true; });
-      }
-    } else {
-      final img = await picker.pickImage(source: source);
-      if (img != null) {
-        final bytes = await img.readAsBytes();
-        setState(() { _mediaBytes = bytes; _isVideo = false; });
-      }
-    }
+  @override
+  void initState() {
+    super.initState();
+    _initCamera();
+  }
+
+  Future<void> _initCamera() async {
+    _cameras = await availableCameras();
+    if (_cameras.isEmpty) return;
+    final cam = _isFrontCamera
+        ? _cameras.firstWhere((c) => c.lensDirection == CameraLensDirection.front, orElse: () => _cameras.first)
+        : _cameras.firstWhere((c) => c.lensDirection == CameraLensDirection.back, orElse: () => _cameras.first);
+
+    _cameraController = CameraController(cam, ResolutionPreset.high, enableAudio: true);
+    await _cameraController!.initialize();
+    if (mounted) setState(() => _cameraReady = true);
+  }
+
+  Future<void> _flipCamera() async {
+    setState(() { _isFrontCamera = !_isFrontCamera; _cameraReady = false; });
+    await _cameraController?.dispose();
+    await _initCamera();
+  }
+
+  Future<void> _takePicture() async {
+    if (_cameraController == null || !_cameraController!.value.isInitialized) return;
+    final file = await _cameraController!.takePicture();
+    final bytes = await file.readAsBytes();
+    setState(() { _capturedBytes = bytes; _isVideo = false; });
+  }
+
+  Future<void> _startRecording() async {
+    if (_cameraController == null || !_cameraController!.value.isInitialized) return;
+    await _cameraController!.startVideoRecording();
+    setState(() => _isRecording = true);
+  }
+
+  Future<void> _stopRecording() async {
+    if (_cameraController == null || !_isRecording) return;
+    final file = await _cameraController!.stopVideoRecording();
+    final bytes = await file.readAsBytes();
+    setState(() { _capturedBytes = bytes; _isVideo = true; _videoPath = file.path; _isRecording = false; });
+  }
+
+  @override
+  void dispose() {
+    _cameraController?.dispose();
+    super.dispose();
   }
 
   @override
@@ -44,30 +82,47 @@ class _MomentScreenState extends State<MomentScreen> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Media preview or dark bg
-            if (_mediaBytes != null && !_isVideo)
-              Image.memory(_mediaBytes!, fit: BoxFit.cover)
-            else
-              Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0xFF0A0A0A), Color(0xFF000000)],
+            // Camera preview or captured media
+            if (_capturedBytes != null && !_isVideo)
+              Image.memory(_capturedBytes!, fit: BoxFit.cover)
+            else if (_cameraReady && _cameraController != null && _capturedBytes == null)
+              SizedBox.expand(
+                child: FittedBox(
+                  fit: BoxFit.cover,
+                  child: SizedBox(
+                    width: _cameraController!.value.previewSize!.height,
+                    height: _cameraController!.value.previewSize!.width,
+                    child: CameraPreview(_cameraController!),
                   ),
                 ),
-              ),
+              )
+            else if (_capturedBytes != null && _isVideo)
+              Container(
+                color: Colors.black,
+                child: const Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.videocam, color: Colors.white, size: 48),
+                      SizedBox(height: 12),
+                      Text('Video captured', style: TextStyle(color: Colors.white70, fontSize: 16)),
+                    ],
+                  ),
+                ),
+              )
+            else
+              const Center(child: CircularProgressIndicator(color: Colors.white)),
 
-            // Overlay gradient
+            // Gradient overlay
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withOpacity(0.5),
+                    Colors.black.withOpacity(0.4),
                     Colors.transparent,
-                    Colors.black.withOpacity(0.7),
+                    Colors.black.withOpacity(0.6),
                   ],
                   stops: const [0, 0.4, 1],
                 ),
@@ -83,7 +138,13 @@ class _MomentScreenState extends State<MomentScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () {
+                      if (_capturedBytes != null) {
+                        setState(() { _capturedBytes = null; _isVideo = false; });
+                      } else {
+                        Navigator.pop(context);
+                      }
+                    },
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -95,55 +156,47 @@ class _MomentScreenState extends State<MomentScreen> {
                   ),
                   const Text('✦ moment',
                       style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: 1)),
-                  GestureDetector(
-                    onTap: () => setState(() => _showCaption = !_showCaption),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.4),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(_showCaption ? Icons.text_fields : Icons.text_fields_outlined,
-                          color: Colors.white, size: 20),
-                    ),
+                  Row(
+                    children: [
+                      if (_capturedBytes != null)
+                        GestureDetector(
+                          onTap: () => setState(() => _showCaption = !_showCaption),
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.4),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.text_fields, color: Colors.white, size: 20),
+                          ),
+                        ),
+                      const SizedBox(width: 8),
+                      if (_capturedBytes == null)
+                        GestureDetector(
+                          onTap: _flipCamera,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.4),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.flip_camera_ios_outlined, color: Colors.white, size: 20),
+                          ),
+                        ),
+                    ],
                   ),
                 ],
               ),
             ),
 
-            // Video indicator
-            if (_mediaBytes != null && _isVideo)
-              const Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.videocam, color: Colors.white, size: 48),
-                    SizedBox(height: 12),
-                    Text('Video ready', style: TextStyle(color: Colors.white70, fontSize: 16)),
-                  ],
-                ),
-              ),
-
-            // No media placeholder
-            if (_mediaBytes == null)
-              const Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.auto_awesome, color: Colors.white24, size: 48),
-                    SizedBox(height: 12),
-                    Text('your moment', style: TextStyle(color: Colors.white24, fontSize: 16, letterSpacing: 2)),
-                  ],
-                ),
-              ),
-
             // Caption overlay
-            if (_showCaption)
+            if (_showCaption && _capturedBytes != null)
               Center(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 32),
                   child: TextField(
                     controller: captionController,
+                    autofocus: true,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 22,
@@ -164,87 +217,120 @@ class _MomentScreenState extends State<MomentScreen> {
 
             // Bottom controls
             Positioned(
-              bottom: 24,
+              bottom: 32,
               left: 0,
               right: 0,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Media source buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _sourceBtn(Icons.camera_alt_outlined, 'Camera', () => _pickMedia(ImageSource.camera)),
-                      const SizedBox(width: 16),
-                      _sourceBtn(Icons.photo_library_outlined, 'Gallery', () => _pickMedia(ImageSource.gallery)),
-                      const SizedBox(width: 16),
-                      _sourceBtn(Icons.videocam_outlined, 'Video', () => _pickMedia(ImageSource.camera, video: true)),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
+              child: _capturedBytes == null
+                  ? _cameraControls()
+                  : _shareControls(),
+            ),
 
-                  // Share button
-                  GestureDetector(
-                    onTap: _processing ? null : _share,
-                    child: Container(
-                      width: 200,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: BoxDecoration(
-                        color: _mediaBytes != null || captionController.text.isNotEmpty
-                            ? Colors.white
-                            : Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(40),
-                      ),
-                      child: _processing
-                          ? const Center(child: SizedBox(width: 20, height: 20,
-                              child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2)))
-                          : const Text('Share Moment',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15)),
+            // Recording indicator
+            if (_isRecording)
+              Positioned(
+                top: 60,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.fiber_manual_record, color: Colors.white, size: 10),
+                        SizedBox(width: 6),
+                        Text('REC', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _sourceBtn(IconData icon, String label, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white.withOpacity(0.2)),
+  Widget _cameraControls() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text('tap to photo · hold to video',
+            style: TextStyle(color: Colors.white38, fontSize: 11, letterSpacing: 1)),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Shutter button
+            GestureDetector(
+              onTap: _takePicture,
+              onLongPressStart: (_) => _startRecording(),
+              onLongPressEnd: (_) => _stopRecording(),
+              child: Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 3),
+                  color: _isRecording ? Colors.red.withOpacity(0.8) : Colors.white.withOpacity(0.2),
+                ),
+                child: Center(
+                  child: Container(
+                    width: _isRecording ? 24 : 56,
+                    height: _isRecording ? 24 : 56,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: _isRecording ? BorderRadius.circular(4) : BorderRadius.circular(28),
+                    ),
+                  ),
+                ),
+              ),
             ),
-            child: Icon(icon, color: Colors.white, size: 22),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _shareControls() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: _processing ? null : _share,
+          child: Container(
+            width: 200,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(40),
+            ),
+            child: _processing
+                ? const Center(child: SizedBox(width: 20, height: 20,
+                    child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2)))
+                : const Text('Share Moment',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15)),
           ),
-          const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: Colors.white54, fontSize: 10, letterSpacing: 0.5)),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Future<void> _share() async {
-    if (_mediaBytes == null && captionController.text.isEmpty) return;
+    if (_capturedBytes == null && captionController.text.isEmpty) return;
     FocusScope.of(context).unfocus();
     setState(() => _processing = true);
     String? mediaUrl;
-    if (_mediaBytes != null) {
+    if (_capturedBytes != null) {
       if (_isVideo) {
-        mediaUrl = await ApiService.uploadVideo(_mediaBytes!, _videoName ?? 'moment.mp4');
+        mediaUrl = await ApiService.uploadVideo(_capturedBytes!, _videoPath ?? 'moment.mp4');
       } else {
-        mediaUrl = await ApiService.uploadImage(_mediaBytes!, 'moment.jpg');
+        mediaUrl = await ApiService.uploadImage(_capturedBytes!, 'moment.jpg');
       }
     }
     await ApiService.createPost(

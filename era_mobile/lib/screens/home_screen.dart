@@ -75,20 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
 
-                    // Orbit moments view
-                    if (moments.isNotEmpty)
-                      Positioned(
-                        top: 100,
-                        left: 0,
-                        right: 0,
-                        child: SizedBox(
-                          height: 200,
-                          child: _OrbitView(
-                            moments: moments,
-                            onTap: (index) => _showMomentViewer(context, index),
-                          ),
-                        ),
-                      ),
+
 
                     // Header
                     Positioned(
@@ -118,6 +105,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                     shape: BoxShape.circle,
                                   ),
                                   child: const Icon(Icons.search, color: Colors.white, size: 20),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              GestureDetector(
+                                onTap: () => Navigator.push(context, MaterialPageRoute(
+                                  builder: (context) => _OrbitScreen(moments: moments, onTap: (i) => _showMomentViewer(context, i)),
+                                )),
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.3),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.auto_awesome_outlined, color: Colors.white, size: 20),
                                 ),
                               ),
                               const SizedBox(width: 8),
@@ -914,4 +915,75 @@ class _OrbitPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_) => false;
+}
+
+class _OrbitScreen extends StatelessWidget {
+  final List<dynamic> moments;
+  final Function(int) onTap;
+
+  const _OrbitScreen({required this.moments, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            // Header
+            Positioned(
+              top: 16,
+              left: 16,
+              right: 16,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 16),
+                    ),
+                  ),
+                  const Text('moments',
+                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600, letterSpacing: 1)),
+                  const SizedBox(width: 36),
+                ],
+              ),
+            ),
+
+            // Orbit view
+            if (moments.isEmpty)
+              const Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.auto_awesome, color: Colors.white24, size: 48),
+                    SizedBox(height: 16),
+                    Text('No moments yet', style: TextStyle(color: Colors.white38, fontSize: 16)),
+                    SizedBox(height: 8),
+                    Text('Share a moment to see it here', style: TextStyle(color: Colors.white24, fontSize: 13)),
+                  ],
+                ),
+              )
+            else
+              Center(
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 400,
+                  child: _OrbitView(moments: moments, onTap: (i) {
+                    Navigator.pop(context);
+                    onTap(i);
+                  }),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 }

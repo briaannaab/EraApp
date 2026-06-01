@@ -332,18 +332,9 @@ class _MomentScreenState extends State<MomentScreen> {
     setState(() => _processing = true);
     String? mediaUrl;
     if (_capturedBytes != null) {
-      if (_isVideo && _videoPath != null) {
-        // Compress video before upload
-        final compressed = await VideoCompress.compressVideo(
-          _videoPath!,
-          quality: VideoQuality.MediumQuality,
-          deleteOrigin: false,
-        );
-        final compressedBytes = await compressed?.file?.readAsBytes();
-        if (compressedBytes != null) {
-          mediaUrl = await ApiService.uploadVideo(compressedBytes, 'moment.mp4');
-        }
-      } else if (!_isVideo) {
+      if (_isVideo) {
+        mediaUrl = await ApiService.uploadVideo(_capturedBytes!, _videoPath ?? 'moment.mp4');
+      } else {
         mediaUrl = await ApiService.uploadImage(_capturedBytes!, 'moment.jpg');
       }
     }

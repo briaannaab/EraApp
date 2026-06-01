@@ -51,8 +51,8 @@ async def upload_video(file: UploadFile = File(...)):
         contents,
         folder="era/videos",
         resource_type="video",
-        eager=[{"quality": "auto", "fetch_format": "mp4"}],
-        eager_async=True
+        quality="auto",
+        format="mp4" 
     )
     return {
         "url": result["secure_url"],

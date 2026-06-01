@@ -689,7 +689,7 @@ class _MomentViewerState extends State<_MomentViewer>
           children: [
             // Media
             if (moment['media_url'] != null)
-              _MomentMedia(url: moment['media_url']),
+              _MomentMedia(url: moment['media_url'])
             else
               Container(
                 color: const Color(0xFF0A0A0A),

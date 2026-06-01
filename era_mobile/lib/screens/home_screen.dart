@@ -689,8 +689,7 @@ class _MomentViewerState extends State<_MomentViewer>
           children: [
             // Media
             if (moment['media_url'] != null)
-              Image.network(moment['media_url'], fit: BoxFit.cover)
-            else
+              _MomentMedia(url: moment['media_url']),
               Container(
                 color: const Color(0xFF0A0A0A),
                 child: Center(
@@ -985,5 +984,63 @@ class _OrbitScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _MomentMedia extends StatefulWidget {
+  final String url;
+  const _MomentMedia({required this.url});
+
+  @override
+  State<_MomentMedia> createState() => _MomentMediaState();
+}
+
+class _MomentMediaState extends State<_MomentMedia> {
+  VideoPlayerController? _controller;
+  bool _isVideo = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isVideo = widget.url.contains('.mp4') ||
+        widget.url.contains('.mov') ||
+        widget.url.contains('video');
+    if (_isVideo) {
+      _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url))
+        ..initialize().then((_) {
+          if (mounted) {
+            setState(() {});
+            _controller!.play();
+            _controller!.setLooping(true);
+          }
+        });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isVideo && _controller != null && _controller!.value.isInitialized) {
+      return SizedBox.expand(
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: _controller!.value.size.width,
+            height: _controller!.value.size.height,
+            child: VideoPlayer(_controller!),
+          ),
+        ),
+      );
+    } else if (_isVideo) {
+      return const Center(child: CircularProgressIndicator(color: Colors.white));
+    }
+    return Image.network(widget.url, fit: BoxFit.cover,
+        errorBuilder: (c, e, s) => const Center(
+            child: Icon(Icons.auto_awesome, color: Colors.white24, size: 40)));
   }
 }

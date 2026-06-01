@@ -59,6 +59,10 @@ class _MomentScreenState extends State<MomentScreen> {
     if (_cameraController == null || !_cameraController!.value.isInitialized) return;
     await _cameraController!.startVideoRecording();
     setState(() => _isRecording = true);
+    // Auto stop after 15 seconds
+    Future.delayed(const Duration(seconds: 15), () {
+      if (_isRecording && mounted) _stopRecording();
+    });
   }
 
   Future<void> _stopRecording() async {

@@ -50,7 +50,9 @@ async def upload_video(file: UploadFile = File(...)):
     result = cloudinary.uploader.upload(
         contents,
         folder="era/videos",
-        resource_type="video"
+        resource_type="video",
+        eager=[{"quality": "auto", "fetch_format": "mp4"}],
+        eager_async=True
     )
     return {
         "url": result["secure_url"],

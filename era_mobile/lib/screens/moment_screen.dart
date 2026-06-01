@@ -3,6 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
+import 'package:video_compress/video_compress.dart';
 
 class MomentScreen extends StatefulWidget {
   const MomentScreen({super.key});
@@ -331,9 +332,18 @@ class _MomentScreenState extends State<MomentScreen> {
     setState(() => _processing = true);
     String? mediaUrl;
     if (_capturedBytes != null) {
-      if (_isVideo) {
-        mediaUrl = await ApiService.uploadVideo(_capturedBytes!, _videoPath ?? 'moment.mp4');
-      } else {
+      if (_isVideo && _videoPath != null) {
+        // Compress video before upload
+        final compressed = await VideoCompress.compressVideo(
+          _videoPath!,
+          quality: VideoQuality.MediumQuality,
+          deleteOrigin: false,
+        );
+        final compressedBytes = await compressed?.file?.readAsBytes();
+        if (compressedBytes != null) {
+          mediaUrl = await ApiService.uploadVideo(compressedBytes, 'moment.mp4');
+        }
+      } else if (!_isVideo) {
         mediaUrl = await ApiService.uploadImage(_capturedBytes!, 'moment.jpg');
       }
     }

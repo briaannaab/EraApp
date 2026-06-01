@@ -7,7 +7,7 @@ const String baseUrl = 'https://eraapp-production.up.railway.app';
 
 class ApiService {
   static Future<List<dynamic>> getPosts() async {
-    final response = await http.get(Uri.parse('$baseUrl/posts/'));
+    final response = await http.get(Uri.parse('$baseUrl/posts/feed/'));
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     }
@@ -50,7 +50,7 @@ class ApiService {
     bool isMoment = false,
   }) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/posts/'),
+      Uri.parse('$baseUrl/posts/feed/'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'user_id': userId,

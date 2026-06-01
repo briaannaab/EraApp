@@ -12,321 +12,249 @@ class MomentScreen extends StatefulWidget {
 }
 
 class _MomentScreenState extends State<MomentScreen> {
-  Uint8List? _imageBytes;
-  Uint8List? _videoBytes;
+  Uint8List? _mediaBytes;
   String? _videoName;
+  bool _isVideo = false;
   final captionController = TextEditingController();
   bool _processing = false;
-  String _type = 'photo';
+  bool _showCaption = false;
 
-  Future<void> _pickImage(ImageSource source) async {
+  Future<void> _pickMedia(ImageSource source, {bool video = false}) async {
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: source);
-    if (image != null) {
-      final bytes = await image.readAsBytes();
-      setState(() {
-        _imageBytes = bytes;
-        _videoBytes = null;
-      });
-    }
-  }
-
-  Future<void> _pickVideo(ImageSource source) async {
-    final picker = ImagePicker();
-    final video = await picker.pickVideo(source: source);
-    if (video != null) {
-      final bytes = await video.readAsBytes();
-      setState(() {
-        _videoBytes = bytes;
-        _videoName = video.name;
-        _imageBytes = null;
-      });
+    if (video) {
+      final v = await picker.pickVideo(source: source);
+      if (v != null) {
+        final bytes = await v.readAsBytes();
+        setState(() { _mediaBytes = bytes; _videoName = v.name; _isVideo = true; });
+      }
+    } else {
+      final img = await picker.pickImage(source: source);
+      if (img != null) {
+        final bytes = await img.readAsBytes();
+        setState(() { _mediaBytes = bytes; _isVideo = false; });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF000000),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF000000),
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text('New Moment',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            // Type selector
-            Row(
-              children: [
-                _typeTab('photo', Icons.image_outlined, 'Photo'),
-                const SizedBox(width: 12),
-                _typeTab('video', Icons.videocam_outlined, 'Video'),
-                const SizedBox(width: 12),
-                _typeTab('text', Icons.edit_outlined, 'Text'),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Photo
-            if (_type == 'photo') ...[
+            // Media preview or dark bg
+            if (_mediaBytes != null && !_isVideo)
+              Image.memory(_mediaBytes!, fit: BoxFit.cover)
+            else
               Container(
-                width: double.infinity,
-                height: 220,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0A0A0A),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: _imageBytes != null
-                        ? Colors.white
-                        : const Color(0xFF333333),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xFF0A0A0A), Color(0xFF000000)],
                   ),
                 ),
-                child: _imageBytes != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Image.memory(_imageBytes!, fit: BoxFit.cover),
-                      )
-                    : const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.add_photo_alternate_outlined,
-                              color: Colors.white54, size: 48),
-                          SizedBox(height: 12),
-                          Text('Select a source below',
-                              style: TextStyle(color: Colors.white38, fontSize: 14)),
-                        ],
-                      ),
               ),
-              const SizedBox(height: 12),
-              Row(
+
+            // Overlay gradient
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.5),
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.7),
+                  ],
+                  stops: const [0, 0.4, 1],
+                ),
+              ),
+            ),
+
+            // Top bar
+            Positioned(
+              top: 12,
+              left: 16,
+              right: 16,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: _sourceButton(
-                      Icons.camera_alt_outlined,
-                      'Camera',
-                      () => _pickImage(ImageSource.camera),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.4),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.close, color: Colors.white, size: 20),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _sourceButton(
-                      Icons.photo_library_outlined,
-                      'Gallery',
-                      () => _pickImage(ImageSource.gallery),
+                  const Text('✦ moment',
+                      style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: 1)),
+                  GestureDetector(
+                    onTap: () => setState(() => _showCaption = !_showCaption),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.4),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(_showCaption ? Icons.text_fields : Icons.text_fields_outlined,
+                          color: Colors.white, size: 20),
                     ),
                   ),
                 ],
               ),
-            ],
+            ),
 
-            // Video
-            if (_type == 'video') ...[
-              Container(
-                width: double.infinity,
-                height: 220,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0A0A0A),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: _videoBytes != null
-                        ? Colors.white
-                        : const Color(0xFF333333),
-                  ),
+            // Video indicator
+            if (_mediaBytes != null && _isVideo)
+              const Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.videocam, color: Colors.white, size: 48),
+                    SizedBox(height: 12),
+                    Text('Video ready', style: TextStyle(color: Colors.white70, fontSize: 16)),
+                  ],
                 ),
-                child: _videoBytes != null
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.videocam, color: Colors.white, size: 48),
-                          const SizedBox(height: 12),
-                          Text(_videoName ?? 'Video selected',
-                              style: const TextStyle(color: Colors.white54, fontSize: 14)),
-                        ],
-                      )
-                    : const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.video_call_outlined,
-                              color: Colors.white54, size: 48),
-                          SizedBox(height: 12),
-                          Text('Select a source below',
-                              style: TextStyle(color: Colors.white38, fontSize: 14)),
-                        ],
-                      ),
               ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: _sourceButton(
-                      Icons.videocam_outlined,
-                      'Record',
-                      () => _pickVideo(ImageSource.camera),
+
+            // No media placeholder
+            if (_mediaBytes == null)
+              const Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.auto_awesome, color: Colors.white24, size: 48),
+                    SizedBox(height: 12),
+                    Text('your moment', style: TextStyle(color: Colors.white24, fontSize: 16, letterSpacing: 2)),
+                  ],
+                ),
+              ),
+
+            // Caption overlay
+            if (_showCaption)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: TextField(
+                    controller: captionController,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      height: 1.4,
+                      shadows: [Shadow(color: Colors.black, blurRadius: 8)],
+                    ),
+                    maxLines: null,
+                    textAlign: TextAlign.center,
+                    decoration: const InputDecoration(
+                      hintText: 'say something...',
+                      hintStyle: TextStyle(color: Colors.white38, fontSize: 22),
+                      border: InputBorder.none,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _sourceButton(
-                      Icons.video_library_outlined,
-                      'Gallery',
-                      () => _pickVideo(ImageSource.gallery),
+                ),
+              ),
+
+            // Bottom controls
+            Positioned(
+              bottom: 24,
+              left: 0,
+              right: 0,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Media source buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _sourceBtn(Icons.camera_alt_outlined, 'Camera', () => _pickMedia(ImageSource.camera)),
+                      const SizedBox(width: 16),
+                      _sourceBtn(Icons.photo_library_outlined, 'Gallery', () => _pickMedia(ImageSource.gallery)),
+                      const SizedBox(width: 16),
+                      _sourceBtn(Icons.videocam_outlined, 'Video', () => _pickMedia(ImageSource.camera, video: true)),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Share button
+                  GestureDetector(
+                    onTap: _processing ? null : _share,
+                    child: Container(
+                      width: 200,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        color: _mediaBytes != null || captionController.text.isNotEmpty
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      child: _processing
+                          ? const Center(child: SizedBox(width: 20, height: 20,
+                              child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2)))
+                          : const Text('Share Moment',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15)),
                     ),
                   ),
                 ],
               ),
-            ],
-
-            // Text moment
-            if (_type == 'text')
-              Container(
-                width: double.infinity,
-                height: 260,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF0A0A0A), Color(0xFF1A1A1A)],
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.white.withOpacity(0.15)),
-                ),
-                child: TextField(
-                  controller: captionController,
-                  style: const TextStyle(color: Colors.white, fontSize: 20, height: 1.5),
-                  maxLines: null,
-                  expands: true,
-                  textAlignVertical: TextAlignVertical.center,
-                  decoration: const InputDecoration(
-                    hintText: 'Share your moment...',
-                    hintStyle: TextStyle(color: Colors.white38, fontSize: 20),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.all(20),
-                  ),
-                ),
-              ),
-
-            const SizedBox(height: 20),
-
-            if (_type != 'text')
-              TextField(
-                controller: captionController,
-                style: const TextStyle(color: Colors.white),
-                maxLines: 2,
-                decoration: InputDecoration(
-                  hintText: 'Add a caption...',
-                  hintStyle: const TextStyle(color: Colors.white38),
-                  filled: true,
-                  fillColor: const Color(0xFF0A0A0A),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-
-            const Spacer(),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: _processing
-                    ? null
-                    : () async {
-                        if (_type == 'text' && captionController.text.isEmpty) return;
-                        if (_type == 'photo' && _imageBytes == null) return;
-                        if (_type == 'video' && _videoBytes == null) return;
-
-                        setState(() => _processing = true);
-                        String? mediaUrl;
-
-                        if (_type == 'photo' && _imageBytes != null) {
-                          mediaUrl = await ApiService.uploadImage(_imageBytes!, 'moment.jpg');
-                        } else if (_type == 'video' && _videoBytes != null) {
-                          mediaUrl = await ApiService.uploadVideo(_videoBytes!, _videoName ?? 'moment.mp4');
-                        }
-
-                        await ApiService.createPost(
-                          userId: AuthService.userId ?? 1,
-                          username: AuthService.username ?? 'briaannaab',
-                          content: captionController.text.isEmpty ? '✨ Moment' : captionController.text,
-                          mediaUrl: mediaUrl,
-                          isMoment: true,
-                        );
-                        setState(() => _processing = false);
-                        if (mounted) Navigator.pop(context);
-                      },
-                child: _processing
-                    ? const CircularProgressIndicator(color: Colors.black)
-                    : const Text('Share Moment',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              ),
             ),
-            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
-  Widget _sourceButton(IconData icon, String label, VoidCallback onTap) {
+  Widget _sourceBtn(IconData icon, String label, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.06),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withOpacity(0.12)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: Colors.white, size: 18),
-            const SizedBox(width: 8),
-            Text(label,
-                style: const TextStyle(color: Colors.white, fontSize: 13)),
-          ],
-        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.1),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white.withOpacity(0.2)),
+            ),
+            child: Icon(icon, color: Colors.white, size: 22),
+          ),
+          const SizedBox(height: 4),
+          Text(label, style: const TextStyle(color: Colors.white54, fontSize: 10, letterSpacing: 0.5)),
+        ],
       ),
     );
   }
 
-  Widget _typeTab(String type, IconData icon, String label) {
-    final isSelected = _type == type;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _type = type),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            color: isSelected ? Colors.white : const Color(0xFF0A0A0A),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: isSelected ? Colors.black : Colors.white54, size: 16),
-              const SizedBox(width: 6),
-              Text(label,
-                  style: TextStyle(
-                      color: isSelected ? Colors.black : Colors.white54,
-                      fontSize: 12,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
-            ],
-          ),
-        ),
-      ),
+  Future<void> _share() async {
+    if (_mediaBytes == null && captionController.text.isEmpty) return;
+    FocusScope.of(context).unfocus();
+    setState(() => _processing = true);
+    String? mediaUrl;
+    if (_mediaBytes != null) {
+      if (_isVideo) {
+        mediaUrl = await ApiService.uploadVideo(_mediaBytes!, _videoName ?? 'moment.mp4');
+      } else {
+        mediaUrl = await ApiService.uploadImage(_mediaBytes!, 'moment.jpg');
+      }
+    }
+    await ApiService.createPost(
+      userId: AuthService.userId ?? 1,
+      username: AuthService.username ?? 'briaannaab',
+      content: captionController.text.isEmpty ? '✦' : captionController.text,
+      mediaUrl: mediaUrl,
+      isMoment: true,
     );
+    setState(() => _processing = false);
+    if (mounted) Navigator.pop(context);
   }
 }

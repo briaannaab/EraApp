@@ -50,7 +50,7 @@ class ApiService {
     bool isMoment = false,
   }) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/posts/feed/'),
+      Uri.parse('$baseUrl/posts/'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'user_id': userId,

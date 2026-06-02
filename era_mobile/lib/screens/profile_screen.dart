@@ -591,203 +591,68 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             const SizedBox(height: 24),
                           ],
 
-                          // Moments
-                          if (profile!['posts'] != null && (profile!['posts'] as List).isNotEmpty) ...[
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-                              child: Row(
-                                children: [
-                                  Text('Moments',
-                                      style: TextStyle(color: accent, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                                  const SizedBox(width: 8),
-                                  Text('${profile!["post_count"]} posts',
-                                      style: const TextStyle(color: Colors.white38, fontSize: 11)),
-                                ],
-                              ),
+                          // Tabs
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Row(
+                              children: [
+                                _profileTab('Posts', 0, accent),
+                                _profileTab('Moments', 1, accent),
+                                _profileTab('Vibes', 2, accent),
+                              ],
                             ),
-                            SizedBox(
-                              height: 140,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
-                                itemCount: (profile!['posts'] as List).take(6).length,
-                                itemBuilder: (context, index) {
-                                  final post = profile!['posts'][index];
-                                  return GestureDetector(
-                                    onTap: () => Navigator.push(context, MaterialPageRoute(
-                                      builder: (context) => PostDetailScreen(
-                                        post: Map<String, dynamic>.from(post),
-                                        allPosts: (profile!['posts'] as List).map((p) => Map<String, dynamic>.from(p)).toList(),
-                                        initialIndex: index,
-                                      ),
-                                    )),
-                                    child: Container(
-                                      width: 110,
-                                      margin: const EdgeInsets.only(right: 12),
-                                      decoration: BoxDecoration(
-                                        color: accent.withOpacity(0.08),
-                                        borderRadius: BorderRadius.circular(16),
-                                        border: Border.all(color: accent.withOpacity(0.15)),
-                                      ),
-                                      child: post['media_url'] != null
-                                          ? ClipRRect(
-                                              borderRadius: BorderRadius.circular(16),
-                                              child: Stack(
-                                                fit: StackFit.expand,
-                                                children: [
-                                                  Image.network(
-                                                    getVideoThumbnail(post['media_url']) ?? post['media_url'],
-                                                    fit: BoxFit.cover,
-                                                    errorBuilder: (c, e, s) => Container(
-                                                      color: const Color(0xFF1A1A1A),
-                                                      child: const Center(
-                                                        child: Icon(Icons.play_circle_outline, color: Colors.white54, size: 32),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  if (isVideo(post['media_url']))
-                                                    const Positioned(
-                                                      top: 8, right: 8,
-                                                      child: Icon(Icons.play_circle_outline, color: Colors.white70, size: 20),
-                                                    ),
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                      gradient: LinearGradient(
-                                                        begin: Alignment.topCenter,
-                                                        end: Alignment.bottomCenter,
-                                                        colors: [Colors.transparent, Colors.black.withOpacity(0.6)],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            )
-                                          : Padding(
-                                              padding: const EdgeInsets.all(10),
-                                              child: Text(post['content'] ?? '',
-                                                  maxLines: 5,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 11, height: 1.4)),
-                                            ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                          ],
+                          ),
+                          Container(height: 1, color: Colors.white.withOpacity(0.08)),
+                          const SizedBox(height: 16),
 
-                          // Posts grid
-                          if (profile!['posts'] != null && (profile!['posts'] as List).isNotEmpty) ...[
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-                              child: Text('All Posts',
-                                  style: TextStyle(color: accent, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                            ),
+                          // Posts tab
+                          if (selectedTab == 0 && profile!['posts'] != null) ...[
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               child: GridView.builder(
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
                                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 8,
-                                  mainAxisSpacing: 8,
-                                  childAspectRatio: 0.85,
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 2,
+                                  mainAxisSpacing: 2,
+                                  childAspectRatio: 1,
                                 ),
-                                itemCount: (profile!['posts'] as List).length,
+                                itemCount: (profile!['posts'] as List).where((p) => p['is_moment'] == false || p['is_moment'] == null).length,
                                 itemBuilder: (context, index) {
-                                  final post = profile!['posts'][index];
+                                  final posts = (profile!['posts'] as List).where((p) => p['is_moment'] == false || p['is_moment'] == null).toList();
+                                  if (index >= posts.length) return const SizedBox();
+                                  final post = posts[index];
                                   return GestureDetector(
                                     onTap: () => Navigator.push(context, MaterialPageRoute(
                                       builder: (context) => PostDetailScreen(
                                         post: Map<String, dynamic>.from(post),
-                                        allPosts: (profile!['posts'] as List).map((p) => Map<String, dynamic>.from(p)).toList(),
+                                        allPosts: posts.map((p) => Map<String, dynamic>.from(p)).toList(),
                                         initialIndex: index,
                                       ),
                                     )),
                                     child: Container(
-                                      decoration: BoxDecoration(
-                                        color: accent.withOpacity(0.06),
-                                        borderRadius: BorderRadius.circular(16),
-                                        border: Border.all(color: accent.withOpacity(0.1)),
-                                      ),
+                                      color: const Color(0xFF0A0A0A),
                                       child: post['media_url'] != null
-                                          ? ClipRRect(
-                                              borderRadius: BorderRadius.circular(16),
-                                              child: Stack(
-                                                fit: StackFit.expand,
-                                                children: [
-                                                  Image.network(
-                                                    getVideoThumbnail(post['media_url']) ?? post['media_url'],
-                                                    fit: BoxFit.cover,
-                                                    errorBuilder: (c, e, s) => Container(
-                                                      color: const Color(0xFF1A1A1A),
-                                                      child: const Center(
-                                                        child: Icon(Icons.play_circle_outline, color: Colors.white54, size: 40),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  if (isVideo(post['media_url']))
-                                                    const Positioned(
-                                                      top: 8, right: 8,
-                                                      child: Icon(Icons.play_circle_fill, color: Colors.white70, size: 24),
-                                                    ),
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                      gradient: LinearGradient(
-                                                        begin: Alignment.topCenter,
-                                                        end: Alignment.bottomCenter,
-                                                        colors: [Colors.transparent, Colors.black.withOpacity(0.5)],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Positioned(
-                                                    bottom: 10, left: 10,
-                                                    child: Row(
-                                                      children: [
-                                                        const Icon(Icons.favorite, color: Colors.white, size: 12),
-                                                        const SizedBox(width: 4),
-                                                        Text('${post["likes"] ?? 0}',
-                                                            style: const TextStyle(color: Colors.white, fontSize: 11)),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
+                                          ? Stack(
+                                              fit: StackFit.expand,
+                                              children: [
+                                                Image.network(
+                                                  getVideoThumbnail(post['media_url']) ?? post['media_url'],
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (c, e, s) => const Center(child: Icon(Icons.image_outlined, color: Colors.white24, size: 24)),
+                                                ),
+                                                if (isVideo(post['media_url']))
+                                                  const Positioned(top: 4, right: 4, child: Icon(Icons.play_circle_fill, color: Colors.white70, size: 16)),
+                                              ],
                                             )
-                                          : Padding(
-                                              padding: const EdgeInsets.all(14),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  if (post['vibe'] != null)
-                                                    Container(
-                                                      margin: const EdgeInsets.only(bottom: 8),
-                                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                                      decoration: BoxDecoration(
-                                                        color: accent.withOpacity(0.15),
-                                                        borderRadius: BorderRadius.circular(8),
-                                                      ),
-                                                      child: Text('✨ ${post["vibe"]}',
-                                                          style: TextStyle(color: accent, fontSize: 9)),
-                                                    ),
-                                                  Expanded(
-                                                    child: Text(post['content'] ?? '',
-                                                        overflow: TextOverflow.ellipsis,
-                                                        maxLines: 6,
-                                                        style: const TextStyle(color: Colors.white, fontSize: 12, height: 1.5)),
-                                                  ),
-                                                  const SizedBox(height: 8),
-                                                  Row(
-                                                    children: [
-                                                      Icon(Icons.favorite_border, color: accent, size: 12),
-                                                      const SizedBox(width: 4),
-                                                      Text('${post["likes"] ?? 0}',
-                                                          style: TextStyle(color: accent, fontSize: 11)),
-                                                    ],
-                                                  ),
-                                                ],
+                                          : Center(
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8),
+                                                child: Text(post['content'] ?? '',
+                                                    maxLines: 4,
+                                                    overflow: TextOverflow.ellipsis,
+                                                    style: const TextStyle(color: Colors.white54, fontSize: 10)),
                                               ),
                                             ),
                                     ),
@@ -796,6 +661,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                           ],
+
+                          // Moments tab
+                          if (selectedTab == 1 && profile!['posts'] != null) ...[
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 2,
+                                  mainAxisSpacing: 2,
+                                  childAspectRatio: 0.7,
+                                ),
+                                itemCount: (profile!['posts'] as List).where((p) => p['is_moment'] == true).length,
+                                itemBuilder: (context, index) {
+                                  final moments = (profile!['posts'] as List).where((p) => p['is_moment'] == true).toList();
+                                  if (index >= moments.length) return const SizedBox();
+                                  final moment = moments[index];
+                                  return Container(
+                                    color: const Color(0xFF0A0A0A),
+                                    child: moment['media_url'] != null
+                                        ? Stack(
+                                            fit: StackFit.expand,
+                                            children: [
+                                              Image.network(
+                                                getVideoThumbnail(moment['media_url']) ?? moment['media_url'],
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (c, e, s) => const Center(child: Icon(Icons.auto_awesome, color: Colors.white24, size: 20)),
+                                              ),
+                                              const Positioned(top: 4, right: 4,
+                                                child: Text('✦', style: TextStyle(color: Colors.white54, fontSize: 10))),
+                                            ],
+                                          )
+                                        : Center(
+                                            child: Text(moment['content'] ?? '✦',
+                                                maxLines: 3,
+                                                textAlign: TextAlign.center,
+                                                style: const TextStyle(color: Colors.white54, fontSize: 10)),
+                                          ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+
+                          // Vibes tab
+                          if (selectedTab == 2)
+                            Padding(
+                              padding: const EdgeInsets.all(40),
+                              child: Center(child: Text('Vibes coming soon',
+                                  style: TextStyle(color: accent.withOpacity(0.4), fontSize: 13))),
+                            ),
+
                           const SizedBox(height: 100),
                         ],
                       ),

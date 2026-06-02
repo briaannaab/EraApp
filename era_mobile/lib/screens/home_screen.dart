@@ -1005,7 +1005,7 @@ class _MomentMediaState extends State<_MomentMedia> {
     super.initState();
     _isVideo = widget.url.contains('.mp4') ||
         widget.url.contains('.mov') ||
-        widget.url.contains('video');
+        widget.url.contains('/video/upload/');
     if (_isVideo) {
       _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url))
         ..initialize().then((_) {

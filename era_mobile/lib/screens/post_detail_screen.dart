@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart';
 import 'package:http/http.dart' as http;
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
@@ -121,12 +123,7 @@ class _PostDetailCardState extends State<_PostDetailCard> {
           ),
 
           if (hasMedia)
-            Image.network(
-              post['media_url'],
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (c, e, s) => const SizedBox.shrink(),
-            ),
+            _PostMedia(url: post['media_url']),
 
           Padding(
             padding: const EdgeInsets.all(16),
@@ -424,6 +421,72 @@ class _PostDetailCardState extends State<_PostDetailCard> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _PostMedia extends StatefulWidget {
+  final String url;
+  const _PostMedia({required this.url});
+
+  @override
+  State<_PostMedia> createState() => _PostMediaState();
+}
+
+class _PostMediaState extends State<_PostMedia> {
+  VideoPlayerController? _controller;
+  ChewieController? _chewieController;
+  bool _isVideo = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isVideo = widget.url.contains('/video/upload/') ||
+        widget.url.contains('.mp4') ||
+        widget.url.contains('.mov');
+    if (_isVideo) {
+      _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url))
+        ..initialize().then((_) {
+          if (mounted) {
+            setState(() {
+              _chewieController = ChewieController(
+                videoPlayerController: _controller!,
+                autoPlay: true,
+                looping: false,
+                aspectRatio: _controller!.value.aspectRatio,
+              );
+            });
+          }
+        });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    _chewieController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isVideo) {
+      if (_chewieController != null) {
+        return AspectRatio(
+          aspectRatio: _controller!.value.aspectRatio,
+          child: Chewie(controller: _chewieController!),
+        );
+      }
+      return const SizedBox(
+        height: 200,
+        child: Center(child: CircularProgressIndicator(color: Colors.white)),
+      );
+    }
+    return Image.network(
+      widget.url,
+      width: double.infinity,
+      fit: BoxFit.cover,
+      errorBuilder: (c, e, s) => const SizedBox.shrink(),
     );
   }
 }

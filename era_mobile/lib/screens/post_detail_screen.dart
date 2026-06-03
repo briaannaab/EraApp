@@ -153,7 +153,7 @@ class _PostDetailCardState extends State<_PostDetailCard> {
                           Text('@$username',
                               style: const TextStyle(
                                   color: Colors.white, fontWeight: FontWeight.bold)),
-                          Text(post['created_at'].toString().substring(0, 10),
+                          Text(post['created_at']?.toString().substring(0, 10) ?? '',
                               style: const TextStyle(color: Colors.white38, fontSize: 12)),
                         ],
                       ),

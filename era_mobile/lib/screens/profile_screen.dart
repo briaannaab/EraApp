@@ -550,7 +550,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             SizedBox(
                               height: 52,
-                              child: ListView(
+                              child: RefreshIndicator(
+                color: Colors.white,
+                backgroundColor: Colors.black,
+                onRefresh: loadProfile,
+                child: ListView(
                                 scrollDirection: Axis.horizontal,
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
                                 children: [

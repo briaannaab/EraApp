@@ -113,7 +113,7 @@ def update_profile_picture(user_id: int, url: str, db: Session = Depends(get_db)
 
 class AuraUpdate(BaseModel):
     theme: str = 'default'
-    color: str = None
+    color: Optional[str] = None
 
 @router.post("/{user_id}/aura")
 def update_aura(user_id: int, data: AuraUpdate, db: Session = Depends(get_db)):

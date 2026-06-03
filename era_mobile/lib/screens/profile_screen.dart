@@ -98,6 +98,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (profile!['profile_picture_url'] != null) {
           profileImageUrl = profile!['profile_picture_url'];
         }
+        if (profile!['aura_theme'] != null) {
+          selectedTheme = profile!['aura_theme'];
+        }
+        if (profile!['aura_color'] != null) {
+          final hex = profile!['aura_color'] as String;
+          customAccentColor = Color(int.parse(hex, radix: 16));
+        }
       });
     }
   }
@@ -139,9 +146,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               setState(() => customAccentColor = picked);
               Navigator.pop(context);
+              await http.post(
+                Uri.parse('\$baseUrl/users/\${AuthService.userId ?? 1}/aura'),
+                headers: {'Content-Type': 'application/json'},
+                body: jsonEncode({'theme': selectedTheme, 'color': picked.value.toRadixString(16)}),
+              );
             },
             child: const Text('Apply', style: TextStyle(color: Colors.white)),
           ),
@@ -546,10 +558,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     final isSelected = selectedTheme == theme && customAccentColor == null;
                                     final colors = themes[theme]!;
                                     return GestureDetector(
-                                      onTap: () => setState(() {
-                                        selectedTheme = theme;
-                                        customAccentColor = null;
-                                      }),
+                                      onTap: () async {
+                                        setState(() {
+                                          selectedTheme = theme;
+                                          customAccentColor = null;
+                                        });
+                                        await http.post(
+                                          Uri.parse('\$baseUrl/users/\${AuthService.userId ?? 1}/aura'),
+                                          headers: {'Content-Type': 'application/json'},
+                                          body: jsonEncode({'theme': theme, 'color': null}),
+                                        );
+                                      },
                                       child: Container(
                                         width: 44,
                                         height: 44,

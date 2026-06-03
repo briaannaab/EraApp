@@ -25,7 +25,7 @@
   .hero-title em { font-style: italic; color: rgba(255,255,255,0.3); }
   .hero-sub { margin-top: 48px; font-size: 18px; color: rgba(255,255,255,0.4); font-weight: 300; max-width: 400px; line-height: 1.7; opacity: 0; animation: fadeUp 1s ease 0.6s forwards; }
   .hero-cta { margin-top: 56px; display: flex; gap: 16px; align-items: center; opacity: 0; animation: fadeUp 1s ease 0.8s forwards; }
-  .btn-primary { background: white; color: black; padding: 16px 36px; border-radius: 60px; font-size: 14px; font-weight: 500; letter-spacing: 0.5px; text-decoration: none; transition: transform 0.2s ease; display: inline-flex; align-items: center; gap: 10px; }
+  .btn-primary { background: white; color: black; padding: 16px 36px; border-radius: 60px; font-size: 14px; font-weight: 500; letter-spacing: 0.5px; text-decoration: none; transition: transform 0.2s ease; display: inline-flex; align-items: center; gap: 10px; outline: none; border: none; -webkit-tap-highlight-color: transparent; }
   .btn-primary:hover { transform: scale(1.03); }
   .btn-ghost { color: rgba(255,255,255,0.4); font-size: 13px; text-decoration: none; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 2px; transition: color 0.2s ease; }
   .btn-ghost:hover { color: white; }
@@ -74,7 +74,7 @@
   }
   @media (max-width: 768px) {
     nav { padding: 24px; } .nav-links { display: none; }
-    .hero { padding: 0 24px; } .hero-title { font-size: 72px; }
+    .hero { padding: 120px 24px 0; min-height: 100vh; } .hero-title { font-size: 72px; }
     .features { padding: 80px 24px; } .features-grid { grid-template-columns: 1fr; }
     .vibes-section { padding: 80px 24px; } .vibes-header { flex-direction: column; gap: 24px; align-items: flex-start; } .vibes-sub { text-align: left; }
     .cta-section { padding: 80px 24px; }
@@ -82,7 +82,8 @@
     .btn-primary { width: 100%; justify-content: center; }
     footer { padding: 32px 24px; flex-direction: column; gap: 24px; text-align: center; } 
     .footer-links { justify-content: center; flex-wrap: wrap; }
-    .hero-cta { flex-direction: column; align-items: flex-start; }
+    .hero-cta { flex-direction: column; align-items: flex-start; gap: 20px; }
+    .btn-ghost { border-bottom: 1px solid rgba(255,255,255,0.3); }
     .marquee-item { font-size: 40px; }
   }
 </style>

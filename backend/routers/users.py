@@ -53,6 +53,8 @@ def get_profile(username: str, db: Session = Depends(get_db)):
         "voice_bio_url": user.voice_bio_url,
         "subscription_price": user.subscription_price if hasattr(user, 'subscription_price') else 0,
         "is_creator_subscription": user.is_creator_subscription if hasattr(user, 'is_creator_subscription') else False,
+        "aura_theme": user.aura_theme if hasattr(user, 'aura_theme') else 'default',
+        "aura_color": user.aura_color if hasattr(user, 'aura_color') else None,
     }
 
 @router.get("/{user_id}")
@@ -108,3 +110,17 @@ def update_profile_picture(user_id: int, url: str, db: Session = Depends(get_db)
     db.commit()
     return {"message": "Profile picture updated"}
 
+
+class AuraUpdate(BaseModel):
+    theme: str = 'default'
+    color: str = None
+
+@router.post("/{user_id}/aura")
+def update_aura(user_id: int, data: AuraUpdate, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.aura_theme = data.theme
+    user.aura_color = data.color
+    db.commit()
+    return {"message": "Aura updated"}

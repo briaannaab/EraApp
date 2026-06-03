@@ -10,8 +10,8 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; overflow-x: hidden; cursor: none; }
-  .cursor { position: fixed; width: 8px; height: 8px; background: white; border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease; }
-  .cursor-ring { position: fixed; width: 32px; height: 32px; border: 1px solid rgba(255,255,255,0.4); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%, -50%); transition: transform 0.15s ease, width 0.2s ease, height 0.2s ease, border-color 0.2s ease; }
+  .cursor { display: none; position: fixed; width: 8px; height: 8px; background: white; border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease; }
+  .cursor-ring { display: none; position: fixed; width: 32px; height: 32px; border: 1px solid rgba(255,255,255,0.4); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%, -50%); transition: transform 0.15s ease, width 0.2s ease, height 0.2s ease, border-color 0.2s ease; }
   nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 28px 48px; display: flex; justify-content: space-between; align-items: center; mix-blend-mode: difference; }
   .nav-logo { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; letter-spacing: -1px; color: white; text-decoration: none; }
   .nav-links { display: flex; gap: 40px; list-style: none; }
@@ -68,9 +68,9 @@
   .footer-links a { color: rgba(255,255,255,0.25); text-decoration: none; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; transition: color 0.2s ease; }
   .footer-links a:hover { color: white; }
   .footer-copy { font-size: 12px; color: rgba(255,255,255,0.15); }
-  @media (hover: none) {
-    body { cursor: auto; }
-    .cursor, .cursor-ring { display: none; }
+  @media (hover: hover) {
+    body { cursor: none; }
+    .cursor, .cursor-ring { display: block; }
   }
   @media (max-width: 768px) {
     nav { padding: 24px; } .nav-links { display: none; }
@@ -95,7 +95,7 @@
   <ul class="nav-links">
     <li><a href="#features">Features</a></li>
     <li><a href="#vibes">Vibes</a></li>
-    <li><a href="#download">Download</a></li>
+    <li><a href="https://testflight.apple.com/join/9bMq13FE" target="_blank">Download</a></li>
   </ul>
 </nav>
 <section class="hero">
@@ -108,7 +108,7 @@
   <h1 class="hero-title">define<br><em>your</em><br>era.</h1>
   <p class="hero-sub">A social platform built around how you feel — not just what you post.</p>
   <div class="hero-cta">
-    <a href="#download" class="btn-primary" id="download">
+    <a href="https://testflight.apple.com/join/9bMq13FE" class="btn-primary" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
       Download on TestFlight
     </a>

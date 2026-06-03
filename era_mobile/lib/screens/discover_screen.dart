@@ -277,11 +277,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             )
                           : SizedBox(
                               height: 120,
-                              child: RefreshIndicator(
-                color: Colors.white,
-                backgroundColor: Colors.black,
-                onRefresh: loadPosts,
-                child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
                                 itemCount: trending.length,

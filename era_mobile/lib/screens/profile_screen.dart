@@ -724,6 +724,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _profileTab(String label, int index, Color accent) {
+    final isSelected = selectedTab == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => selectedTab = index),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: isSelected ? accent : Colors.transparent,
+                width: 1.5,
+              ),
+            ),
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: isSelected ? accent : Colors.white24,
+              fontSize: 11,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              letterSpacing: 1,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _menuItem(IconData icon, String label, Color color, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,

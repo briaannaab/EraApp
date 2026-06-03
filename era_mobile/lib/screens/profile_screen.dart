@@ -150,7 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               setState(() => customAccentColor = picked);
               Navigator.pop(context);
               await http.post(
-                Uri.parse('\$baseUrl/users/\${AuthService.userId ?? 1}/aura'),
+                Uri.parse('$baseUrl/users/${AuthService.userId ?? 1}/aura'),
                 headers: {'Content-Type': 'application/json'},
                 body: jsonEncode({'theme': selectedTheme, 'color': picked.value.toRadixString(16)}),
               );
@@ -564,7 +564,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           customAccentColor = null;
                                         });
                                         await http.post(
-                                          Uri.parse('\$baseUrl/users/\${AuthService.userId ?? 1}/aura'),
+                                          Uri.parse('$baseUrl/users/${AuthService.userId ?? 1}/aura'),
                                           headers: {'Content-Type': 'application/json'},
                                           body: jsonEncode({'theme': theme, 'color': null}),
                                         );

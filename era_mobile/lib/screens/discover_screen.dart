@@ -2,10 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../services/api_service.dart';
+import 'post_detail_screen.dart';
 import 'profile_screen.dart';
 import 'vibe_screen.dart';
-
-const String baseUrl = 'https://eraapp-production.up.railway.app';
 
 class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen({super.key});

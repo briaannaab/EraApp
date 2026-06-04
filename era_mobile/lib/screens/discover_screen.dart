@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../services/api_service.dart';
@@ -12,23 +13,48 @@ class DiscoverScreen extends StatefulWidget {
   State<DiscoverScreen> createState() => _DiscoverScreenState();
 }
 
-class _DiscoverScreenState extends State<DiscoverScreen> {
+class _DiscoverScreenState extends State<DiscoverScreen>
+    with SingleTickerProviderStateMixin {
   final searchController = TextEditingController();
-  List<dynamic> creators = [];
   List<dynamic> allPosts = [];
+  List<dynamic> filteredPosts = [];
+  List<dynamic> creators = [];
+  List<dynamic> filteredUsers = [];
   bool loading = true;
-  int selectedTab = 0;
+  bool isSearching = false;
+  String selectedVibe = 'all';
 
   final List<Map<String, dynamic>> vibes = [
-    {'label': 'Peaceful', 'emoji': '🌊', 'color': const Color(0xFF1A3A4A)},
-    {'label': 'Healing', 'emoji': '🌿', 'color': const Color(0xFF1A2A1A)},
-    {'label': 'Inspired', 'emoji': '🔥', 'color': const Color(0xFF2A1A0A)},
-    {'label': 'Energized', 'emoji': '⚡', 'color': const Color(0xFF3A1A1A)},
-    {'label': 'Quiet', 'emoji': '🌙', 'color': const Color(0xFF1A1A3A)},
-    {'label': 'Safe', 'emoji': '🏠', 'color': const Color(0xFF2A1A3A)},
-    {'label': 'Grounded', 'emoji': '✨', 'color': const Color(0xFF2A2A1A)},
-    {'label': 'Unbothered', 'emoji': '🖤', 'color': const Color(0xFF1A1A1A)},
+    {'label': 'All', 'emoji': '✦', 'color': Colors.transparent, 'tint': const Color(0xFF000000)},
+    {'label': 'Peaceful', 'emoji': '🌊', 'color': const Color(0xFF1A3A4A), 'tint': const Color(0xFF00101A)},
+    {'label': 'Healing', 'emoji': '🌿', 'color': const Color(0xFF1A2A1A), 'tint': const Color(0xFF001A00)},
+    {'label': 'Inspired', 'emoji': '🔥', 'color': const Color(0xFF2A1A0A), 'tint': const Color(0xFF1A0A00)},
+    {'label': 'Energized', 'emoji': '⚡', 'color': const Color(0xFF3A1A1A), 'tint': const Color(0xFF1A0000)},
+    {'label': 'Quiet', 'emoji': '🌙', 'color': const Color(0xFF1A1A3A), 'tint': const Color(0xFF00001A)},
+    {'label': 'Safe', 'emoji': '🏠', 'color': const Color(0xFF2A1A3A), 'tint': const Color(0xFF0A001A)},
+    {'label': 'Grounded', 'emoji': '✨', 'color': const Color(0xFF2A2A1A), 'tint': const Color(0xFF0A0A00)},
+    {'label': 'Unbothered', 'emoji': '🖤', 'color': const Color(0xFF1A1A1A), 'tint': const Color(0xFF000000)},
   ];
+
+  Color get currentTint {
+    final vibe = vibes.firstWhere(
+        (v) => v['label'].toString().toLowerCase() == selectedVibe,
+        orElse: () => vibes[0]);
+    return vibe['tint'] as Color;
+  }
+
+  Color get currentVibeColor {
+    final vibe = vibes.firstWhere(
+        (v) => v['label'].toString().toLowerCase() == selectedVibe,
+        orElse: () => vibes[0]);
+    return vibe['color'] as Color;
+  }
+
+  List<dynamic> get displayPosts {
+    if (selectedVibe == 'all') return allPosts;
+    return allPosts.where((p) =>
+        (p['vibe'] ?? '').toString().toLowerCase() == selectedVibe).toList();
+  }
 
   @override
   void initState() {
@@ -48,6 +74,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       if (mounted) {
         setState(() {
           allPosts = posts;
+          filteredPosts = posts;
           creators = users;
           loading = false;
         });
@@ -57,79 +84,185 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     }
   }
 
+  void search(String query) {
+    setState(() {
+      isSearching = query.isNotEmpty;
+      if (query.isEmpty) {
+        filteredPosts = allPosts;
+        filteredUsers = [];
+      } else {
+        filteredPosts = allPosts.where((post) {
+          final content = (post['content'] ?? '').toLowerCase();
+          final username = (post['username'] ?? '').toLowerCase();
+          return content.contains(query.toLowerCase()) ||
+              username.contains(query.toLowerCase());
+        }).toList();
+        filteredUsers = creators.where((user) {
+          final username = (user['username'] ?? '').toLowerCase();
+          return username.contains(query.toLowerCase());
+        }).toList();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-              child: const Text('discover.',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -1)),
-            ),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onHorizontalDragEnd: (details) {
+        if (details.primaryVelocity! > 200) Navigator.pop(context);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 600),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [currentTint, Colors.black],
+            stops: const [0.0, 0.4],
+          ),
+        ),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('discover.',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 26,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -1)),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() => isSearching = !isSearching);
+                          if (!isSearching) {
+                            searchController.clear();
+                            filteredUsers = [];
+                            filteredPosts = allPosts;
+                          }
+                        },
+                        child: Icon(
+                          isSearching ? Icons.close : Icons.search,
+                          color: Colors.white38,
+                          size: 22,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
-            // Tabs
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  _tab('People', 0),
-                  _tab('Vibes', 1),
-                  _tab('Posts', 2),
+                // Search field
+                if (isSearching) ...[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                    child: TextField(
+                      controller: searchController,
+                      onChanged: search,
+                      autofocus: true,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'search people, vibes, topics...',
+                        hintStyle: const TextStyle(color: Colors.white24),
+                        prefixIcon: const Icon(Icons.search, color: Colors.white24),
+                        filled: true,
+                        fillColor: const Color(0xFF0F0F0F),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                ] else ...[
+                  // Vibe filter row
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 34,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: vibes.length,
+                      itemBuilder: (context, index) {
+                        final vibe = vibes[index];
+                        final label = vibe['label'].toString();
+                        final isActive = selectedVibe == label.toLowerCase();
+                        final vibeColor = vibe['color'] as Color;
+                        return GestureDetector(
+                          onTap: () => setState(
+                              () => selectedVibe = label.toLowerCase()),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            margin: const EdgeInsets.only(right: 8),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 7),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: isActive
+                                    ? (vibeColor == Colors.transparent
+                                        ? Colors.white
+                                        : vibeColor.withOpacity(0.8))
+                                    : Colors.white.withOpacity(0.1),
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                              color: isActive
+                                  ? vibeColor.withOpacity(0.2)
+                                  : Colors.transparent,
+                            ),
+                            child: Text(
+                              '${vibe['emoji']} $label',
+                              style: TextStyle(
+                                color: isActive ? Colors.white : Colors.white38,
+                                fontSize: 11,
+                                fontWeight: isActive
+                                    ? FontWeight.w700
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  // Post count
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                    child: Text(
+                      selectedVibe == 'all'
+                          ? '${allPosts.length} posts · ${creators.length} people in your orbit'
+                          : '${displayPosts.length} ${selectedVibe} posts',
+                      style: TextStyle(
+                        color: selectedVibe == 'all'
+                            ? Colors.white24
+                            : currentVibeColor.withOpacity(0.5),
+                        fontSize: 10,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
                 ],
-              ),
-            ),
 
-            Container(height: 1, color: const Color(0xFF111111)),
+                const SizedBox(height: 8),
 
-            // Content
-            Expanded(
-              child: loading
-                  ? const Center(
-                      child: CircularProgressIndicator(color: Colors.white))
-                  : selectedTab == 0
-                      ? _peopleTab()
-                      : selectedTab == 1
-                          ? _vibesTab()
-                          : _postsTab(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _tab(String label, int index) {
-    final isActive = selectedTab == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => selectedTab = index),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: isActive ? Colors.white : Colors.transparent,
-                width: 1.5,
-              ),
-            ),
-          ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isActive ? Colors.white : Colors.white24,
-              fontSize: 11,
-              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-              letterSpacing: 1,
+                // Content
+                Expanded(
+                  child: loading
+                      ? const Center(
+                          child: CircularProgressIndicator(color: Colors.white))
+                      : isSearching
+                          ? _searchResults()
+                          : _moodBoard(),
+                ),
+              ],
             ),
           ),
         ),
@@ -137,42 +270,254 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     );
   }
 
-  Widget _peopleTab() {
+  Widget _moodBoard() {
+    final posts = displayPosts;
+    return Column(
+      children: [
+        Expanded(
+          child: posts.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.auto_awesome,
+                          color: Colors.white12, size: 40),
+                      const SizedBox(height: 12),
+                      Text(
+                        selectedVibe == 'all'
+                            ? 'No posts yet'
+                            : 'No $selectedVibe posts yet',
+                        style: const TextStyle(
+                            color: Colors.white24, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                )
+              : _buildMasonryGrid(posts),
+        ),
+
+        // People orbit strip
+        if (creators.isNotEmpty && !isSearching)
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+            decoration: const BoxDecoration(
+              border: Border(top: BorderSide(color: Color(0xFF0A0A0A))),
+            ),
+            child: Row(
+              children: [
+                ...creators.take(5).map((creator) {
+                  final username = creator['username'] ?? '?';
+                  return GestureDetector(
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                ProfileScreen(username: username))),
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      margin: const EdgeInsets.only(right: 4),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFF1A1A1A),
+                        border: Border.all(color: Colors.black, width: 2),
+                      ),
+                      child: Center(
+                        child: Text(
+                          username.isNotEmpty
+                              ? username[0].toUpperCase()
+                              : '?',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+                const SizedBox(width: 8),
+                Text(
+                  selectedVibe == 'all'
+                      ? 'in your orbit'
+                      : '$selectedVibe together',
+                  style: TextStyle(
+                    color: selectedVibe == 'all'
+                        ? Colors.white24
+                        : currentVibeColor.withOpacity(0.4),
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildMasonryGrid(List<dynamic> posts) {
+    final random = Random(42);
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: posts.take(12).toList().asMap().entries.map((entry) {
+          final index = entry.key;
+          final post = entry.value;
+          // Vary card sizes
+          final sizes = [
+            const Size(150, 180),
+            const Size(110, 110),
+            const Size(110, 150),
+            const Size(150, 110),
+            const Size(230, 80),
+            const Size(110, 90),
+          ];
+          final size = sizes[index % sizes.length];
+          return _moodCard(post, size);
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _moodCard(Map<String, dynamic> post, Size size) {
+    final username = post['username'] ?? '?';
+    final vibe = post['vibe'];
+    final vibeData = vibe != null
+        ? vibes.firstWhere(
+            (v) => v['label'].toString().toLowerCase() == vibe.toString(),
+            orElse: () => vibes[0])
+        : null;
+    final cardColor = vibeData != null && vibeData['color'] != Colors.transparent
+        ? (vibeData['color'] as Color).withOpacity(0.3)
+        : const Color(0xFF0D0D0D);
+
+    return GestureDetector(
+      onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ProfileScreen(username: username))),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 400),
+        width: size.width,
+        height: size.height,
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white.withOpacity(0.04)),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Media
+              if (post['media_url'] != null)
+                Image.network(
+                  post['media_url'],
+                  fit: BoxFit.cover,
+                  errorBuilder: (c, e, s) => Container(color: cardColor),
+                ),
+
+              // Gradient
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.8),
+                    ],
+                    stops: const [0.3, 1.0],
+                  ),
+                ),
+              ),
+
+              // Content
+              Positioned(
+                bottom: 8,
+                left: 10,
+                right: 10,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('@$username',
+                        style: TextStyle(
+                            color: vibeData != null
+                                ? (vibeData['color'] as Color).withOpacity(0.8)
+                                : Colors.white38,
+                            fontSize: 8,
+                            fontWeight: FontWeight.w700)),
+                    if (post['content'] != null &&
+                        post['content'].toString().isNotEmpty)
+                      Text(
+                        post['content'],
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            height: 1.3),
+                      ),
+                    if (vibe != null)
+                      Container(
+                        margin: const EdgeInsets.only(top: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: vibeData != null
+                              ? (vibeData['color'] as Color).withOpacity(0.2)
+                              : Colors.white.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '${vibeData?['emoji'] ?? '✦'} $vibe',
+                          style: TextStyle(
+                              color: vibeData != null
+                                  ? (vibeData['color'] as Color)
+                                  : Colors.white38,
+                              fontSize: 7),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _searchResults() {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        if (creators.isEmpty)
-          const Center(
-            child: Padding(
-              padding: EdgeInsets.all(40),
-              child: Text('No users yet',
-                  style: TextStyle(color: Colors.white38)),
-            ),
-          )
-        else
-          ...creators.take(20).map((creator) {
-            final username = (creator['username'] ?? 'unknown') as String;
+        if (filteredUsers.isNotEmpty) ...[
+          const Text('PEOPLE',
+              style: TextStyle(
+                  color: Colors.white24, fontSize: 9, letterSpacing: 2)),
+          const SizedBox(height: 12),
+          ...filteredUsers.map((user) {
+            final username = user['username'] ?? 'unknown';
             return GestureDetector(
               onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
                           ProfileScreen(username: username))),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: const BoxDecoration(
-                    border: Border(
-                        bottom:
-                            BorderSide(color: Color(0xFF0A0A0A)))),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Row(
                   children: [
                     CircleAvatar(
                       radius: 20,
                       backgroundColor: const Color(0xFF1A1A1A),
                       child: Text(
-                        username.isNotEmpty
-                            ? username[0].toUpperCase()
-                            : '?',
+                        username.isNotEmpty ? username[0].toUpperCase() : '?',
                         style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold),
@@ -186,12 +531,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                           Text('@$username',
                               style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 13,
                                   fontWeight: FontWeight.w600)),
-                          Text(creator['bio'] ?? 'Era member',
+                          Text(user['bio'] ?? '',
                               style: const TextStyle(
-                                  color: Colors.white38,
-                                  fontSize: 11),
+                                  color: Colors.white38, fontSize: 12),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis),
                         ],
@@ -201,13 +544,11 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 14, vertical: 6),
                       decoration: BoxDecoration(
-                        border: Border.all(
-                            color: Colors.white.withOpacity(0.2)),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Text('Follow',
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20)),
+                      child: const Text('View',
                           style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 11,
                               fontWeight: FontWeight.w600)),
                     ),
@@ -216,94 +557,65 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
               ),
             );
           }),
-        const SizedBox(height: 80),
-      ],
-    );
-  }
-
-  Widget _vibesTab() {
-    return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        childAspectRatio: 1.6,
-      ),
-      itemCount: vibes.length,
-      itemBuilder: (context, index) {
-        final vibe = vibes[index];
-        return GestureDetector(
-          onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => VibeScreen(
-                      vibe: vibe['label']
-                          .toString()
-                          .toLowerCase()))),
-          child: Container(
-            decoration: BoxDecoration(
-              color: vibe['color'] as Color,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(vibe['emoji'] as String,
-                    style: const TextStyle(fontSize: 20)),
-                const SizedBox(height: 4),
-                Text(vibe['label'] as String,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700)),
-              ],
+          const SizedBox(height: 20),
+        ],
+        if (filteredPosts.isNotEmpty) ...[
+          const Text('POSTS',
+              style: TextStyle(
+                  color: Colors.white24, fontSize: 9, letterSpacing: 2)),
+          const SizedBox(height: 12),
+          ...filteredPosts.map((post) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 18,
+                      backgroundColor: const Color(0xFF1A1A1A),
+                      child: Text(
+                        (post['username'] ?? '?')[0].toUpperCase(),
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('@${post['username']}',
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13)),
+                          Text(post['content'] ?? '',
+                              style: const TextStyle(
+                                  color: Colors.white38, fontSize: 12),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+        ],
+        if (filteredUsers.isEmpty && filteredPosts.isEmpty)
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40),
+              child: Column(
+                children: [
+                  Icon(Icons.search_off, color: Colors.white12, size: 48),
+                  SizedBox(height: 12),
+                  Text('No results found',
+                      style:
+                          TextStyle(color: Colors.white24, fontSize: 15)),
+                ],
+              ),
             ),
           ),
-        );
-      },
-    );
-  }
-
-  Widget _postsTab() {
-    if (allPosts.isEmpty) {
-      return const Center(
-        child: Text('No posts yet',
-            style: TextStyle(color: Colors.white38)),
-      );
-    }
-    return GridView.builder(
-      padding: EdgeInsets.zero,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 2,
-        mainAxisSpacing: 2,
-      ),
-      itemCount: allPosts.length,
-      itemBuilder: (context, index) {
-        final post = allPosts[index];
-        return Container(
-          color: const Color(0xFF0A0A0A),
-          child: post['media_url'] != null
-              ? Image.network(post['media_url'],
-                  fit: BoxFit.cover,
-                  errorBuilder: (c, e, s) => const Center(
-                      child: Icon(Icons.image_outlined,
-                          color: Colors.white12, size: 20)))
-              : Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(6),
-                    child: Text(post['content'] ?? '',
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            color: Colors.white38, fontSize: 9)),
-                  ),
-                ),
-        );
-      },
+      ],
     );
   }
 }

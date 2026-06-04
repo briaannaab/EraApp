@@ -35,8 +35,8 @@ class _CommentsScreenState extends State<CommentsScreen> {
     if (controller.text.isEmpty) return;
     await ApiService.createComment(
       postId: widget.post['id'],
-      userId: AuthService.userId ?? 1,
-      username: AuthService.username ?? 'briaannaab',
+      userId: AuthService.userId ?? 0,
+      username: AuthService.username ?? '',
       content: controller.text,
       parentId: replyingToId,
     );

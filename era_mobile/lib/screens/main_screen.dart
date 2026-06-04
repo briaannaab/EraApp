@@ -51,7 +51,7 @@ class _MainScreenState extends State<MainScreen> {
             Navigator.push(context, _slideRoute(const DiscoverScreen(), fromRight: true));
           } else if (details.primaryVelocity! > 300) {
             // Swipe right → Profile
-            Navigator.push(context, _slideRoute(ProfileScreen(username: AuthService.username ?? 'briaannaab'), fromRight: false));
+            Navigator.push(context, _slideRoute(ProfileScreen(username: AuthService.username ?? ''), fromRight: false));
           }
         },
         child: IndexedStack(
@@ -67,7 +67,7 @@ class _MainScreenState extends State<MainScreen> {
         onTap: (index) => setState(() => _currentIndex = index),
         onCreate: () => _showCreateMenu(context),
         onDiscover: () => Navigator.push(context, _slideRoute(const DiscoverScreen(), fromRight: true)),
-        onProfile: () => Navigator.push(context, _slideRoute(ProfileScreen(username: AuthService.username ?? 'briaannaab'), fromRight: false)),
+        onProfile: () => Navigator.push(context, _slideRoute(ProfileScreen(username: AuthService.username ?? ''), fromRight: false)),
       ),
     );
   }
@@ -356,7 +356,7 @@ class _MainScreenState extends State<MainScreen> {
                     }
                     await ApiService.createPost(
                       userId: AuthService.userId ?? 1,
-                      username: AuthService.username ?? 'briaannaab',
+                      username: AuthService.username ?? '',
                       content: controller.text,
                       mediaUrl: mediaUrl,
                       vibe: selectedVibe,

@@ -414,20 +414,17 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       ),
                     ),
 
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 1.4,
-                          ),
-                          itemCount: vibes.length,
-                          itemBuilder: (context, index) {
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      sliver: SliverGrid(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 1.4,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
                             final vibe = vibes[index];
                             final vibeName = (vibe['label'] as String).toLowerCase();
                             return GestureDetector(
@@ -454,6 +451,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                               ),
                             );
                           },
+                          childCount: vibes.length,
                         ),
                       ),
                     ),

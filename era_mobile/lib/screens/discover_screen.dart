@@ -95,7 +95,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> with SingleTickerProvid
       },
       child: Scaffold(
         backgroundColor: Colors.black,
-        body: SafeArea(
+        body: Container(
+          color: Colors.black,
+          child: SafeArea(
           child: Column(
             children: [
               // Header
@@ -169,6 +171,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> with SingleTickerProvid
                 Expanded(child: _searchResults()),
               ],
             ],
+          ),
           ),
         ),
       ),

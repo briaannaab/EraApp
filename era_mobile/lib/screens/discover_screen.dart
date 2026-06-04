@@ -94,7 +94,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             : RefreshIndicator(
                 color: Colors.white,
                 backgroundColor: Colors.black,
-                onRefresh: loadPosts,
+                onRefresh: loadData,
                 child: CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(

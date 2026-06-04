@@ -81,6 +81,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onHorizontalDragEnd: (details) {
         if (details.primaryVelocity! > 200) {
           Navigator.pop(context);

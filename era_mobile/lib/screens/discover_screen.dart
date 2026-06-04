@@ -91,7 +91,11 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       body: SafeArea(
         child: loading
             ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFFFFF)))
-            : CustomScrollView(
+            : RefreshIndicator(
+                color: Colors.white,
+                backgroundColor: Colors.black,
+                onRefresh: loadPosts,
+                child: CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(
                     child: Padding(
@@ -456,6 +460,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   ],
                 ],
               ),
+            ),
         ),
       ),
     );

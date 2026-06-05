@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'auth_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'home_screen.dart';
 import 'discover_screen.dart';
@@ -51,7 +52,7 @@ class _MainScreenState extends State<MainScreen> {
             Navigator.push(context, _slideRoute(const DiscoverScreen(), fromRight: true));
           } else if (details.primaryVelocity! > 300) {
             // Swipe right → Profile
-            Navigator.push(context, _slideRoute(ProfileScreen(username: AuthService.username ?? 'guest'), fromRight: false));
+            AuthService.username != null ? Navigator.push(context, _slideRoute(ProfileScreen(username: AuthService.username!), fromRight: false)) : Navigator.push(context, _slideRoute(const AuthScreen(), fromRight: false));
           }
         },
         child: IndexedStack(
@@ -67,7 +68,7 @@ class _MainScreenState extends State<MainScreen> {
         onTap: (index) => setState(() => _currentIndex = index),
         onCreate: () => _showCreateMenu(context),
         onDiscover: () => Navigator.push(context, _slideRoute(const DiscoverScreen(), fromRight: true)),
-        onProfile: () => Navigator.push(context, _slideRoute(ProfileScreen(username: AuthService.username ?? 'guest'), fromRight: false)),
+        onProfile: () => AuthService.username != null ? Navigator.push(context, _slideRoute(ProfileScreen(username: AuthService.username!), fromRight: false)) : Navigator.push(context, _slideRoute(const AuthScreen(), fromRight: false)),
       ),
     );
   }

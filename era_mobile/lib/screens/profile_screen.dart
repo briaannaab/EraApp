@@ -116,6 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (mounted) setState(() => loading = false);
       }
     } catch (e) {
+      print('PROFILE ERROR: \$e for user: \${widget.username}');
       if (mounted) setState(() => loading = false);
     }
   }
@@ -179,6 +180,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final isOwnProfile = widget.username == currentUser;
 
     return Scaffold(
+      backgroundColor: Colors.black,
       body: loading
           ? const Center(child: CircularProgressIndicator(color: Colors.white))
           : profile == null

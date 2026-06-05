@@ -76,21 +76,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> loadSubscriptionData() async {
-    final count = await ApiService.getSubscriberCount(widget.username);
-    final earnings = await ApiService.getCreatorEarnings(widget.username);
-    final subscribed = await ApiService.checkSubscription(
-      widget.username, AuthService.userId ?? 1);
-    setState(() {
-      subscriberCount = count;
-      creatorEarnings = earnings;
-      isSubscribed = subscribed;
-    });
+    try {
+      final count = await ApiService.getSubscriberCount(widget.username);
+      final earnings = await ApiService.getCreatorEarnings(widget.username);
+      final subscribed = AuthService.userId != null
+          ? await ApiService.checkSubscription(widget.username, AuthService.userId!)
+          : false;
+      if (mounted) setState(() {
+        subscriberCount = count;
+        creatorEarnings = earnings;
+        isSubscribed = subscribed;
+      });
+    } catch (e) {
+      // Silently fail
+    }
   }
 
   Future<void> loadProfile() async {
+    try {
     final response = await http.get(
       Uri.parse('$baseUrl/users/${widget.username}/profile'),
-    );
+    ).timeout(const Duration(seconds: 10));
     if (response.statusCode == 200) {
       setState(() {
         profile = jsonDecode(response.body);

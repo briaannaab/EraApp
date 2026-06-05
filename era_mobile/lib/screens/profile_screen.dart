@@ -96,7 +96,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/users/${widget.username}/profile'),
-      ).timeout(const Duration(seconds: 10));
+      ).timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
         if (mounted) setState(() {
           profile = jsonDecode(response.body);

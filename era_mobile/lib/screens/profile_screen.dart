@@ -93,34 +93,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> loadProfile() async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/users/${widget.username}/profile'),
-      ).timeout(const Duration(seconds: 30));
-      if (response.statusCode == 200) {
-        if (mounted) setState(() {
-          profile = jsonDecode(response.body);
-          loading = false;
-          if (profile!['profile_picture_url'] != null) {
-            profileImageUrl = profile!['profile_picture_url'];
-          }
-          if (profile!['aura_theme'] != null) {
-            selectedTheme = profile!['aura_theme'];
-          }
-          if (profile!['aura_color'] != null) {
-            final hex = profile!['aura_color'] as String;
-            customAccentColor = Color(int.parse(hex, radix: 16));
-          }
-        });
-      } else {
-        if (mounted) setState(() => loading = false);
-      }
-    } catch (e) {
-      print('PROFILE ERROR: \$e for user: \${widget.username}');
-      if (mounted) setState(() => loading = false);
+    final response = await http.get(
+      Uri.parse('$baseUrl/users/${widget.username}/profile'),
+    );
+    if (response.statusCode == 200) {
+      setState(() {
+        profile = jsonDecode(response.body);
+        loading = false;
+        if (profile!['profile_picture_url'] != null) {
+          profileImageUrl = profile!['profile_picture_url'];
+        }
+        if (profile!['aura_theme'] != null) {
+          selectedTheme = profile!['aura_theme'];
+        }
+        if (profile!['aura_color'] != null) {
+          final hex = profile!['aura_color'] as String;
+          customAccentColor = Color(int.parse(hex, radix: 16));
+        }
+      });
+    } else {
+      setState(() => loading = false);
     }
   }
-  Future<void> pickProfileImage() async {
+  Future<void> pickProfileImageFuture<void> pickProfileImage() async {
     final picker = ImagePicker();
     final image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
@@ -184,7 +179,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: loading
           ? const Center(child: CircularProgressIndicator(color: Colors.white))
           : profile == null
-              ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text('User not found', style: TextStyle(color: Colors.white54)), SizedBox(height: 8), Text('user: ' + widget.username, style: TextStyle(color: Colors.white24, fontSize: 11)), GestureDetector(onTap: loadProfile, child: Padding(padding: EdgeInsets.all(16), child: Text('Retry', style: TextStyle(color: Colors.white38))))]))
+              ? const Center(child: Text('User not found', style: TextStyle(color: Colors.white54)))
               : Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(

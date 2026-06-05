@@ -21,6 +21,10 @@ class _AuthScreenState extends State<AuthScreen> {
   String? error;
 
   Future<void> submit() async {
+    if (usernameController.text.isEmpty || passwordController.text.isEmpty) {
+      setState(() => error = 'Please enter your username and password');
+      return;
+    }
     setState(() { loading = true; error = null; });
 
     final url = isLogin ? '$baseUrl/auth/login' : '$baseUrl/auth/register';

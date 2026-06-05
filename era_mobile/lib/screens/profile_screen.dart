@@ -94,7 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> loadProfile() async {
     try {
-    final response = await http.get(
+      final response = await http.get(
       Uri.parse('$baseUrl/users/${widget.username}/profile'),
     ).timeout(const Duration(seconds: 10));
     if (response.statusCode == 200) {

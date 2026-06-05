@@ -95,29 +95,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> loadProfile() async {
     try {
       final response = await http.get(
-      Uri.parse('$baseUrl/users/${widget.username}/profile'),
-    ).timeout(const Duration(seconds: 10));
-    if (response.statusCode == 200) {
-      setState(() {
-        profile = jsonDecode(response.body);
-        loading = false;
-        if (profile!['profile_picture_url'] != null) {
-          profileImageUrl = profile!['profile_picture_url'];
-        }
-        if (profile!['aura_theme'] != null) {
-          selectedTheme = profile!['aura_theme'];
-        }
-        if (profile!['aura_color'] != null) {
-          final hex = profile!['aura_color'] as String;
-          customAccentColor = Color(int.parse(hex, radix: 16));
-        }
-      });
-    }
-  }
+        Uri.parse('$baseUrl/users/${widget.username}/profile'),
+      ).timeout(const Duration(seconds: 10));
+      if (response.statusCode == 200) {
+        if (mounted) setState(() {
+          profile = jsonDecode(response.body);
+          loading = false;
+          if (profile!['profile_picture_url'] != null) {
+            profileImageUrl = profile!['profile_picture_url'];
+          }
+          if (profile!['aura_theme'] != null) {
+            selectedTheme = profile!['aura_theme'];
+          }
+          if (profile!['aura_color'] != null) {
+            final hex = profile!['aura_color'] as String;
+            customAccentColor = Color(int.parse(hex, radix: 16));
+          }
+        });
+      } else {
+        if (mounted) setState(() => loading = false);
+      }
     } catch (e) {
       if (mounted) setState(() => loading = false);
     }
-
+  }
   Future<void> pickProfileImage() async {
     final picker = ImagePicker();
     final image = await picker.pickImage(source: ImageSource.gallery);

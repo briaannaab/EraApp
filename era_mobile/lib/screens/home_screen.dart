@@ -32,11 +32,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> loadPosts() async {
     try {
       final data = await ApiService.getPosts();
-      final momentData = await ApiService.getMoments();
       setState(() {
         posts = data;
-        moments = momentData;
         loading = false;
+      });
+      // Load moments in background
+      ApiService.getMoments().then((momentData) {
+        if (mounted) setState(() => moments = momentData);
       });
     } catch (e) {
       setState(() => loading = false);

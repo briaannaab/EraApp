@@ -114,6 +114,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
     }
   }
+    } catch (e) {
+      if (mounted) setState(() => loading = false);
+    }
 
   Future<void> pickProfileImage() async {
     final picker = ImagePicker();

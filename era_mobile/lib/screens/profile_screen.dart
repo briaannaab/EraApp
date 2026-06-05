@@ -115,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() => loading = false);
     }
   }
-  Future<void> pickProfileImageFuture<void> pickProfileImage() async {
+  Future<void> pickProfileImage() async {
     final picker = ImagePicker();
     final image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {

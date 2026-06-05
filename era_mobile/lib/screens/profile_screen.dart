@@ -184,7 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: loading
           ? const Center(child: CircularProgressIndicator(color: Colors.white))
           : profile == null
-              ? const Center(child: Text('User not found', style: TextStyle(color: Colors.white54)))
+              ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text('User not found', style: TextStyle(color: Colors.white54)), SizedBox(height: 8), Text('username: \${widget.username}', style: TextStyle(color: Colors.white24, fontSize: 11)), GestureDetector(onTap: loadProfile, child: Padding(padding: EdgeInsets.all(16), child: Text('Retry', style: TextStyle(color: Colors.white38))))]))
               : Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(

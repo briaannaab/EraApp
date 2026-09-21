@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'live_stream_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
@@ -19,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> posts = [];
   List<dynamic> moments = [];
+  List<dynamic> liveStreams = [];
   bool loading = true;
   int currentIndex = 0;
   final PageController _pageController = PageController();
@@ -35,6 +37,10 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         posts = data;
         loading = false;
+      });
+      // Load live streams in background
+      ApiService.getLiveStreams().then((liveData) {
+        if (mounted) setState(() => liveStreams = liveData);
       });
       // Load moments in background
       ApiService.getMoments().then((momentData) {

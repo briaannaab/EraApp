@@ -20,4 +20,5 @@ class User(Base):
     voice_bio_url = Column(String, nullable=True)
     profile_picture_url = Column(String, nullable=True)
     aura_theme = Column(String, default='default')
+    is_live = Column(Boolean, default=False)
     aura_color = Column(String, nullable=True)

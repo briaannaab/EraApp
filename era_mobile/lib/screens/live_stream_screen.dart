@@ -230,11 +230,12 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                     const SizedBox(height: 12),
                     _controlBtn(
                       icon: Icons.flip_camera_ios,
-                      onTap: () => _localVideo?.setCameraPosition(
-                        _localVideo!.currentOptions.params.position == CameraPosition.front
-                            ? CameraPosition.back
-                            : CameraPosition.front,
-                      ),
+                      onTap: () async {
+                        final isFront = _localVideo?.currentOptions.params.cameraPosition == CameraPosition.front;
+                        await _localVideo?.setCameraPosition(
+                          isFront ? CameraPosition.back : CameraPosition.front,
+                        );
+                      },
                     ),
                   ],
                 ),

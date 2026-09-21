@@ -227,16 +227,7 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                         setState(() => _cameraOff = !_cameraOff);
                       },
                     ),
-                    const SizedBox(height: 12),
-                    _controlBtn(
-                      icon: Icons.flip_camera_ios,
-                      onTap: () async {
-                        final isFront = _localVideo?.currentOptions.params.cameraPosition == CameraPosition.front;
-                        await _localVideo?.setCameraPosition(
-                          isFront ? CameraPosition.back : CameraPosition.front,
-                        );
-                      },
-                    ),
+
                   ],
                 ),
               ),
